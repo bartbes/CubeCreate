@@ -117,53 +117,29 @@ static inline float parsefloat(const char *s)
 #define VARN(name, global, min, cur, max) _VAR(name, global, min, cur, max, 0)
 #define VARNP(name, global, min, cur, max) _VAR(name, global, min, cur, max, IDF_PERSIST)
 #define VARNR(name, global, min, cur, max) _VAR(name, global, min, cur, max, IDF_OVERRIDE)
-#define VAR(name, min, cur, max) _VAR(name, name, min, cur, max, 0)
-#define VARP(name, min, cur, max) _VAR(name, name, min, cur, max, IDF_PERSIST)
-#define VARR(name, min, cur, max) _VAR(name, name, min, cur, max, IDF_OVERRIDE)
 #define _VARF(name, global, min, cur, max, body, persist)  void var_##name(); int global = variable(#name, min, cur, max, &global, var_##name, persist); void var_##name() { body; }
 #define VARFN(name, global, min, cur, max, body) _VARF(name, global, min, cur, max, body, 0)
-#define VARF(name, min, cur, max, body) _VARF(name, name, min, cur, max, body, 0)
-#define VARFP(name, min, cur, max, body) _VARF(name, name, min, cur, max, body, IDF_PERSIST)
-#define VARFR(name, min, cur, max, body) _VARF(name, name, min, cur, max, body, IDF_OVERRIDE)
 
 #define _HVAR(name, global, min, cur, max, persist)  int global = variable(#name, min, cur, max, &global, NULL, persist | IDF_HEX)
 #define HVARN(name, global, min, cur, max) _HVAR(name, global, min, cur, max, 0)
 #define HVARNP(name, global, min, cur, max) _HVAR(name, global, min, cur, max, IDF_PERSIST)
 #define HVARNR(name, global, min, cur, max) _HVAR(name, global, min, cur, max, IDF_OVERRIDE)
-#define HVAR(name, min, cur, max) _HVAR(name, name, min, cur, max, 0)
-#define HVARP(name, min, cur, max) _HVAR(name, name, min, cur, max, IDF_PERSIST)
-#define HVARR(name, min, cur, max) _HVAR(name, name, min, cur, max, IDF_OVERRIDE)
 #define _HVARF(name, global, min, cur, max, body, persist)  void var_##name(); int global = variable(#name, min, cur, max, &global, var_##name, persist | IDF_HEX); void var_##name() { body; }
 #define HVARFN(name, global, min, cur, max, body) _HVARF(name, global, min, cur, max, body, 0)
-#define HVARF(name, min, cur, max, body) _HVARF(name, name, min, cur, max, body, 0)
-#define HVARFP(name, min, cur, max, body) _HVARF(name, name, min, cur, max, body, IDF_PERSIST)
-#define HVARFR(name, min, cur, max, body) _HVARF(name, name, min, cur, max, body, IDF_OVERRIDE)
 
 #define _FVAR(name, global, min, cur, max, persist) float global = fvariable(#name, min, cur, max, &global, NULL, persist)
 #define FVARN(name, global, min, cur, max) _FVAR(name, global, min, cur, max, 0)
 #define FVARNP(name, global, min, cur, max) _FVAR(name, global, min, cur, max, IDF_PERSIST)
 #define FVARNR(name, global, min, cur, max) _FVAR(name, global, min, cur, max, IDF_OVERRIDE)
-#define FVAR(name, min, cur, max) _FVAR(name, name, min, cur, max, 0)
-#define FVARP(name, min, cur, max) _FVAR(name, name, min, cur, max, IDF_PERSIST)
-#define FVARR(name, min, cur, max) _FVAR(name, name, min, cur, max, IDF_OVERRIDE)
 #define _FVARF(name, global, min, cur, max, body, persist) void var_##name(); float global = fvariable(#name, min, cur, max, &global, var_##name, persist); void var_##name() { body; }
 #define FVARFN(name, global, min, cur, max, body) _FVARF(name, global, min, cur, max, body, 0)
-#define FVARF(name, min, cur, max, body) _FVARF(name, name, min, cur, max, body, 0)
-#define FVARFP(name, min, cur, max, body) _FVARF(name, name, min, cur, max, body, IDF_PERSIST)
-#define FVARFR(name, min, cur, max, body) _FVARF(name, name, min, cur, max, body, IDF_OVERRIDE)
 
 #define _SVAR(name, global, cur, persist) char *global = svariable(#name, cur, &global, NULL, persist)
 #define SVARN(name, global, cur) _SVAR(name, global, cur, 0)
 #define SVARNP(name, global, cur) _SVAR(name, global, cur, IDF_PERSIST)
 #define SVARNR(name, global, cur) _SVAR(name, global, cur, IDF_OVERRIDE)
-#define SVAR(name, cur) _SVAR(name, name, cur, 0)
-#define SVARP(name, cur) _SVAR(name, name, cur, IDF_PERSIST)
-#define SVARR(name, cur) _SVAR(name, name, cur, IDF_OVERRIDE)
 #define _SVARF(name, global, cur, body, persist) void var_##name(); char *global = svariable(#name, cur, &global, var_##name, persist); void var_##name() { body; }
 #define SVARFN(name, global, cur, body) _SVARF(name, global, cur, body, 0)
-#define SVARF(name, cur, body) _SVARF(name, name, cur, body, 0)
-#define SVARFP(name, cur, body) _SVARF(name, name, cur, body, IDF_PERSIST)
-#define SVARFR(name, cur, body) _SVARF(name, name, cur, body, IDF_OVERRIDE)
 
 // new style macros, have the body inline, and allow binds to happen anywhere, even inside class constructors, and access the surrounding class
 #define _CCOMMAND(idtype, tv, n, g, proto, b) \
@@ -183,20 +159,3 @@ static inline float parsefloat(const char *s)
 #define ICOMMANDNAME(name) _icmd_##name
 #define ICOMMAND(name, nargs, proto, b) _ICOMMAND(ICOMMANDNAME(name), name, nargs, proto, b)
  
-#define _IVAR(n, m, c, x, b, p) \
-    struct var_##n : ident \
-    { \
-        var_##n() : ident(ID_VAR, #n, m, c, x, &val.i, NULL, p) \
-        { \
-            addident(name, this); \
-        } \
-        int operator()() { return val.i; } \
-        b \
-    } n
-#define IVAR(n, m, c, x)  _IVAR(n, m, c, x, , 0)
-#define IVARF(n, m, c, x, b) _IVAR(n, m, c, x, void changed() { b; }, 0)
-#define IVARP(n, m, c, x)  _IVAR(n, m, c, x, , IDF_PERSIST)
-#define IVARR(n, m, c, x)  _IVAR(n, m, c, x, , IDF_OVERRIDE)
-#define IVARFP(n, m, c, x, b) _IVAR(n, m, c, x, void changed() { b; }, IDF_PERSIST)
-#define IVARFR(n, m, c, x, b) _IVAR(n, m, c, x, void changed() { b; }, IDF_OVERRIDE)
-

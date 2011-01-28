@@ -732,8 +732,8 @@ void do_upload()
     renderprogress(0.3, "generating map...");
     save_world(game::getclientmap());
 
-// load_world: ogzname, mname, cname: packages/base/spiral/map.ogz,base/spiral/map,(null)
-// save_world ogzname, mname, cname: packages//packages.ogz,/packages
+// load_world: ogzname, mname, cname: data/base/spiral/map.ogz,base/spiral/map,(null)
+// save_world ogzname, mname, cname: data//packages.ogz,/data
 
     // Save entities (and backup)
     renderprogress(0.4, "exporting entities...");
@@ -747,7 +747,7 @@ void do_upload()
 
     // Remember asset
     REFLECT_PYTHON( get_curr_map_asset_id );
-    std::string assetId = boost::python::extract<std::string>( get_curr_map_asset_id() );
+    const char *assetId = boost::python::extract<const char*>( get_curr_map_asset_id() );
     SETVF(last_uploaded_map_asset, assetId);
 }
 

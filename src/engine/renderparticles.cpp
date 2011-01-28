@@ -779,13 +779,13 @@ struct varenderer : partrenderer
     void render()
     {   
         if(!tex) tex = textureload(texname, texclamp);
-        if(!strcmp(texname, "<grey>packages/particles/glow.png") && parts->size != 5.1f) glDisable(GL_DEPTH_TEST); // SAUER ENHANCED - disable depth test for glow
+        if(!strcmp(texname, "<grey>data/textures/particles/glow.png") && parts->size != 5.1f) glDisable(GL_DEPTH_TEST); // SAUER ENHANCED - disable depth test for glow
         glBindTexture(GL_TEXTURE_2D, tex->id);
         glVertexPointer(3, GL_FLOAT, sizeof(partvert), &verts->pos);
         glTexCoordPointer(2, GL_FLOAT, sizeof(partvert), &verts->u);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(partvert), &verts->color);
         glDrawArrays(GL_QUADS, 0, numparts*4);
-        if(!strcmp(texname, "<grey>packages/particles/glow.png") && parts->size != 5.1f) glEnable(GL_DEPTH_TEST); // SAUER ENHANCED - enable it again
+        if(!strcmp(texname, "<grey>data/textures/particles/glow.png") && parts->size != 5.1f) glEnable(GL_DEPTH_TEST); // SAUER ENHANCED - enable it again
     }
 };
 typedef varenderer<PT_PART> quadrenderer;
@@ -831,53 +831,53 @@ struct softquadrenderer : quadrenderer
 
 static partrenderer *parts[] = 
 {
-    new quadrenderer("<grey>packages/particles/blood.png", PT_PART|PT_FLIP|PT_MOD|PT_RND4, DECAL_BLOOD), // blood spats (note: rgb is inverted) 
-    new trailrenderer("packages/particles/base.png", PT_TRAIL|PT_LERP),                            // water, entity
-    new quadrenderer("<grey>packages/particles/smoke.png", PT_PART|PT_FLIP|PT_LERP),                     // smoke
-    new softquadrenderer("<grey>packages/particles/smoke.png", PT_PART|PT_FLIP|PT_LERP),                     // smoke // SAUER ENHANCED - soft smoke
-    new quadrenderer("<grey>packages/particles/steam.png", PT_PART|PT_FLIP),                             // steam
-    new quadrenderer("<grey>packages/particles/flames.png", PT_PART|PT_HFLIP|PT_RND4|PT_GLARE),          // flame on - no flipping please, they have orientation
-    new quadrenderer("packages/particles/ball1.png", PT_PART|PT_FEW|PT_GLARE),                     // fireball1
-    new quadrenderer("packages/particles/ball2.png", PT_PART|PT_FEW|PT_GLARE),                     // fireball2
-    new quadrenderer("packages/particles/ball3.png", PT_PART|PT_FEW|PT_GLARE),                     // fireball3
-    new taperenderer("packages/particles/flare.png", PT_TAPE|PT_GLARE),                            // streak
+    new quadrenderer("<grey>data/textures/particles/blood.png", PT_PART|PT_FLIP|PT_MOD|PT_RND4, DECAL_BLOOD), // blood spats (note: rgb is inverted) 
+    new trailrenderer("data/textures/particles/base.png", PT_TRAIL|PT_LERP),                            // water, entity
+    new quadrenderer("<grey>data/textures/particles/smoke.png", PT_PART|PT_FLIP|PT_LERP),                     // smoke
+    new softquadrenderer("<grey>data/textures/particles/smoke.png", PT_PART|PT_FLIP|PT_LERP),                     // smoke // SAUER ENHANCED - soft smoke
+    new quadrenderer("<grey>data/textures/particles/steam.png", PT_PART|PT_FLIP),                             // steam
+    new quadrenderer("<grey>data/textures/particles/flames.png", PT_PART|PT_HFLIP|PT_RND4|PT_GLARE),          // flame on - no flipping please, they have orientation
+    new quadrenderer("data/textures/particles/ball1.png", PT_PART|PT_FEW|PT_GLARE),                     // fireball1
+    new quadrenderer("data/textures/particles/ball2.png", PT_PART|PT_FEW|PT_GLARE),                     // fireball2
+    new quadrenderer("data/textures/particles/ball3.png", PT_PART|PT_FEW|PT_GLARE),                     // fireball3
+    new taperenderer("data/textures/particles/flare.png", PT_TAPE|PT_GLARE),                            // streak
     &lightnings,                                                                                   // lightning
     &fireballs,                                                                                    // explosion fireball
     &bluefireballs,                                                                                // bluish explosion fireball
-    new quadrenderer("packages/particles/spark.png", PT_PART|PT_FLIP),                    // sparks
-    new quadrenderer("packages/particles/base.png",  PT_PART|PT_FLIP|PT_GLARE),                    // edit mode entities
-    new quadrenderer("packages/particles/muzzleflash1.jpg", PT_PART|PT_FEW|PT_FLIP|PT_TRACK), // muzzle flash
-    new quadrenderer("packages/particles/muzzleflash2.jpg", PT_PART|PT_FEW|PT_FLIP|PT_TRACK), // muzzle flash
-    new quadrenderer("packages/particles/muzzleflash3.jpg", PT_PART|PT_FEW|PT_FLIP|PT_TRACK), // muzzle flash
-    new quadrenderer("packages/particles/muzzleflash4a.jpg", PT_PART|PT_FEW|PT_TRACK), // muzzle flash // SAUER ENHANCED - muzzle flash changes
-    new quadrenderer("packages/particles/muzzleflash4b.jpg", PT_PART|PT_FEW|PT_TRACK), // muzzle flash // SAUER ENHANCED - muzzle flash changes
-    new quadrenderer("packages/particles/beam.png", PT_PART|PT_FEW|PT_GLARE|PT_TRACK), // muzzle flash // SAUER ENHANCED
+    new quadrenderer("data/textures/particles/spark.png", PT_PART|PT_FLIP),                    // sparks
+    new quadrenderer("data/textures/particles/base.png",  PT_PART|PT_FLIP|PT_GLARE),                    // edit mode entities
+    new quadrenderer("data/textures/particles/muzzleflash1.jpg", PT_PART|PT_FEW|PT_FLIP|PT_TRACK), // muzzle flash
+    new quadrenderer("data/textures/particles/muzzleflash2.jpg", PT_PART|PT_FEW|PT_FLIP|PT_TRACK), // muzzle flash
+    new quadrenderer("data/textures/particles/muzzleflash3.jpg", PT_PART|PT_FEW|PT_FLIP|PT_TRACK), // muzzle flash
+    new quadrenderer("data/textures/particles/muzzleflash4a.jpg", PT_PART|PT_FEW|PT_TRACK), // muzzle flash // SAUER ENHANCED - muzzle flash changes
+    new quadrenderer("data/textures/particles/muzzleflash4b.jpg", PT_PART|PT_FEW|PT_TRACK), // muzzle flash // SAUER ENHANCED - muzzle flash changes
+    new quadrenderer("data/textures/particles/beam.png", PT_PART|PT_FEW|PT_GLARE|PT_TRACK), // muzzle flash // SAUER ENHANCED
     &texts,                                                                                        // text
     &meters,                                                                                       // meter
     &metervs,                                                                                      // meter vs.
     &flares,                                                                                       // lens flares
-    new quadrenderer("packages/particles/flame1.png", PT_PART|PT_FLIP), // SAUER ENHANCED start - add new particles
-    new quadrenderer("packages/particles/flame2.png", PT_PART|PT_FLIP),
-    new quadrenderer("packages/particles/flame3.png", PT_PART|PT_FLIP),
-    new quadrenderer("packages/particles/flame4.png", PT_PART|PT_FLIP),
-    new quadrenderer("packages/particles/snow.png", PT_PART|PT_GLARE|PT_FLIP), // snow
-    new trailrenderer("packages/particles/rain.png", PT_TRAIL|PT_LERP),
-    new trailrenderer("packages/particles/flare.png", PT_TRAIL),
-    new quadrenderer("<grey>packages/particles/glow.png", PT_PART),
-    new quadrenderer("<grey>packages/particles/glow.png", PT_PART|PT_TRACK),
-    new taperenderer("packages/particles/lightflare.png", PT_TAPE|PT_GLARE),
-    new quadrenderer("<grey>packages/particles/bubble.jpg", PT_PART|PT_GLARE),
-    new quadrenderer("packages/particles/explode.jpg", PT_PART|PT_GLARE),
-    new taperenderer("packages/particles/smoketrail.png", PT_TAPE|PT_GLARE), // SAUER ENHANCED end - add new particles
+    new quadrenderer("data/textures/particles/flame1.png", PT_PART|PT_FLIP), // SAUER ENHANCED start - add new particles
+    new quadrenderer("data/textures/particles/flame2.png", PT_PART|PT_FLIP),
+    new quadrenderer("data/textures/particles/flame3.png", PT_PART|PT_FLIP),
+    new quadrenderer("data/textures/particles/flame4.png", PT_PART|PT_FLIP),
+    new quadrenderer("data/textures/particles/snow.png", PT_PART|PT_GLARE|PT_FLIP), // snow
+    new trailrenderer("data/textures/particles/rain.png", PT_TRAIL|PT_LERP),
+    new trailrenderer("data/textures/particles/flare.png", PT_TRAIL),
+    new quadrenderer("<grey>data/textures/particles/glow.png", PT_PART),
+    new quadrenderer("<grey>data/textures/particles/glow.png", PT_PART|PT_TRACK),
+    new taperenderer("data/textures/particles/lightflare.png", PT_TAPE|PT_GLARE),
+    new quadrenderer("<grey>data/textures/particles/bubble.jpg", PT_PART|PT_GLARE),
+    new quadrenderer("data/textures/particles/explode.jpg", PT_PART|PT_GLARE),
+    new taperenderer("data/textures/particles/smoketrail.png", PT_TAPE|PT_GLARE), // SAUER ENHANCED end - add new particles
     // here come editparticles, must be ALWAYS last.
-    new quadrenderer("packages/icons/edit_light.png", PT_PART),
-    new quadrenderer("packages/icons/edit_spotlight.png", PT_PART),
-    new quadrenderer("packages/icons/edit_envmap.png", PT_PART),
-    new quadrenderer("packages/icons/edit_sound.png", PT_PART),
-    new quadrenderer("packages/icons/edit_marker.png", PT_PART),
-    new quadrenderer("packages/icons/edit_mapmodel.png", PT_PART),
-    new quadrenderer("packages/icons/edit_particles.png", PT_PART),
-    new quadrenderer("packages/icons/edit_generic.png", PT_PART)
+    new quadrenderer("data/textures/icons/edit_light.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_spotlight.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_envmap.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_sound.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_marker.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_mapmodel.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_particles.png", PT_PART),
+    new quadrenderer("data/textures/icons/edit_generic.png", PT_PART)
 };
 
 void finddepthfxranges()

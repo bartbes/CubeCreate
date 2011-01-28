@@ -8,7 +8,7 @@
 
     #include <string>
 
-    #include "engine_variables.h"
+    #include "variable_system.hpp"
     #include "engine_additions.h"
     #include "logging.h"
     #include "utility.h"

@@ -41,7 +41,7 @@ void force_quit() // INTENSITY - change quit to force_quit
     cleanup();
 
     SystemManager::quit(); // INTENSITY
-    EngineVariables::flush(); // CubeCreate
+    var::flush(); // CubeCreate
 
     EXEC_PYTHON_FILE("intensity/quit.py"); // INTENSITY
 
@@ -241,7 +241,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
     loopi(restore ? 1 : 3)
     {
         glColor3f(1, 1, 1);
-        settexture("data/background.png", 0);
+        settexture("data/textures/ui/background.png", 0);
         float bu = w*0.67f/256.0f + backgroundu, bv = h*0.67f/256.0f + backgroundv;
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(0,  0);  glVertex2f(0, 0);
@@ -252,7 +252,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
 #if 0 // INTENSITY: No background detail
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_BLEND);
-        settexture("data/background_detail.png", 0);
+        settexture("data/textures/ui/background_detail.png", 0);
         float du = w*0.8f/512.0f + detailu, dv = h*0.8f/512.0f + detailv;
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(0,  0);  glVertex2f(0, 0);
@@ -261,7 +261,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         glTexCoord2f(du, dv); glVertex2f(w, h);
         glEnd();
 #endif
-        settexture("data/background_decal.png", 3);
+        settexture("data/textures/ui/background_decal.png", 3);
         glBegin(GL_QUADS);
         loopj(numdecals)
         {
@@ -274,7 +274,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
         glEnd();
         float lh = 0.5f*min(w, h), lw = lh*2,
               lx = 0.5f*(w - lw), ly = 0.5f*(h*0.5f - lh);
-        settexture((maxtexsize ? min(maxtexsize, hwtexsize) : hwtexsize) >= 1024 && (screen->w > 1280 || screen->h > 800) ? "data/logo.png" : "data/logo.png", 3); // INTENSITY: First was suffixed '_1024', but we use a single hi-res one
+        settexture((maxtexsize ? min(maxtexsize, hwtexsize) : hwtexsize) >= 1024 && (screen->w > 1280 || screen->h > 800) ? "data/textures/ui/logo.png" : "data/textures/ui/logo.png", 3); // INTENSITY: First was suffixed '_1024', but we use a single hi-res one
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(0, 0); glVertex2f(lx,    ly);
         glTexCoord2f(1, 0); glVertex2f(lx+lw, ly);
@@ -327,7 +327,7 @@ void renderbackground(const char *caption, Texture *mapshot, const char *mapname
                 glPopMatrix();
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             }        
-            settexture("data/mapshot_frame.png", 3);
+            settexture("data/textures/ui/mapshot_frame.png", 3);
             glBegin(GL_TRIANGLE_STRIP);
             glTexCoord2f(0, 0); glVertex2f(x,    y);
             glTexCoord2f(1, 0); glVertex2f(x+sz, y);
@@ -415,7 +415,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
     glEnable(GL_BLEND); // INTENSITY: Moved to here, to cover loading_frame as well
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // INTENSITY: ditto
 
-    settexture("data/loading_frame.png", 3);
+    settexture("data/textures/ui/loading_frame.png", 3);
     glBegin(GL_TRIANGLE_STRIP);
     glTexCoord2f(fu1, fv1); glVertex2f(fx,    fy);
     glTexCoord2f(fu2, fv1); glVertex2f(fx+fw, fy);
@@ -432,7 +432,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
           ex = bx+sw + max(mw*bar, fw*7/511.0f);
     if(bar > 0)
     {
-        settexture("data/loading_bar.png", 3);
+        settexture("data/textures/ui/loading_bar.png", 3);
         glBegin(GL_QUADS);
         glTexCoord2f(su1, bv1); glVertex2f(bx,    by);
         glTexCoord2f(su2, bv1); glVertex2f(bx+sw, by);
@@ -469,7 +469,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
               mw = bw - sw - ew,
               ex = bx+sw + max(mw*width, fw*7/511.0f);
 
-        settexture("data/loading_bar.png", 3);
+        settexture("data/textures/ui/loading_bar.png", 3);
         glBegin(GL_QUADS);
         glTexCoord2f(su1, bv1); glVertex2f(bx,    by);
         glTexCoord2f(su2, bv1); glVertex2f(bx+sw, by);
@@ -516,7 +516,7 @@ void renderprogress(float bar, const char *text, GLuint tex, bool background)   
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        settexture("data/mapshot_frame.png", 3);
+        settexture("data/textures/ui/mapshot_frame.png", 3);
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2f(0, 0); glVertex2f(x,    y);
         glTexCoord2f(1, 0); glVertex2f(x+sz, y);
@@ -782,14 +782,14 @@ void resetgl()
     extern void reloadshaders();
     inbetweenframes = false;
     if(!reloadtexture(*notexture) ||
-       !reloadtexture("data/logo.png") ||
-       !reloadtexture("data/logo_1024.png") || 
-       !reloadtexture("data/background.png") ||
-       !reloadtexture("data/background_detail.png") ||
-       !reloadtexture("data/background_decal.png") ||
-       !reloadtexture("data/mapshot_frame.png") ||
-       !reloadtexture("data/loading_frame.png") ||
-       !reloadtexture("data/loading_bar.png"))
+       !reloadtexture("data/textures/ui/logo.png") ||
+       !reloadtexture("data/textures/ui/logo_1024.png") || 
+       !reloadtexture("data/textures/ui/background.png") ||
+       !reloadtexture("data/textures/ui/background_detail.png") ||
+       !reloadtexture("data/textures/ui/background_decal.png") ||
+       !reloadtexture("data/textures/ui/mapshot_frame.png") ||
+       !reloadtexture("data/textures/ui/loading_frame.png") ||
+       !reloadtexture("data/textures/ui/loading_bar.png"))
         fatal("failed to reload core texture");
     reloadfonts();
     inbetweenframes = true;
@@ -1147,7 +1147,7 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
             }
             case 'l': 
             {
-                char pkgdir[] = "packages/"; 
+                char pkgdir[] = "data/"; 
                 load = strstr(path(&argv[i][2]), path(pkgdir)); 
                 if(load) load += sizeof(pkgdir)-1; 
                 else load = &argv[i][2]; 
@@ -1204,13 +1204,13 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
     initlog("gl");
     gl_checkextensions();
     gl_init(GETIV(scr_w), GETIV(scr_h), usedcolorbits, useddepthbits, usedfsaa);
-    notexture = textureload("packages/textures/notexture.png");
+    notexture = textureload("data/textures/core/notexture.png");
     if(!notexture) fatal("could not find core textures");
 
     initlog("console");
-    EngineVariables::persistVars = false;
-    if(!lua::engine.execf("data/stdlib.lua")) fatal("cannot find data files (you are running from the wrong directory - you must run CubeCreate from root directory)");   // this is the first file we load.
-    if(!lua::engine.execf("data/font.lua")) fatal("cannot find font definitions");
+    var::persistvars = false;
+    if(!lua::engine.execf("data/cfg/stdlib.lua")) fatal("cannot find data files (you are running from the wrong directory - you must run CubeCreate from root directory)");   // this is the first file we load.
+    if(!lua::engine.execf("data/cfg/font.lua")) fatal("cannot find font definitions");
     if(!setfont("default")) fatal("no default font specified");
 
     inbetweenframes = true;
@@ -1230,15 +1230,15 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
 
     initlog("cfg");
 
-    lua::engine.execf("data/keymap.lua");
-    lua::engine.execf("data/sounds.lua");
-    lua::engine.execf("data/stdedit.lua");
-    lua::engine.execf("data/menus.lua");
-    lua::engine.execf("data/brush.lua");
+    lua::engine.execf("data/cfg/keymap.lua");
+    lua::engine.execf("data/cfg/sounds.lua");
+    lua::engine.execf("data/cfg/stdedit.lua");
+    lua::engine.execf("data/cfg/menus.lua");
+    lua::engine.execf("data/cfg/brush.lua");
     lua::engine.execf("mybrushes.lua");
     if(game::savedservers()) lua::engine.execf(game::savedservers());
     
-    EngineVariables::persistVars = true;
+    var::persistvars = true;
     
     initing = INIT_LOAD;
     if(!config_exec_json(game::savedconfig(), false)) 
@@ -1249,11 +1249,11 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
     lua::engine.execf(game::autoexec());
     initing = NOT_INITING;
 
-    EngineVariables::persistVars = false;
+    var::persistvars = false;
 
     game::loadconfigs();
 
-    EngineVariables::persistVars = true;
+    var::persistvars = true;
 
     initlog("Intensity Engine System Initialization");
     SystemManager::init(); // INTENSITY

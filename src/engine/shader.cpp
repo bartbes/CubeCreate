@@ -53,7 +53,7 @@ void loadshaders()
 
     initshaders = true;
     standardshader = true;
-    lua::engine.execf("data/glsl.lua");
+    lua::engine.execf("data/shaders/glsl.lua");
     standardshader = false;
     initshaders = false;
     defaultshader = lookupshaderbyname("default");
@@ -1434,13 +1434,13 @@ void useshader(Shader *s)
         
     char *defer = s->defer;
     s->defer = NULL;
-    bool wasstandard = standardshader, wasforcing = forceshaders, waspersisting = EngineVariables::persistVars;
+    bool wasstandard = standardshader, wasforcing = forceshaders, waspersisting = var::persistvars;
     standardshader = s->standard;
     forceshaders = false;
-    EngineVariables::persistVars = false;
+    var::persistvars = false;
     curparams.shrink(0);
     lua::engine.exec(defer); // CubeCreate: lua
-    EngineVariables::persistVars = waspersisting;
+    var::persistvars = waspersisting;
     forceshaders = wasforcing;
     standardshader = wasstandard;
     delete[] defer;
@@ -2162,9 +2162,9 @@ void cleanupshaders()
 
 void reloadshaders()
 {
-    EngineVariables::persistVars = false;
+    var::persistvars = false;
     loadshaders();
-    EngineVariables::persistVars = true;
+    var::persistvars = true;
     if(GETIV(renderpath)==R_FIXEDFUNCTION) return;
     linkslotshaders();
     enumerate(shaders, Shader, s, 

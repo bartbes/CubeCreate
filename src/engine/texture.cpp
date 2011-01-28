@@ -830,13 +830,13 @@ static bool texturedata(ImageData &d, const char *tname, Slot::Tex *tex = NULL, 
         {
             cmds = tex->name;
             file = strrchr(tex->name, '>');
-            if(!file) { if(msg) conoutf(CON_ERROR, "could not load texture packages/%s", tex->name); return false; }
+            if(!file) { if(msg) conoutf(CON_ERROR, "could not load texture data/%s", tex->name); return false; }
             file++;
         }
         else file = tex->name;
         
         static string pname;
-        formatstring(pname)("packages/%s", file);
+        formatstring(pname)("data/%s", file);
         file = path(pname);
     }
     else if(tname[0]=='<') 
@@ -992,7 +992,7 @@ VSlot dummyvslot(&dummyslot);
 
 void texturereset(int n)
 {
-    if(!EngineVariables::overrideVars && !game::allowedittoggle()) return;
+    if(!var::overridevars && !game::allowedittoggle()) return;
     resetslotshader();
     int limit = clamp(n, 0, slots.length());
     for(int i = limit; i < slots.length(); i++) 
@@ -1006,7 +1006,7 @@ void texturereset(int n)
 
 void materialreset()
 {
-    if(!EngineVariables::overrideVars && !game::allowedittoggle()) return;
+    if(!var::overridevars && !game::allowedittoggle()) return;
     loopi(MATF_VOLUME+1) materialslots[i].reset();
 }
 
@@ -1404,7 +1404,7 @@ void autograss(char *name)
     if(slots.empty()) return;
     Slot &s = *slots.last();
     DELETEA(s.autograss);
-    s.autograss = name[0] ? newstring(makerelpath("packages", name)) : NULL;
+    s.autograss = name[0] ? newstring(makerelpath("data", name)) : NULL;
 }
 COMMAND(autograss, "s");
 
@@ -1451,7 +1451,7 @@ void texlayer(int *layer, char *name, int *mode, float *scale)
     if(slots.empty()) return;
     Slot &s = *slots.last();
     s.variants->layer = *layer < 0 ? max(slots.length()-1+*layer, 0) : *layer;
-    s.layermaskname = name[0] ? newstring(path(makerelpath("packages", name))) : NULL; 
+    s.layermaskname = name[0] ? newstring(path(makerelpath("data", name))) : NULL; 
     s.layermaskmode = *mode;
     s.layermaskscale = *scale <= 0 ? 1 : *scale;
     propagatevslot(s.variants, 1<<VSLOT_LAYER);
@@ -1593,7 +1593,7 @@ static void addname(vector<char> &key, Slot &slot, Slot::Tex &t, bool combined =
 {
     if(combined) key.add('&');
     if(prefix) { while(*prefix) key.add(*prefix++); }
-    defformatstring(tname)("packages/%s", t.name);
+    defformatstring(tname)("data/%s", t.name);
     for(const char *s = path(tname); *s; key.add(*s++));
 }
 
@@ -1987,7 +1987,7 @@ Texture *cubemapload(const char *name, bool mipit, bool msg, bool transient)
 {
     if(!hasCM) return NULL;
     string pname;
-    copystring(pname, makerelpath("packages", name));
+    copystring(pname, makerelpath("data", name));
     path(pname);
     Texture *t = NULL;
     if(!strchr(pname, '*'))
@@ -2074,7 +2074,7 @@ void initenvmaps()
 {
     if(!hasCM) return;
     clearenvmaps();
-    skyenvmap = !GETSV(skybox).empty() ? cubemapload(GETSV(skybox).c_str(), true, false, true) : NULL;
+    skyenvmap = GETSV(skybox) ? cubemapload(GETSV(skybox), true, false, true) : NULL;
     const vector<extentity *> &ents = entities::getents();
     loopv(ents)
     {
@@ -2670,8 +2670,8 @@ void screenshot(char *filename)
 {
     static string buf;
     int format = -1;
-    copystring(buf, GETSV(screenshotdir).c_str());
-    if(!GETSV(screenshotdir).empty())
+    copystring(buf, GETSV(screenshotdir));
+    if(GETSV(screenshotdir))
     {
         int len = strlen(buf);
         if(buf[len] != '/' && buf[len] != '\\' && len+1 < (int)sizeof(buf)) { buf[len] = '/'; buf[len+1] = '\0'; }

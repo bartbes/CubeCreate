@@ -8,6 +8,8 @@
 #include "openjpeg.h"
 #endif
 
+#include <set>
+
 
 // 'Background' loading system for texture slots
 
@@ -189,7 +191,7 @@ COMMAND(genopenjpeg, "ss");
 // Publics
 
 #define FIX_PATH(s) \
-    s = "packages/" + s; \
+    s = "data/" + s; \
     static string __##s; \
     copystring(__##s, s.c_str()); \
     s = path(__##s); \

@@ -1,1 +1,0 @@
-see docs/source/guide/compiling.rst

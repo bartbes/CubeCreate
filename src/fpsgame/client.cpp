@@ -490,8 +490,8 @@ namespace game
 #ifdef CLIENT
                 if(d->state!=CS_SPECTATOR)
                     particle_textcopy(d->abovehead(), text, PART_TEXT, 2000, 0x32FF64, 4.0f, -8);
-                if (!GETSV(chat_sound).empty())
-                    playsoundname(GETSV(chat_sound).c_str());
+                if (GETSV(chat_sound))
+                    playsoundname(GETSV(chat_sound));
 #endif
                 conoutf(CON_CHAT, "%s:\f0 %s", colorname(d), text);
                 break;

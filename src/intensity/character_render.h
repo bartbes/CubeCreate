@@ -17,7 +17,7 @@ struct CharacterRendering
 
 struct Attachment
 {
-    //! The model name, under packages/models
+    //! The model name, under data/models
     std::string name;
 
     //! The type of attachment, for MD3 attachments to which bone it attaches. For MD5 attachments,
@@ -40,7 +40,7 @@ class CharacterInfo
     //! The dynamic entity whose character info this is, i.e., our parent
     fpsent* data; 
 
-    //! Model name under packages/models
+    //! Model name under data/models
     char*         modelName;
 
     //! The attachments currently active for this character. From this list we generate a Sauer-

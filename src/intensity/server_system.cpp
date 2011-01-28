@@ -243,7 +243,7 @@ int main(int argc, char **argv)
     // Start the main Python script that runs it all
     EXEC_PYTHON_FILE("../../intensity_server.py");
 
-    EngineVariables::flush(); // CubeCreate: flush all variables after successful run
+    var::flush(); // CubeCreate: flush all variables after successful run
 
     return 0;
 }
@@ -288,9 +288,6 @@ void conoutf(const char *fmt, ...)
 // Stubs to avoid 'missing command' warnings on server when executing .cfg's
 void texture(const char *type, const char *name, int rot, int xoffset, int yoffset, float scale, int forcedindex) { }
 COMMAND(texture, "ssiiif");
-
-VARR(fog, 1, 2, 300000);
-VAR(thirdperson, 0, 1, 2);
 
 void setshader(char *t) { }
 COMMAND(setshader, "s");

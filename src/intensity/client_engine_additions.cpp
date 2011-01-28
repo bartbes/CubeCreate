@@ -385,8 +385,8 @@ void prepare_entity_gui()
         std::string fieldName = "entity_gui_field_" + Utility::toString(i);
         std::string labelName = "entity_gui_label_" + Utility::toString(i);
 
-        EngineVariables::get(fieldName)->set(value, true, true, true);
-        EngineVariables::get(labelName)->set(guiName, true, true, true);
+        var::get(fieldName.c_str())->s(value.c_str(), true, true, true);
+        var::get(labelName.c_str())->s(guiName.c_str(), true, true, true);
     }
 
     // Title
@@ -395,7 +395,7 @@ void prepare_entity_gui()
     engine.pop(1);
     title = Utility::toString(uniqueId) + ": " + title;
 
-    SETVF(entity_gui_title, title);
+    SETVF(entity_gui_title, title.c_str());
 
     // Create the gui
     std::string command =

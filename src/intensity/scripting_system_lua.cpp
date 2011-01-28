@@ -1,6 +1,6 @@
 /*
  * scripting_system_lua.cpp, version 1
- * Source file for Lua lua system
+ * Source file for Lua scripting system
  *
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
@@ -252,6 +252,40 @@ namespace lua
      */
 
     /*
+     * constructors, destructor
+     */
+
+    lua_Engine::lua_Engine() :
+        m_handle(NULL),
+        m_retcount(-1),
+        m_hashandle(false),
+        m_runtests(false),
+        m_rantests(false),
+        m_scriptdir("src/lua/"),
+        m_version("0.0"),
+        m_lasterror(NULL),
+        m_params(NULL) {}
+
+    lua_Engine::lua_Engine(lua_State *l) :
+        m_handle(l),
+        m_hashandle(true),
+        m_runtests(false),
+        m_rantests(false),
+        m_scriptdir(NULL),
+        m_version(NULL),
+        m_lasterror(NULL),
+        m_params(NULL) { m_retcount = gettop(); }
+
+    lua_Engine::~lua_Engine()
+    {
+        /*
+         * don't close handler when version is empty,
+         * because that means this class comes from existing handler
+         */
+        if (m_version) destroy();
+    }
+
+    /*
      * Some template specializations (prototypes, templates defined in header too)
      */
 
@@ -430,7 +464,7 @@ namespace lua
         m_params = new LE_params;
 
         // before even opening lua, register internal variables
-        EngineVariables::fill();
+        var::fill();
 
         m_handle = luaL_newstate();
         if (m_handle)
@@ -445,7 +479,7 @@ namespace lua
 
             setup_libs(); bind();
             // after setting up bindings, we can fill lua variables too :)
-            EngineVariables::fillLua();
+            var::filllua();
         }
         Logging::log(Logging::DEBUG, "Handler creation went properly.\n");
 

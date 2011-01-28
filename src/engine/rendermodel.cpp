@@ -280,7 +280,7 @@ void mapmodelcompat(int *rad, int *h, int *tex, char *name, char *shadow)
 
 void mapmodelreset(int *n) 
 { 
-    if(!EngineVariables::overrideVars && !game::allowedittoggle()) return;
+    if(!var::overridevars && !game::allowedittoggle()) return;
     mapmodels.shrink(clamp(*n, 0, mapmodels.length())); 
 }
 
@@ -326,7 +326,7 @@ model *loadmodel(const char *name, int i, bool msg)
         if(lightmapping > 1) return NULL;
         if(msg)
         {
-            defformatstring(filename)("packages/models/%s", name);
+            defformatstring(filename)("data/models/%s", name);
             renderprogress(loadprogress, filename);
         }
         loopi(NUMMODELTYPES)
@@ -929,8 +929,8 @@ void loadskin(const char *dir, const char *altdir, Texture *&skin, Texture *&mas
         } \
     }
    
-    defformatstring(mdir)("packages/models/%s", dir);
-    defformatstring(maltdir)("packages/models/%s", altdir);
+    defformatstring(mdir)("data/models/%s", dir);
+    defformatstring(maltdir)("data/models/%s", altdir);
     masks = notexture;
     tryload(skin, NULL, NULL, "skin");
     tryload(masks, "<stub>", NULL, "masks");

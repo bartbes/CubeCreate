@@ -55,11 +55,11 @@ void setmapfilenames(const char *fname, const char *cname = 0)
     string pakname, mapname, mcfgname;
     getmapfilenames(fname, cname, pakname, mapname, mcfgname);
 
-    formatstring(ogzname)("packages/%s.ogz", mapname);
-    if(GETIV(savebak)==1) formatstring(bakname)("packages/%s.BAK", mapname);
-    else formatstring(bakname)("packages/%s_%d.BAK", mapname, totalmillis);
-    formatstring(cfgname)("packages/%s/%s.cfg", pakname, mcfgname);
-    formatstring(picname)("packages/%s.jpg", mapname);
+    formatstring(ogzname)("data/%s.ogz", mapname);
+    if(GETIV(savebak)==1) formatstring(bakname)("data/%s.BAK", mapname);
+    else formatstring(bakname)("data/%s_%d.BAK", mapname, totalmillis);
+    formatstring(cfgname)("data/%s/%s.cfg", pakname, mcfgname);
+    formatstring(picname)("data/%s.jpg", mapname);
 
     path(ogzname);
     path(bakname);
@@ -74,7 +74,7 @@ void mapcfgname()
 
     string pakname, mapname, mcfgname;
     getmapfilenames(mname, NULL, pakname, mapname, mcfgname);
-    defformatstring(cfgname)("packages/%s/%s.lua", pakname, mcfgname);
+    defformatstring(cfgname)("data/%s/%s.lua", pakname, mcfgname);
     path(cfgname);
     result(cfgname);
 }
@@ -663,7 +663,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
             case ID_VAR:
             {
                 int val = f->getlil<int>();
-                if(exists && id->minval <= id->maxval) EngineVariables::get(std::string(name))->set(val, true, true, false);
+                if(exists && id->minval <= id->maxval) var::get(name)->s(val, true, true, false);
                 if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read var %s: %d", name, val);
                 break;
             }
@@ -671,7 +671,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
             case ID_FVAR:
             {
                 float val = f->getlil<float>();
-                if(exists && id->minvalf <= id->maxvalf) EngineVariables::get(std::string(name))->set(val, true, true, false);
+                if(exists && id->minvalf <= id->maxvalf) var::get(name)->s(val, true, true, false);
                 if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read fvar %s: %f", name, val);
                 break;
             }
@@ -683,7 +683,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 f->read(val, min(slen, MAXSTRLEN-1));
                 val[min(slen, MAXSTRLEN-1)] = '\0';
                 if(slen >= MAXSTRLEN) f->seek(slen - (MAXSTRLEN-1), SEEK_CUR);
-                if(exists) EngineVariables::get(std::string(name))->set(std::string(val), true, true, true);
+                if(exists) var::get(name)->s(val, true, true, false);
                 if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read svar %s: %s", name, val);
                 break;
             }
@@ -1016,13 +1016,13 @@ bool load_world(const char *mname, const char *cname)        // still supports a
 
     clearmainmenu();
 
-    EngineVariables::overrideVars = true;
+    var::overridevars = true;
     if (lua::engine.hashandle())
     {
-        lua::engine.execf("data/default_map_settings.lua");
+        lua::engine.execf("data/cfg/default_map_settings.lua");
         WorldSystem::runMapScript();
     }
-    EngineVariables::overrideVars = false;
+    var::overridevars = false;
    
 #ifdef CLIENT // INTENSITY: Stop, finish loading later when we have all the entities
     renderprogress(0, "requesting entities...");
@@ -1202,7 +1202,7 @@ void writeobj(char *name)
     {
         VSlot &vslot = lookupvslot(usedmtl[i], false);
         f->printf("newmtl slot%d\n", usedmtl[i]);
-        f->printf("map_Kd %s\n", vslot.slot->sts.empty() ? notexture->name : path(makerelpath("packages", vslot.slot->sts[0].name)));
+        f->printf("map_Kd %s\n", vslot.slot->sts.empty() ? notexture->name : path(makerelpath("data", vslot.slot->sts[0].name)));
         f->printf("\n");
     } 
     delete f;

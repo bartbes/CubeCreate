@@ -552,8 +552,8 @@ blobrenderer *blobrenderer::lastrender = NULL;
 
 static blobrenderer blobs[] = 
 {
-    blobrenderer("<grey>packages/particles/blob.png"),
-    blobrenderer("<grey>packages/particles/blob.png")
+    blobrenderer("<grey>data/textures/particles/blob.png"),
+    blobrenderer("<grey>data/textures/particles/blob.png")
 };
 
 void initblobs(int type)

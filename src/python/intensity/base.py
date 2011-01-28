@@ -105,7 +105,7 @@ def get_home_subdir():
 
 ## The subdirectory name (single name) under home
 def get_asset_subdir():
-    return 'packages'
+    return 'data'
 
 ## The directory to which the client saves assets
 def get_asset_dir():
@@ -136,15 +136,15 @@ def get_map_dir():
     return MAP_DIR
 
 
-## Returns the short path to an asset. If we get e.g. /home/X/intensityengine/packages/base/somemap.ogz,
-## then we return base/somemap.ogz, i.e., the path under /packages. This short path can then be used
+## Returns the short path to an asset. If we get e.g. /home/X/intensityengine/data/base/somemap.ogz,
+## then we return base/somemap.ogz, i.e., the path under /data. This short path can then be used
 ## to know where to play an asset on the client, under the client's home subdir.
-## A shortpath does not include '/packages'. Thus, you can concatenate a shortpath to the asset_dir
+## A shortpath does not include '/data'. Thus, you can concatenate a shortpath to the asset_dir
 ## returned in get_asset_dir to get a real path.
 def get_asset_shortpath(path):
     ret = []
     elements = path.split(os.path.sep)
-    while elements[-1] != 'packages':
+    while elements[-1] != 'data':
         ret = [elements[-1]] + ret
         elements = elements[:-1]
     return os.path.join(ret)

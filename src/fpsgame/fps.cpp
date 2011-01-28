@@ -723,7 +723,7 @@ namespace game
     const char *defaultmap() { return "login"; }
     const char *savedconfig() { return "config.json"; }
     const char *restoreconfig() { return "restore.json"; }
-    const char *defaultconfig() { return "data/defaults.lua"; }
+    const char *defaultconfig() { return "data/cfg/defaults.lua"; }
     const char *autoexec() { return "autoexec.lua"; }
     const char *savedservers() { return NULL; } //"servers.cfg"; }
 
@@ -748,7 +748,7 @@ namespace game
 
     const char *defaultcrosshair(int index)
     {
-        return "data/crosshair.png";
+        return "data/textures/hud/crosshair.png";
     }
 
     int selectcrosshair(float &r, float &g, float &b)

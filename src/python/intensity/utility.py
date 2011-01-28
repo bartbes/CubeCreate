@@ -92,23 +92,23 @@ if Global.CLIENT:
 
 def validate_relative_path(path):
     '''
-    >>> validate_relative_path('packages/models/cannon/barrel/../skin.jpg')
+    >>> validate_relative_path('data/models/cannon/barrel/../skin.jpg')
     True
     >>> validate_relative_path('skin.jpg')
     False
     >>> validate_relative_path('../skin.jpg')
     False
-    >>> validate_relative_path('packages/../skin.jpg')
+    >>> validate_relative_path('data/../skin.jpg')
     False
-    >>> validate_relative_path('packages/skin.jpg')
+    >>> validate_relative_path('data/skin.jpg')
     True
-    >>> validate_relative_path('packages//../skin.jpg')
+    >>> validate_relative_path('data//../skin.jpg')
     False
-    >>> validate_relative_path('packages//skin.jpg')
+    >>> validate_relative_path('data//skin.jpg')
     True
-    >>> validate_relative_path('packages/models/../../skin.jpg')
+    >>> validate_relative_path('data/models/../../skin.jpg')
     False
-    >>> validate_relative_path('packages/models/../skin.jpg')
+    >>> validate_relative_path('data/models/../skin.jpg')
     True
     '''
     path = path.replace('\\', '/') # Use entirely UNIX-style seps to check

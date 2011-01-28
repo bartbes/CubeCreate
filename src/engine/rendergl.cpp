@@ -1942,7 +1942,7 @@ void drawdamagescreen(int w, int h)
     glEnable(GL_TEXTURE_2D);
 
     static Texture *damagetex = NULL;
-    if(!damagetex) damagetex = textureload("packages/hud/damage.png", 3);
+    if(!damagetex) damagetex = textureload("data/textures/hud/damage.png", 3);
 
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glBindTexture(GL_TEXTURE_2D, damagetex->id);
@@ -1972,7 +1972,7 @@ void loadcrosshair(const char *name, int i)
     if(crosshairs[i] == notexture) 
     {
         name = game::defaultcrosshair(i);
-        if(!name) name = "data/crosshair.png";
+        if(!name) name = "data/textures/hud/crosshair.png";
         crosshairs[i] = textureload(name, 3, true);
     }
 }
@@ -2002,7 +2002,7 @@ void drawcrosshair(int w, int h)
     if(windowhit)
     {
         static Texture *cursor = NULL;
-        if(!cursor) cursor = textureload("data/guicursor.png", 3, true);
+        if(!cursor) cursor = textureload("data/textures/ui/guicursor.png", 3, true);
         crosshair = cursor;
         chsize = GETIV(cursorsize)*w/900.0f;
         g3d_cursorpos(cx, cy);
@@ -2015,7 +2015,7 @@ void drawcrosshair(int w, int h)
         {
             engine.getg("ApplicationManager").t_getraw("instance").t_getraw("getCrosshair");
             engine.push_index(-2).call(1, 1);
-            crosshairName = engine.get(-1, "data/crosshair.png");
+            crosshairName = engine.get(-1, "data/textures/hud/crosshair.png");
             engine.pop(3);
         }
         crosshair = textureload(crosshairName.c_str(), 3, true, false);

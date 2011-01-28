@@ -416,7 +416,7 @@ void disconnectmaster()
 
 ENetSocket connectmaster()
 {
-    if(GETSV(mastername).empty()) return ENET_SOCKET_NULL;
+    if(!GETSV(mastername)) return ENET_SOCKET_NULL;
 
     if(masteraddress.host == ENET_HOST_ANY)
     {
@@ -424,7 +424,7 @@ ENetSocket connectmaster()
         printf("looking up %s...\n", GETSV(mastername).c_str());
 #endif
         masteraddress.port = server::masterport();
-        if(!resolverwait(GETSV(mastername).c_str(), &masteraddress)) return ENET_SOCKET_NULL;
+        if(!resolverwait(GETSV(mastername), &masteraddress)) return ENET_SOCKET_NULL;
     }
     ENetSocket sock = enet_socket_create(ENET_SOCKET_TYPE_STREAM);
     if(sock != ENET_SOCKET_NULL && serveraddress.host != ENET_HOST_ANY && enet_socket_bind(sock, &serveraddress) < 0)
@@ -432,7 +432,7 @@ ENetSocket connectmaster()
         enet_socket_destroy(sock);
         sock = ENET_SOCKET_NULL;
     }
-    if(sock == ENET_SOCKET_NULL || connectwithtimeout(sock, GETSV(mastername).c_str(), masteraddress) < 0) 
+    if(sock == ENET_SOCKET_NULL || connectwithtimeout(sock, GETSV(mastername), masteraddress) < 0) 
     {
 #ifdef STANDALONE
         printf(sock==ENET_SOCKET_NULL ? "could not open socket\n" : "could not connect\n"); 
@@ -795,9 +795,9 @@ bool servererror(bool dedicated, const char *desc)
 bool setuplistenserver(bool dedicated)
 {
     ENetAddress address = { ENET_HOST_ANY, GETIV(serverport) <= 0 ? enet_uint16(server::serverport()) : enet_uint16(GETIV(serverport)) };
-    if(!GETSV(serverip).empty())
+    if(GETSV(serverip))
     {
-        if(enet_address_set_host(&address, GETSV(serverip).c_str())<0) conoutf(CON_WARN, "WARNING: server ip not resolved");
+        if(enet_address_set_host(&address, GETSV(serverip))<0) conoutf(CON_WARN, "WARNING: server ip not resolved");
         else serveraddress.host = address.host;
     }
     serverhost = enet_host_create(&address, min(maxclients + server::reserveclients(), MAXCLIENTS), server::numchannels(), 0, GETIV(serveruprate));
@@ -888,9 +888,9 @@ bool serveroption(char *opt)
     {
         case 'u': SETV(serveruprate, atoi(opt+2)); return true;
         case 'c': maxclients = atoi(opt+2); return true;
-        case 'i': SETVF(serverip, std::string(opt+2)); return true;
+        case 'i': SETVF(serverip, opt+2); return true;
         case 'j': SETVFN(serverport, atoi(opt+2)); return true; 
-        case 'm': SETVF(mastername, std::string(opt+2)); SETV(updatemaster, !GETSV(mastername).empty() ? 1 : 0); return true;
+        case 'm': SETVF(mastername, opt+2); SETV(updatemaster, GETSV(mastername) ? 1 : 0); return true;
 #ifdef STANDALONE
         case 'q': printf("Using home directory: %s\n", opt+2); sethomedir(opt+2); return true;
         case 'k': printf("Adding package directory: %s\n", opt+2); addpackagedir(opt+2); return true;

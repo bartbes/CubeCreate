@@ -33,7 +33,7 @@ def run_server(location=None, use_master=True):
 
     if location is not None and use_master:
         try:
-            location = AssetMetadata.get_by_path('packages/' + location).asset_id
+            location = AssetMetadata.get_by_path('data/' + location).asset_id
         except Exception, e:
             log(logging.ERROR, "Error in getting asset info for map %s: %s" % (location, str(e)))
 #            raise
@@ -72,7 +72,7 @@ def run_server(location=None, use_master=True):
                 def do_connect():
                     assert(not Module.server_proc.connected_to)
                     Module.server_proc.connected_to = True
-                    CModule.run_script('CV:run("connect 127.0.0.1 28787")') # XXX: hard-coded
+                    CModule.run_script('Network.connect("127.0.0.1", 28787)') # XXX: hard-coded
                 main_actionqueue.add_action(do_connect)
                 break
             else:

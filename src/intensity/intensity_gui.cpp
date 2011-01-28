@@ -33,8 +33,8 @@ void setKeyRepeat(int delay, int interval)
 
 void showCubeGuiMessage(std::string title, std::string content)
 {
-    SETVF(message_title, title);
-    SETVF(message_content, content);
+    SETVF(message_title, title.c_str());
+    SETVF(message_content, content.c_str());
     showgui("message");
 }
 
@@ -53,8 +53,8 @@ void showMessage(std::string title, std::string content, int originClientNumber)
 
 void showInputDialog(std::string title, std::string content)
 {
-    SETVF(input_title, title);
-    SETVF(input_content, content);
+    SETVF(input_title, title.c_str());
+    SETVF(input_content, content.c_str());
     SETVF(input_data, "");
     showgui("input_dialog");
 }

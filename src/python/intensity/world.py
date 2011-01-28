@@ -156,8 +156,8 @@ def set_map(activity_id, map_asset_id):
 
     if Global.SERVER:
         # Create script entities for connected clients
-        log(logging.DEBUG, "Creating scripting entities for map")
-        CModule.create_scripting_entities()
+        log(logging.DEBUG, "Creating lua entities for map")
+        CModule.create_lua_entities()
 
         auth.InstanceStatus.map_loaded = True
 
@@ -184,13 +184,13 @@ def restart_map():
 ## relative position to the current map, and we return the full path
 def get_mapfile_path(relative_path):
     # Check first in the installation packages
-    install_path = os.path.sep.join( os.path.join('packages', World.asset_info.get_zip_location(), relative_path).split('/') )
+    install_path = os.path.sep.join( os.path.join('data', World.asset_info.get_zip_location(), relative_path).split('/') )
     if os.path.exists(install_path):
         return install_path
     return os.path.join(World.asset_info.get_zip_location(AssetManager.get_full_location(World.asset_info)), relative_path)
 
 
-## Reads a file for Scripting. Must be done safely. The path is under /packages,
+## Reads a file for Scripting. Must be done safely. The path is under /data,
 ## and we ensure that no attempt is made to 'break out'
 def read_file_safely(name):
     assert(".." not in name)
@@ -208,8 +208,8 @@ def read_file_safely(name):
         f = open(path, 'r')
     except IOError:
         try:
-            install_path = os.path.join('packages', name)
-            f = open(install_path, 'r') # Look under install /packages
+            install_path = os.path.join('data', name)
+            f = open(install_path, 'r') # Look under install /data
         except IOError:
             print "Could not load file %s (%s, %s)" % (name, path, install_path)
             assert(0)
@@ -274,10 +274,10 @@ def upload_asset(asset_id, backup_postfix = None, num_backups = 0, num_backups_t
     AssetManager.upload_asset(asset_info)
 
 
-## @param location e.g. textures/mypack.tar.gz. No need for 'packages/'.
+## @param location e.g. textures/mypack.tar.gz. No need for 'data/'.
 def upload_asset_by_location(location):
     try:
-        upload_asset(AssetMetadata.get_by_path('packages/' +location).asset_id)
+        upload_asset(AssetMetadata.get_by_path('data/' +location).asset_id)
         print "Asset %s uploaded successfully" % location
     except Exception, e:
         CModule.show_message("Error", "Could not upload the asset to the asset server: " + str(e))

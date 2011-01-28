@@ -176,11 +176,11 @@ struct obj : vertmodel
         mdl.model = this;
         mdl.index = 0;
         const char *pname = parentdir(loadname);
-        defformatstring(name1)("packages/models/%s/tris.obj", loadname);
+        defformatstring(name1)("data/models/%s/tris.obj", loadname);
         mdl.meshes = sharemeshes(path(name1), 2.0);
         if(!mdl.meshes)
         {
-            defformatstring(name2)("packages/models/%s/tris.obj", pname);    // try obj in parent folder (vert sharing)
+            defformatstring(name2)("data/models/%s/tris.obj", pname);    // try obj in parent folder (vert sharing)
             mdl.meshes = sharemeshes(path(name2), 2.0);
             if(!mdl.meshes) return false;
         }
@@ -194,20 +194,20 @@ struct obj : vertmodel
     bool load()
     { 
         if(loaded) return true;
-        formatstring(objdir)("packages/models/%s", loadname);
-        defformatstring(cfgname)("packages/models/%s/obj.lua", loadname); // INTENSITY
+        formatstring(objdir)("data/models/%s", loadname);
+        defformatstring(cfgname)("data/models/%s/obj.lua", loadname); // INTENSITY
 
         loadingobj = this;
-        EngineVariables::persistVars = false;
+        var::persistvars = false;
         if(lua::engine.execf(path(cfgname)) && parts.length()) // INTENSITY configured obj, will call the obj* commands below
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             loadingobj = NULL;
             loopv(parts) if(!parts[i]->meshes) return false;
         }
         else // obj without configuration, try default tris and skin
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             loadingobj = NULL;
             if(!loaddefaultparts()) return false;
         }

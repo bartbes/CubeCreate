@@ -539,7 +539,7 @@ void retrieveservers(vector<char> &data)
     ENetSocket sock = connectmaster();
     if(sock == ENET_SOCKET_NULL) return;
 
-    defformatstring(text)("retrieving servers from %s... (esc to abort)", GETSV(mastername).c_str());
+    defformatstring(text)("retrieving servers from %s... (esc to abort)", GETSV(mastername));
     renderprogress(0, text);
 
     int starttime = SDL_GetTicks(), timeout = 0;

@@ -424,12 +424,12 @@ struct md5 : skelmodel
         const char *fname = loadname + strlen(loadname);
         do --fname; while(fname >= loadname && *fname!='/' && *fname!='\\');
         fname++;
-        defformatstring(meshname)("packages/models/%s/%s.md5mesh", loadname, fname);
+        defformatstring(meshname)("data/models/%s/%s.md5mesh", loadname, fname);
         mdl.meshes = sharemeshes(path(meshname), NULL, 2.0);
         if(!mdl.meshes) return false;
         mdl.initanimparts();
         mdl.initskins();
-        defformatstring(animname)("packages/models/%s/%s.md5anim", loadname, fname);
+        defformatstring(animname)("data/models/%s/%s.md5anim", loadname, fname);
         ((md5meshgroup *)mdl.meshes)->loadmd5anim(path(animname));
         return true;
     }
@@ -437,20 +437,20 @@ struct md5 : skelmodel
     bool load()
     {
         if(loaded) return true;
-        formatstring(md5dir)("packages/models/%s", loadname);
-        defformatstring(cfgname)("packages/models/%s/md5.lua", loadname); // INTENSITY
+        formatstring(md5dir)("data/models/%s", loadname);
+        defformatstring(cfgname)("data/models/%s/md5.lua", loadname); // INTENSITY
 
         loadingmd5 = this;
-        EngineVariables::persistVars = false;
+        var::persistvars = false;
         if(lua::engine.execf(path(cfgname)) && parts.length()) // INTENSITY: execfile(cfgname, false) && parts.length()) // configured md5, will call the md5* commands below
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             loadingmd5 = NULL;
             loopv(parts) if(!parts[i]->meshes) return false;
         }
         else // md5 without configuration, try default tris and skin 
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             if(!loaddefaultparts()) 
             {
                 loadingmd5 = NULL;
@@ -474,7 +474,7 @@ struct md5 : skelmodel
 void setmd5dir(char *name)
 {
     if(!loadingmd5) { conoutf("not loading an md5"); return; }
-    formatstring(md5dir)("packages/models/%s", name);
+    formatstring(md5dir)("data/models/%s", name);
 }
     
 void md5load(char *meshfile, char *skelname, float *smooth)

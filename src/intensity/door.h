@@ -84,7 +84,7 @@ struct DoorManager
     //! to inside the .cfg, because the .cfg has not yet been loaded fully.
     static inline bool isDoor(const char *filename)
     {
-        #define DOOR_FULL_HEADER  "packages/models/doors"
+        #define DOOR_FULL_HEADER  "data/models/doors"
         #define DOOR_SHORT_HEADER "doors/"
         return ( strncmp(filename, DOOR_FULL_HEADER,  strlen(DOOR_FULL_HEADER))  == 0  ||
                  strncmp(filename, DOOR_SHORT_HEADER, strlen(DOOR_SHORT_HEADER)) == 0 );

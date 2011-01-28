@@ -31,7 +31,7 @@ void do_login(char *username, char *password)
     if (success) {
         // Save password
         _password = boost::python::extract<std::string>(ret[1]);
-        SETVF(hashed_password, _password);
+        SETVF(hashed_password, _password.c_str());
 
         // Mark as logged in, and continue
         SETVF(logged_into_master, 1);

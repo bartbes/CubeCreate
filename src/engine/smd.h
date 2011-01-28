@@ -442,7 +442,7 @@ struct smd : skelmodel
         const char *fname = loadname + strlen(loadname);
         do --fname; while(fname >= loadname && *fname!='/' && *fname!='\\');
         fname++;
-        defformatstring(meshname)("packages/models/%s/%s.smd", loadname, fname);
+        defformatstring(meshname)("data/models/%s/%s.smd", loadname, fname);
         mdl.meshes = sharemeshes(path(meshname), NULL);
         if(!mdl.meshes) return false;
         mdl.initanimparts();
@@ -453,20 +453,20 @@ struct smd : skelmodel
     bool load()
     {
         if(loaded) return true;
-        formatstring(smddir)("packages/models/%s", loadname);
-        defformatstring(cfgname)("packages/models/%s/smd.lua", loadname); // INTENSITY
+        formatstring(smddir)("data/models/%s", loadname);
+        defformatstring(cfgname)("data/models/%s/smd.lua", loadname); // INTENSITY
 
         loadingsmd = this;
-        EngineVariables::persistVars = false;
+        var::persistvars = false;
         if(lua::engine.execf(path(cfgname)) && parts.length()) // INTENSITY: execfile(cfgname, false) && parts.length()) // configured smd, will call the smd* commands below
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             loadingsmd = NULL;
             loopv(parts) if(!parts[i]->meshes) return false;
         }
         else // smd without configuration, try default tris and skin 
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             if(!loaddefaultparts()) 
             {
                 loadingsmd = NULL;
@@ -502,7 +502,7 @@ static inline bool htcmp(const smd::smdmeshgroup::smdvertkey &k, int index)
 void setsmddir(char *name)
 {
     if(!loadingsmd) { conoutf("not loading an smd"); return; }
-    formatstring(smddir)("packages/models/%s", name);
+    formatstring(smddir)("data/models/%s", name);
 }
     
 void smdload(char *meshfile, char *skelname)

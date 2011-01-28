@@ -28,7 +28,7 @@ class Browser:
         self.texture = texture
         self.url = url
         self.webview = None
-        self.width = int(texture.split('/')[3]) # Assuming here that the texture is slt: packages/models/videoscreen/1024/...
+        self.width = int(texture.split('/')[3]) # Assuming here that the texture is slt: data/models/videoscreen/1024/...
         self.height = int(self.width*0.75) # Assuming here 4/3 aspect ratio
         self.image = QImage(self.width, self.height, QImage.Format_RGB888)
         self.bits = int(self.image.bits())

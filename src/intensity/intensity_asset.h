@@ -18,11 +18,11 @@ public:
     IntensityAssetManager(AssetType _assetType) : AssetManager(_assetType) { };
 
     //! The shortpath is assumed to contain the path underneath the base asset path
-    //!< (which is "/packages" currently). We append the shortpath
+    //!< (which is "/data" currently). We append the shortpath
     //!< to the base asset path (which can differ on client and server).
     virtual std::string getLocalAssetPath(const AssetId& id);
 
-    //! On the server, we directly access files under /packages, no need to register
+    //! On the server, we directly access files under /data, no need to register
     virtual const AssetInfo getAssetInfo(const AssetId& id);
 };
 

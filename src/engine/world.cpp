@@ -1186,9 +1186,9 @@ bool emptymap(int scale, bool force, const char *mname, bool usecfg)    // main 
 
     if (usecfg)
     {
-        EngineVariables::overrideVars = true;
-        lua::engine.execf("data/default_map_settings.lua");
-        EngineVariables::overrideVars = false;
+        var::overridevars = true;
+        lua::engine.execf("data/cfg/default_map_settings.lua");
+        var::overridevars = false;
     }
 
     clearlights();

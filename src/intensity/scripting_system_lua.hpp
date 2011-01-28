@@ -1,6 +1,6 @@
 /*
  * scripting_system_lua.hpp, version 1
- * Header file for Lua lua system
+ * Header file for Lua scripting system
  *
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
@@ -34,7 +34,7 @@
  * @mainpage Lua
  * 
  * @author q66 <quaker66@gmail.com>
- * @date 2010
+ * @date 2011
  */
 
 #include <cstdlib>
@@ -42,14 +42,14 @@
 #include <lua.hpp>
 #include <typeinfo>
 
+/**
+ * @defgroup Script_Engine_Lua_Group Scripting_Engine
+ *
+ * @{
+ */
+
 namespace lua
 {
-    /**
-     * @defgroup Script_Engine_Lua_Group lua_Engine
-     *
-     * @{
-     */
-
     class lua_Engine;
     /// A typedef for nice code when passing binding functions.
     typedef void (*lua_Binding) (lua_Engine);
@@ -599,40 +599,16 @@ namespace lua
         /**
          * Constructor for lua_Engine.
          */
-        lua_Engine() :
-            m_handle(NULL),
-            m_retcount(-1),
-            m_hashandle(false),
-            m_runtests(false),
-            m_rantests(false),
-            m_scriptdir("src/lua/"),
-            m_version("0.0"),
-            m_lasterror(NULL),
-            m_params(NULL) {}
+        lua_Engine();
         /**
          * Constructor for lua_Engine with existing state handler.
          * Useful for constructing temporary classes for use in binds.
          * @param l The state handler to create the class with.
          * @param dbg Optional parameter telling the class if to log debug messages.
          */
-        lua_Engine(lua_State *l) :
-            m_handle(l),
-            m_hashandle(true),
-            m_runtests(false),
-            m_rantests(false),
-            m_scriptdir(NULL),
-            m_version(NULL),
-            m_lasterror(NULL),
-            m_params(NULL) { m_retcount = gettop(); }
+        lua_Engine(lua_State *l);
 
-        ~lua_Engine()
-        {
-            /*
-             * don't close handler when version is empty,
-             * because that means this class comes from existing handler
-             */
-            if (m_version) destroy();
-        }
+        ~lua_Engine();
 
         /**
          * Overloaded operator for setting non-Lua engine parameters.

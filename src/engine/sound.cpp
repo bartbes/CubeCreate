@@ -180,7 +180,7 @@ void startmusic(char *name, char *cmd)
     stopmusic();
     if(GETIV(soundvol) && GETIV(musicvol) && *name)
     {
-        defformatstring(file)("packages/%s", name);
+        defformatstring(file)("data/%s", name);
         path(file);
         if(loadmusic(file))
         {
@@ -451,7 +451,7 @@ int playsound(int n, const vec *loc, extentity *ent, int loops, int fade, int ch
         string buf; \
         loopi(sizeof(exts)/sizeof(exts[0])) \
         { \
-            formatstring(buf)("packages/sounds/%s%s", slot.sample->name, exts[i]); \
+            formatstring(buf)("data/sounds/%s%s", slot.sample->name, exts[i]); \
             path(buf); \
             slot.sample->chunk = loadwav(buf); \
             if(slot.sample->chunk) break; \

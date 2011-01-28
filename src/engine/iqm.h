@@ -369,7 +369,7 @@ struct iqm : skelmodel
         const char *fname = loadname + strlen(loadname);
         do --fname; while(fname >= loadname && *fname!='/' && *fname!='\\');
         fname++;
-        defformatstring(meshname)("packages/models/%s/%s.iqm", loadname, fname);
+        defformatstring(meshname)("data/models/%s/%s.iqm", loadname, fname);
         mdl.meshes = sharemeshes(path(meshname), NULL);
         if(!mdl.meshes) return false;
         mdl.initanimparts();
@@ -380,20 +380,20 @@ struct iqm : skelmodel
     bool load()
     {
         if(loaded) return true;
-        formatstring(iqmdir)("packages/models/%s", loadname);
-        defformatstring(cfgname)("packages/models/%s/iqm.lua", loadname); // INTENSITY
+        formatstring(iqmdir)("data/models/%s", loadname);
+        defformatstring(cfgname)("data/models/%s/iqm.lua", loadname); // INTENSITY
 
         loadingiqm = this;
-        EngineVariables::persistVars = false;
+        var::persistvars = false;
         if (lua::engine.execf(path(cfgname)) && parts.length()) // INTENSITY: execfile(cfgname, false) && parts.length()) // configured iqm, will call the iqm* commands below
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             loadingiqm = NULL;
             loopv(parts) if(!parts[i]->meshes) return false;
         }
         else // iqm without configuration, try default tris and skin 
         {
-            EngineVariables::persistVars = true;
+            var::persistvars = true;
             if(!loaddefaultparts()) 
             {
                 loadingiqm = NULL;
@@ -417,7 +417,7 @@ struct iqm : skelmodel
 void setiqmdir(char *name)
 {
     if(!loadingiqm) { conoutf("not loading an iqm"); return; }
-    formatstring(iqmdir)("packages/models/%s", name);
+    formatstring(iqmdir)("data/models/%s", name);
 }
     
 void iqmload(char *meshfile, char *skelname)

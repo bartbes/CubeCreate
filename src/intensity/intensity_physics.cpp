@@ -15,6 +15,8 @@
     #include "server_system.h"
 #endif
 
+#include <set>
+
 namespace PhysicsManager
 {
 

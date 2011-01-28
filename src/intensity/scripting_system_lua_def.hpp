@@ -1346,23 +1346,23 @@ LUA_BIND_DEF(setVariable, {
 })
 
 LUA_BIND_DEF(syncVariableFromLua, {
-    std::string name = std::string(e.get<const char*>(1));
+    const char *name = e.get<const char*>(1);
     std::string type = std::string(e.get<const char*>(2));
     switch (type[0])
     {
         case 'I':
         {
-            EngineVariables::syncFromLua(name, e.get<int>(3));
+            var::syncfl(name, e.get<int>(3));
             break;
         }
         case 'F':
         {
-            EngineVariables::syncFromLua(name, (float)e.get<float>(3));
+            var::syncfl(name, e.get<float>(3));
             break;
         }
         case 'S':
         {
-            EngineVariables::syncFromLua(name, std::string(e.get<const char*>(3)));
+            var::syncfl(name, e.get<const char*>(3));
             break;
         }
         default: break;
@@ -1377,7 +1377,7 @@ LUA_BIND_DEF(startStopLocalServer, {
     {
         defformatstring(cmd)("intensity.components.server_runner.run_server('%s'%s)",
                              e.get<const char*>(1),
-                             !_EV_logged_into_master->getInteger() ? ", False" : ""
+                             !GETIV(logged_into_master) ? ", False" : ""
                             );
         run_python((char*)cmd);
     }

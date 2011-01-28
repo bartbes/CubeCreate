@@ -7,11 +7,11 @@ void loadsky(const char *basename, Texture *texs[6])
     loopi(6)
     {
         const char *side = cubemapsides[i].name;
-        defformatstring(name)("%s_%s.jpg", makerelpath("packages", basename), side);
+        defformatstring(name)("%s_%s.jpg", makerelpath("data", basename), side);
         if((texs[i] = textureload(name, 3, true, false))==notexture)
         {
             strcpy(name+strlen(name)-3, "png");
-            if((texs[i] = textureload(name, 3, true, false))==notexture) conoutf(CON_ERROR, "could not load sky texture packages/%s_%s", basename, side);
+            if((texs[i] = textureload(name, 3, true, false))==notexture) conoutf(CON_ERROR, "could not load sky texture data/%s_%s", basename, side);
         }
     }
 }
@@ -20,12 +20,12 @@ Texture *cloudoverlay = NULL; Texture *altcloudoverlay = NULL; // INTENSITY: Sky
 
 Texture *loadskyoverlay(const char *basename)
 {
-    defformatstring(name)("%s.jpg", makerelpath("packages", basename));
+    defformatstring(name)("%s.jpg", makerelpath("data", basename));
     Texture *t = textureload(name, 0, true, false);
     if(t!=notexture) return t;
     strcpy(name+strlen(name)-3, "png");
     t = textureload(name, 0, true, false);
-    if(t==notexture) conoutf(CON_ERROR, "could not load sky overlay texture packages/%s", basename);
+    if(t==notexture) conoutf(CON_ERROR, "could not load sky overlay texture data/%s", basename);
     return t;
 }
 
@@ -475,7 +475,7 @@ void drawskybox(int farplane, bool limited)
 
     if(GETIV(clampsky)) glDepthRange(1, 1);
 
-    if(!GETSV(starbox).empty() && GETFV(skyboxalpha) < 1.0f && GETFV(cloudboxalpha) < 1.0f) // INTENSITY: SkyManager: various sky stuff
+    if(GETSV(starbox) && GETFV(skyboxalpha) < 1.0f && GETFV(cloudboxalpha) < 1.0f) // INTENSITY: SkyManager: various sky stuff
     {    
         // Draw starbox
         glColor3f((GETIV(starboxtint)>>16)/255.0f, ((GETIV(starboxtint)>>8)&255)/255.0f, (GETIV(starboxtint)&255)/255.0f);
@@ -520,7 +520,7 @@ void drawskybox(int farplane, bool limited)
         glPopMatrix();
     }
 
-    if(!glaring && !GETSV(sunbox).empty() && GETFV(cloudboxalpha) < 1.0f && GETFV(sunboxalpha) > 0.0f)
+    if(!glaring && GETSV(sunbox) && GETFV(cloudboxalpha) < 1.0f && GETFV(sunboxalpha) > 0.0f)
     { // The sunbox won't be drawn unless you specify one, it spins x, not y, place at center of up for yaw=0 = 12pm (noon) in sun texture.
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -547,7 +547,7 @@ void drawskybox(int farplane, bool limited)
         defaultshader->set();
     }
 
-    if(!glaring && !GETSV(cloudbox).empty() && GETFV(cloudboxalpha) > 0.0f) // end INTENSITY
+    if(!glaring && GETSV(cloudbox) && GETFV(cloudboxalpha) > 0.0f) // end INTENSITY
     {
         if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
@@ -568,7 +568,7 @@ void drawskybox(int farplane, bool limited)
         glDisable(GL_BLEND);
     }
 
-    if(!glaring && !GETSV(cloudlayer).empty() && GETFV(cloudalpha) > 0.0f && GETFV(cloudheight) && renderedskyfaces&(GETFV(cloudheight) < 0 ? 0x1F : 0x2F)) // INTENSITY: SkyManager: cloudalpha
+    if(!glaring && GETSV(cloudlayer) && GETFV(cloudalpha) > 0.0f && GETFV(cloudheight) && renderedskyfaces&(GETFV(cloudheight) < 0 ? 0x1F : 0x2F)) // INTENSITY: SkyManager: cloudalpha
     {
         if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
@@ -590,7 +590,7 @@ void drawskybox(int farplane, bool limited)
         glEnable(GL_CULL_FACE);
     }
 
-    if(!glaring && !GETSV(altcloudlayer).empty() && GETFV(altcloudalpha) > 0.0f && GETFV(altcloudheight) && renderedskyfaces&(GETFV(altcloudheight) < 0 ? 0x1F : 0x2F)) // INTENSITY: SkyManager: altcloud stuff
+    if(!glaring && GETSV(altcloudlayer) && GETFV(altcloudalpha) > 0.0f && GETFV(altcloudheight) && renderedskyfaces&(GETFV(altcloudheight) < 0 ? 0x1F : 0x2F)) // INTENSITY: SkyManager: altcloud stuff
     {
         if(fading) glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 

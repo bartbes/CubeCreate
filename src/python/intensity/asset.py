@@ -20,7 +20,7 @@ check_existing = Signal(providing_args=['asset_info'])
 
 # Called when an asset is actually modified, and when a file inside it (if it is
 # an archive) is modified. In the latter case 'filename' is given. Filenames
-# are relative to the home_dir/packages/
+# are relative to the home_dir/data/
 asset_item_updated = Signal(providing_args=['asset_info', 'filename'])
 
 # Errors
@@ -60,10 +60,10 @@ def calculate_hash(filename, hasher):
 class AssetMetadata:
     ## Gets the path to the actual metadata file, given the path to
     ## the asset
-    ## For now, we simply use the same filename, but under /metadata instead of /packages
+    ## For now, we simply use the same filename, but under /metadata instead of /data
     @staticmethod
     def get_metadata_path(asset_path):
-        ASSET_FRAG = 'packages'
+        ASSET_FRAG = 'data'
         frags = asset_path.split( os.sep )
         assert(list(frags).count(ASSET_FRAG) == 1) # Need just one such thing, and we replace exactly that
         frags[frags.index(ASSET_FRAG)] = 'metadata'
@@ -103,7 +103,7 @@ class AssetMetadata:
                                 'location': str(tr.contents[1].contents[0].contents[0]),
                                 'url': str(tr.contents[1].contents[0].attrs[0][1])
                             }
-                            if 'packages/' + result['location'] == asset_path:
+                            if 'data/' + result['location'] == asset_path:
                                 results.append(result)
                         except Exception, e:
                             traceback.print_exc(file=sys.stdout)

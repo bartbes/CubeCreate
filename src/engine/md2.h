@@ -253,11 +253,11 @@ struct md2 : vertmodel
         mdl.model = this;
         mdl.index = 0;
         const char *pname = parentdir(loadname);
-        defformatstring(name1)("packages/models/%s/tris.md2", loadname);
+        defformatstring(name1)("data/models/%s/tris.md2", loadname);
         mdl.meshes = sharemeshes(path(name1));
         if(!mdl.meshes)
         {
-            defformatstring(name2)("packages/models/%s/tris.md2", pname);    // try md2 in parent folder (vert sharing)
+            defformatstring(name2)("data/models/%s/tris.md2", pname);    // try md2 in parent folder (vert sharing)
             mdl.meshes = sharemeshes(path(name2));
             if(!mdl.meshes) return false;
         }
@@ -266,14 +266,14 @@ struct md2 : vertmodel
         mdl.initskins(tex, masks);
         if(tex==notexture) conoutf("could not load model skin for %s", name1);
         loadingmd2 = this;
-        EngineVariables::persistVars = false;
-        defformatstring(name3)("packages/models/%s/md2.lua", loadname); // INTENSITY
+        var::persistvars = false;
+        defformatstring(name3)("data/models/%s/md2.lua", loadname); // INTENSITY
         if(!lua::engine.execf(path(name3))) // INTENSITY
         {
-            formatstring(name3)("packages/models/%s/md2.lua", pname); // INTENSITY
+            formatstring(name3)("data/models/%s/md2.lua", pname); // INTENSITY
             lua::engine.execf(path(name3)); // INTENSITY
         }
-        EngineVariables::persistVars = true;
+        var::persistvars = true;
         loadingmd2 = 0;
         scale /= 4;
         translate.y = -translate.y;
