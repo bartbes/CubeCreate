@@ -49,16 +49,17 @@ private:
     {
         int i;
         float f;
-        const char *s;
+        char *s;
     } val;
 
 public:
-    delayedupdate(): type(ACTION) {}
+    delayedupdate(): type(ACTION), var(NULL) { val.s = NULL; }
+    ~delayedupdate() { if(type == STRING || type == ACTION) DELETEA(val.s); }
 
     void schedule(const char *s)
     {
         type = ACTION;
-        val.s = s;
+        val.s = newstring(s);
     }
     void schedule(var::cvar *v, int i)
     {
@@ -82,7 +83,7 @@ public:
     {
         type = STRING;
         var = v;
-        val.s = s;
+        val.s = newstring(s);
 
         var->reglsv();
     }
@@ -328,12 +329,9 @@ template<class T> static void updateval(const char *var, T val, const char *onch
 {
     // try to lookup the variable in map too
     var::cvar *ev = var::get(var);
-    if (!ev)
-    {
-        ev = new var::cvar(var, val, true);
-        var::reg(var, ev); // when creating new, that means it should also get pushed into storage, and here we have to do it manually
-        // registering into storage will also take care of further memory release
-    }
+    // when creating new, that means it should also get pushed into storage, and here we have to do it manually
+    // registering into storage will also take care of further memory release
+    if (!ev) ev = var::reg(var, new var::cvar(var, val, true));
 
     updatelater.add().schedule(ev, val);
     if(onchange[0]) updatelater.add().schedule(onchange);

@@ -146,6 +146,11 @@ namespace var
             const char *val,
             bool reglua
         );
+        /**
+         * Destructor for cvar. Takes care of memory freeing
+         * in case of string variable.
+         */
+        ~cvar();
 
         /**
          * @brief Get name of the variable.
@@ -283,14 +288,20 @@ namespace var
         int type;
         bool readonly, override, alias;
 
-        /* Union for value storage (min, cur, max) */
+        /* Unions for value storage (min, cur, max) */
         union gval_t
         {
             int i;
             float f;
-            const char *s;
+            char *s;
+        } curv;
+
+        union nsval_t
+        {
+            int i;
+            float f;
         };
-        gval_t minv, curv, maxv;
+        nsval_t minv, maxv;
 
         /* Union for callback storage. */
         union vcb_t

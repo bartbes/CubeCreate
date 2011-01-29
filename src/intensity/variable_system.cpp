@@ -130,7 +130,7 @@ namespace var
         type(VAR_S),
         readonly(false),
         override(overridable),
-        alias(false) { vcb.s = cb; hascb = cb ? true : false; curv.s = curvs; }
+        alias(false) { vcb.s = cb; hascb = cb ? true : false; curv.s = (curvs ? newstring(curvs) : NULL); }
 
     cvar::cvar(
         const char *aname,
@@ -181,9 +181,11 @@ namespace var
         alias(true)
     {
         vcb.s = NULL;
-        curv.s = val;
+        curv.s = (val ? newstring(val) : NULL);
         if (reglua && lua::engine.hashandle()) reglsv();
     }
+
+    cvar::~cvar() { if (type == VAR_S) DELETEA(curv.s); }
 
     const char *cvar::gn() { return name;  }
     int         cvar::gt() { return type;  }
@@ -208,7 +210,7 @@ namespace var
     void cvar::s(const char *val, bool luasync, bool forcecb, bool clamp)
     {
         (void)clamp;
-        curv.s = val;
+        curv.s = (val ? newstring(val) : NULL);
         callcb(luasync, forcecb);
     }
 
