@@ -37,36 +37,36 @@ EV.fullconfilter = 0xFFFF -- display all messages in full console
 
 -- WSAD
 
-Console.binds.add("W", [[ CV:run("forward") ]])
-Console.binds.add("S", [[ CV:run("backward") ]])
-Console.binds.add("A", [[ CV:run("left") ]])
-Console.binds.add("D", [[ CV:run("right") ]])
+Console.binds.add("W", [[CV:run("forward")]])
+Console.binds.add("S", [[CV:run("backward")]])
+Console.binds.add("A", [[CV:run("left")]])
+Console.binds.add("D", [[CV:run("right")]])
 
-Console.binds.add("UP", [[ CV:run("forward") ]])
-Console.binds.add("DOWN", [[ CV:run("backward") ]])
-Console.binds.add("LEFT", [[ CV:run("left") ]])
-Console.binds.add("RIGHT", [[ CV:run("right") ]])
+Console.binds.add("UP", [[CV:run("forward")]])
+Console.binds.add("DOWN", [[CV:run("backward")]])
+Console.binds.add("LEFT", [[CV:run("left")]])
+Console.binds.add("RIGHT", [[CV:run("right")]])
 
-Console.binds.add("SPACE", [[ CV:run("jump") ]])
-Console.binds.add("MOUSE2", [[ CV:run("jump") ]])
-Console.binds.add("MOUSE1", [[ CV:run("attack") ]])
-Console.binds.add("MOUSE3", [[ CV:run("weapon") ]])
+Console.binds.add("SPACE", [[CV:run("jump")]])
+Console.binds.add("MOUSE2", [[CV:run("jump")]])
+Console.binds.add("MOUSE1", [[CV:run("attack")]])
+Console.binds.add("MOUSE3", [[CV:run("weapon")]])
 
-Console.binds.addSpec("MOUSE1", [[ CV:run("nextfollow") ]])
-Console.binds.addSpec("MOUSE2", [[ CV:run("nextfollow -1") ]])
-Console.binds.addSpec("MOUSE3", [[ CV:run("follow") ]])
-Console.binds.addSpec("SPACE", [[ CV:run("follow") ]])
+Console.binds.addSpec("MOUSE1", [[CV:run("nextfollow")]])
+Console.binds.addSpec("MOUSE2", [[CV:run("nextfollow -1")]])
+Console.binds.addSpec("MOUSE3", [[CV:run("follow")]])
+Console.binds.addSpec("SPACE", [[CV:run("follow")]])
 
-Console.binds.add("TAB", [[ CV:run("showscores") ]])
+Console.binds.add("TAB", [[CV:run("showscores")]])
 
-Console.binds.add("T", [[ Console.sayCommand() ]])
---Console.binds.add("T", [[ Console.sayTeamCommand() ]])
-Console.binds.add("BACKQUOTE", [[ Console.sayCommand("/") ]])
-Console.binds.add("SLASH", [[ Console.sayCommand("/") ]])
+Console.binds.add("T", [[Console.sayCommand()]])
+--Console.binds.add("T", [[Console.sayTeamCommand()]])
+Console.binds.add("BACKQUOTE", [[Console.sayCommand("/")]])
+Console.binds.add("SLASH", [[Console.sayCommand("/")]])
 
-Console.binds.add("I", [[ CV:run("taunt") ]])
-Console.binds.add("E", [[ CV:run([=[ if (< (getmode) 0) [ echo "^f3Please press F1 to enter editmode from a local game" ] [ edittoggle ] ]=]) ]])
-Console.binds.add("F1", [[ CV:run("edittoggle") ]])
+Console.binds.add("I", [[CV:run("taunt")]])
+Console.binds.add("E", [[CV:run([=[ if (< (getmode) 0) [ echo "^f3Please press F1 to enter editmode from a local game" ] [ edittoggle ] ]=])]])
+Console.binds.add("F1", [[CV:run("edittoggle")]])
 
 CV:run([[
 bind KP_MINUS "conskip 5"

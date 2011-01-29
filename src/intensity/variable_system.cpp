@@ -335,6 +335,7 @@ namespace var
 
     void clear()
     {
+        if (!vars) return;
         if (!pvars) pvars = new vartable;
         enumerate(*vars, cvar*, v, {
             if (v->isalias() || !v->isoverridable())
@@ -346,10 +347,16 @@ namespace var
 
     void flush()
     {
-        enumerate(*vars,  cvar*, v, { delete v; });
-        enumerate(*pvars, cvar*, v, { delete v; });
-        delete vars;
-        delete pvars;
+        if (vars)
+        {
+            enumerate(*vars,  cvar*, v, { if (v) delete v; });
+            delete vars;
+        }
+        if (pvars)
+        {
+            enumerate(*pvars, cvar*, v, { if (v) delete v; });
+            delete pvars;
+        }
     }
 
     void fillfp()

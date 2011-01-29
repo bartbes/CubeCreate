@@ -15,7 +15,6 @@
 _VARS = class()
 _VARS.storage = {}
 
-
 function _VARS:reg(var)
 	if not is_a(var, _VAR) then log(ERROR, "Cannot register variable because wrong class was provided.") return nil end
 	if self.storage[var.name] then return nil end -- Do not register registered vars, but do not error either
@@ -58,7 +57,6 @@ EV = _VARS()
 _VAR = class()
 function _VAR:__init(name, minv, curv, maxv, onchange, readonly, alias)
 	assert(name, "Cannot register variable: name is missing.")
-	assert(curv, "Cannot register variable: no value set.")
 	self.name = name
 	self.minv = minv
 	self.maxv = maxv
@@ -91,27 +89,17 @@ function IVAR:isInReach(v)
 	return true
 end
 
-IVARF = class(IVAR)
-function IVARF:__tostring() return "IVARF" end
-function IVARF:__init(name, minv, curv, maxv, onchange, readonly, alias)
-	assert(type(minv) == "number" and type(curv) == "number" and type(maxv) == "number", "Wrong value type provided to IVARF.")
-	assert(onchange and type(onchange) == "function", "Wrong type of onchange callback to IVARF.")
-	self[_VAR].__user_init(self, name, minv, curv, maxv, onchange, readonly, alias)
-end
-
 FVAR = class(IVAR)
 function FVAR:__tostring() return "FVAR" end
-FVARF = class(IVARF)
-function FVARF:__tostring() return "FVARF" end
 
 SVAR = class(_VAR)
 function SVAR:__tostring() return "SVAR" end
 function SVAR:__init(name, curv, readonly, alias)
-	assert(type(curv) == "string", "Wrong value type provided to SVAR.")
+	assert(type(curv) == "string" or not curv, "Wrong value type provided to SVAR.")
 	self[_VAR].__user_init(self, name, nil, curv, nil, nil, readonly, alias)
 end
 function SVAR:isInReach(v)
-	if type(v) ~= "string" then
+	if type(v) ~= "string" or v then
 		log(ERROR, "Wrong value type passed to variable.")
 		return false
 	end
@@ -123,17 +111,6 @@ function SVAR:isInReach(v)
 	return true
 end
 
-SVARF = class(SVAR)
-function SVARF:__tostring() return "SVARF" end
-function SVARF:__init(name, curv, onchange, readonly, alias)
-	assert(type(curv) == "string", "Wrong value type provided to SVARF.")
-	assert(onchange and type(onchange) == "function", "Wrong type of onchange callback to SVARF.")
-	self[_VAR].__user_init(self, name, nil, curv, nil, onchange, readonly, alias)
-end
-
 function ivar  (name, ...) EV:r("IVAR",   name, ...) end
-function ivarf (name, ...) EV:r("IVARF",  name, ...) end
 function fvar  (name, ...) EV:r("FVAR",   name, ...) end
-function fvarf (name, ...) EV:r("FVARF",  name, ...) end
 function svar  (name, ...) EV:r("SVAR",   name, ...) end
-function svarf (name, ...) EV:r("SVARF",  name, ...) end

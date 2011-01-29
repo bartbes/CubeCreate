@@ -1484,10 +1484,20 @@ LUA_BIND_STD_CLIENT(searchBinds, searchbinds, e.get<char*>(1), keym::ACTION_DEFA
 LUA_BIND_STD_CLIENT(searchSpecBinds, searchbinds, e.get<char*>(1), keym::ACTION_SPECTATOR)
 LUA_BIND_STD_CLIENT(searchEditBinds, searchbinds, e.get<char*>(1), keym::ACTION_EDITING)
 LUA_BIND_CLIENT(sayCommand, {
-    std::string init = std::string(e.get<const char*>(1));
     int n = e.gettop();
-    for (int i = 2; i <= n; i++) init += std::string(e.get<const char*>(i));
-    inputcommand((char*)init.c_str());
+    switch (n)
+    {
+        case 0: inputcommand((char*)""); break;
+        case 1: inputcommand(e.get<char*>(1)); break;
+        default:
+        {
+            char *s = e.get<char*>(1);
+            for (int i = 2; i <= n; i++) strcat(s, e.get<const char*>(i));
+            inputcommand(s);
+            delete s;
+            break;
+        }
+    }
 })
 LUA_BIND_STD_CLIENT(inputCommand, inputcommand, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
 LUA_BIND_STD_CLIENT(history, history_, e.get<int*>(1))
