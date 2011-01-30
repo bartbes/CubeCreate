@@ -305,8 +305,21 @@ void stoplistenserver();
 
 void reloadmodel(char* name);
 
+namespace EditingSystem {
 #ifdef CLIENT
-namespace EditingSystem { extern std::vector<std::string> entityClasses; }
+    extern int savedMousePosTime;
+    extern vec savedMousePos;
+#endif
+    extern std::vector<std::string> entityClasses;
+    void newEntity(std::string _class, std::string stateData);
+    void prepareentityclasses();
+}
+void debugoctree();
+void centerent();
+#ifdef CLIENT
+void listtex();
+void massreplacetex(char *filename);
+
 namespace MasterServer { void do_login(char *username, char *password); }
 #endif
 
@@ -1703,6 +1716,28 @@ LUA_BIND_CLIENT(jump, {
         e.pop(2);
     }
 })
+
+// intensity/editing_system.cpp
+
+LUA_BIND_CLIENT(save_mouse_pos, {
+    EditingSystem::savedMousePosTime = Utility::SystemInfo::currTime();
+    EditingSystem::savedMousePos = TargetingControl::worldPosition;
+    Logging::log(Logging::DEBUG,
+                 "Saved mouse pos: %f,%f,%f (%d)\r\n",
+                 EditingSystem::savedMousePos.x,
+                 EditingSystem::savedMousePos.y,
+                 EditingSystem::savedMousePos.z,
+                 EditingSystem::savedMousePosTime
+                );
+})
+
+LUA_BIND_STD(prepareentityclasses, EditingSystem::prepareentityclasses)
+LUA_BIND_STD(numentityclasses, e.push, (int)EditingSystem::entityClasses.size())
+LUA_BIND_STD(spawnent, EditingSystem::newEntity, e.get<const char*>(1))
+LUA_BIND_STD_CLIENT(listtex, listtex)
+LUA_BIND_STD_CLIENT(massreplacetex, massreplacetex, e.get<char*>(1))
+LUA_BIND_STD(debugoctree, debugoctree)
+LUA_BIND_STD(centerent, centerent)
 
 // intensity/engine_additions.h
 LUA_BIND_STD(reloadmodel, reloadmodel, e.get<char*>(1))

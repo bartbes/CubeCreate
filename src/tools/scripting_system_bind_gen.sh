@@ -54,7 +54,7 @@ cat $TMP | while read x
 do
 	if [ $counter -ge 2 ]; then
 		name="$(echo $x|sed -e 's/,.*//' -e 's/.*(//')"
-		echo -e "\tLUAREG($name)," >> $OUT
+		echo -e "    LUAREG($name)," >> $OUT
 	fi
 	let counter++
 done

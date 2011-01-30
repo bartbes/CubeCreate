@@ -58,16 +58,6 @@ namespace EditingSystem
     // Saved mouse position
     int savedMousePosTime = -1;
     vec savedMousePos;
-
-    void save_mouse_pos()
-    {
-        savedMousePosTime = Utility::SystemInfo::currTime();
-        savedMousePos = TargetingControl::worldPosition;
-        Logging::log(Logging::DEBUG, "Saved mouse pos: %f,%f,%f (%d)\r\n", savedMousePos.x, savedMousePos.y, savedMousePos.z,
-                                                                           savedMousePosTime);
-    }
-
-    COMMAND(save_mouse_pos, "");
 #endif
 
 
@@ -83,10 +73,6 @@ void prepareentityclasses()
     });
     lua::engine.pop(1);
 }
-
-COMMAND(prepareentityclasses, "");
-
-ICOMMAND(numentityclasses, "", (), { intret(entityClasses.size()); });
 
 bool validateEntityClass(std::string _class)
 {
@@ -128,13 +114,6 @@ void newEntity(std::string _class, std::string stateData)
         assert(0); // Where?
     #endif
 }
-
-void newentnoparams(char* _class)
-{
-    newEntity(_class);
-}
-COMMAND(newentnoparams, "s");
-
 
 //----------------
 
@@ -638,7 +617,7 @@ LogicEntityPtr getSelectedEntity()
 
 
 #ifdef CLIENT
-    // Cubescript tools
+    // Lua tools
 
     std::set<int> listTextures;
 
@@ -663,9 +642,6 @@ LogicEntityPtr getSelectedEntity()
                 printf("%d : %s\r\n", *it, currSlot.sts[0].name);
         }
     }
-
-    COMMAND(listtex, "");
-
 
     std::vector<int> massReplaceLookup;
 
@@ -701,8 +677,6 @@ LogicEntityPtr getSelectedEntity()
         loopi(8) massreplacetexcube(worldroot[i], lookup);
         allchanged();
     }
-
-    COMMAND(massreplacetex, "s");
 
 #endif
 
@@ -762,8 +736,6 @@ void debugoctree()
     debugcube(worldroot[7], GETIV(mapsize)/2, GETIV(mapsize)/2, GETIV(mapsize)/2, GETIV(mapsize)/2);
 }
 
-COMMAND(debugoctree, "");
-
 //CModule.run_cubescript("debugoctree");
 
 //! Centers the selected entity on the cube cursor
@@ -788,6 +760,4 @@ void centerent()
     if (!entity.get()) return;
     entity->setOrigin(center);
 }
-
-COMMAND(centerent, "");
 
