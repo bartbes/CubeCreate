@@ -102,13 +102,6 @@ namespace game
     {
         scoreboard.render();
     }
-
-    void showscores(bool on)
-    {
-        SETV(scoreboard, on ? 1 : 0);
-        scoreboard.show(on);
-    }
-    ICOMMAND(showscores, "D", (int *down), showscores(*down!=0));
 }
 
 // CubeCreate: temporary for variable exports >.>

@@ -266,7 +266,6 @@ namespace game
             addmsg(N_TEXT, "rcs", player1, text);
         }
     }
-    COMMANDN(say, toserver, "C");
 
 #if 0
     void sayteam(char *text)
@@ -754,8 +753,6 @@ assert(0); // Kripken: Do not let clients know other clients' pings
         // We do not use sauer protocol to update mapvars. Use our method to run a script
         // to make each client update its map vars, or upload/restart the map.
     }
-
-    ICOMMAND(getmode, "", (), intret(0)); // Prevent warnings
 
     void forceedit(const char *name) { };
 };

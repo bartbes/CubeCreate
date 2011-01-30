@@ -41,12 +41,6 @@ namespace game
     vector<fpsent *> players;       // other clients
     fpsent lastplayerstate;
 
-    ICOMMAND(getfollow, "", (),
-    {
-        fpsent *f = followingplayer();
-        intret(f ? f->clientnum : -1);
-    });
-
     void follow(char *arg)
     {
         if(arg[0] ? player1->state==CS_SPECTATOR : following>=0)

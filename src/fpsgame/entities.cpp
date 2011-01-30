@@ -223,12 +223,6 @@ namespace entities
         }
     }
 
-    ICOMMAND(trigger, "ii", (int *tag, int *state),
-    {
-        if(*state) unlocktriggers(*tag);
-        else unlocktriggers(*tag, TRIGGERED, TRIGGER_RESETTING);
-    });
-
     void doleveltrigger(int trigger, int state)
     {
         defformatstring(aliasname)("level_trigger_%d", trigger);

@@ -303,6 +303,13 @@ void pvsstats();
 void startlistenserver(int *usemaster);
 void stoplistenserver();
 
+namespace game
+{
+    void toserver(char *text);
+    fpsent *followingplayer();
+}
+void scorebshow(bool on);
+
 void reloadmodel(char* name);
 
 namespace EditingSystem {
@@ -1515,7 +1522,13 @@ LUA_BIND_CLIENT(sayCommand, {
         default:
         {
             char *s = e.get<char*>(1);
-            for (int i = 2; i <= n; i++) strcat(s, e.get<const char*>(i));
+            for (int i = 2; i <= n; i++)
+            {
+                const char *a = e.get<const char*>(i);
+                s = (char*)realloc(s, strlen(s) + strlen(a) + 1);
+                assert(s);
+                strcat(s, a);
+            }
             inputcommand(s);
             delete s;
             break;
@@ -1662,6 +1675,46 @@ LUA_BIND_STD(pvsStats, pvsstats)
 
 LUA_BIND_STD(startListenServer, startlistenserver, e.get<int*>(1))
 LUA_BIND_STD(stopListenServer, stoplistenserver)
+
+// fpsgame/client.cpp
+
+LUA_BIND_DEF(say, {
+    int n = e.gettop();
+    switch (n)
+    {
+        case 0: game::toserver((char*)""); break;
+        case 1: game::toserver(e.get<char*>(1)); break;
+        default:
+        {
+            char *s = e.get<char*>(1);
+            for (int i = 2; i <= n; i++)
+            {
+                const char *a = e.get<const char*>(i);
+                s = (char*)realloc(s, strlen(s) + strlen(a) + 1);
+                assert(s);
+                strcat(s, a);
+            }
+            game::toserver(s);
+            delete s;
+            break;
+        }
+    }
+})
+
+// fpsgame/fps.cpp
+
+LUA_BIND_DEF(getfollow, {
+    fpsent *f = game::followingplayer();
+    e.push(f ? f->clientnum : -1);
+})
+
+// fpsgame/scoreboard.cpp
+
+LUA_BIND_CLIENT(showscores, {
+    bool on = (addreleaseaction("showscores") != 0);
+    SETV(scoreboard, on);
+    scorebshow(on);
+})
 
 // intensity/client_engine_additions.cpp
 
