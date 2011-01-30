@@ -1663,8 +1663,233 @@ LUA_BIND_STD(pvsStats, pvsstats)
 LUA_BIND_STD(startListenServer, startlistenserver, e.get<int*>(1))
 LUA_BIND_STD(stopListenServer, stoplistenserver)
 
-// physics
+// intensity/client_engine_additions.cpp
 
+LUA_BIND_STD_CLIENT(inc_camera, CameraControl::incrementCameraDist, +1)
+LUA_BIND_STD_CLIENT(dec_camera, CameraControl::incrementCameraDist, -1)
+LUA_BIND_STD_CLIENT(mouselook, GuiControl::toggleMouselook)
+LUA_BIND_STD_CLIENT(characterview, GuiControl::toggleCharacterViewing)
+LUA_BIND_STD_CLIENT(menu_key_click_trigger, GuiControl::menuKeyClickTrigger)
+// Sets up a GUI for editing an entity's state data. TODO: get rid of ugly ass STL shit
+LUA_BIND_CLIENT(prepare_entity_gui, {
+    GuiControl::EditedEntity::stateData.clear();
+    GuiControl::EditedEntity::sortedKeys.clear();
+
+    GuiControl::EditedEntity::currEntity = TargetingControl::targetLogicEntity;
+    if (GuiControl::EditedEntity::currEntity->isNone())
+    {
+        Logging::log(Logging::DEBUG, "No entity to show the GUI for\r\n");
+        return;
+    }
+
+    int uniqueId = GuiControl::EditedEntity::currEntity->getUniqueId();
+
+    // we get this beforehand because of further re-use
+    e.getg("getEntity").push(uniqueId).call(1, 1);
+    // we've got the entity here now (popping getEntity out)
+    e.t_getraw("createStateDataDict").push_index(-2).call(1, 1);
+    // ok, state data are on stack, popping createStateDataDict out, let's ref it so we can easily get it later
+    int _tempRef = e.ref();
+    e.pop(1);
+
+    e.getg("table").t_getraw("keys").getref(_tempRef).call(1, 1);
+    // we've got keys on stack. let's loop the table now.
+    LUA_TABLE_FOREACH(e, {
+        // we have array of keys, so the original key is a value in this case
+        const char *key = e.get<const char*>(-1);
+
+        e.getg("__getVariableGuiName").push(uniqueId).push(key).call(2, 1);
+        const char *guiName = e.get<const char*>(-1);
+        e.pop(1);
+
+        e.getref(_tempRef);
+        const char *value = e.t_get<const char*>(key);
+        e.pop(1);
+
+        GuiControl::EditedEntity::stateData.insert(
+            GuiControl::EditedEntity::StateDataMap::value_type(
+                key,
+                std::pair<std::string, std::string>(
+                    guiName,
+                    value
+                )
+            )
+        );
+
+        GuiControl::EditedEntity::sortedKeys.push_back(key);
+        SETVN(num_entity_gui_fields, GETIV(num_entity_gui_fields) + 1); // increment for later loop
+    });
+    e.pop(2).unref(_tempRef);
+
+    // So order is always the same
+    sort(GuiControl::EditedEntity::sortedKeys.begin(), GuiControl::EditedEntity::sortedKeys.end());
+
+    for (int i = 0; i < GETIV(num_entity_gui_fields); i++)
+    {
+        std::string key = GuiControl::EditedEntity::sortedKeys[i];
+        std::string guiName = GuiControl::EditedEntity::stateData[key].first;
+        std::string value = GuiControl::EditedEntity::stateData[key].second;
+
+        std::string fieldName = "entity_gui_field_" + Utility::toString(i);
+        std::string labelName = "entity_gui_label_" + Utility::toString(i);
+
+        var::get(fieldName.c_str())->s(value.c_str(), true, true, true);
+        var::get(labelName.c_str())->s(guiName.c_str(), true, true, true);
+    }
+
+    // Title
+    e.getg("tostring").getref(GuiControl::EditedEntity::currEntity->luaRef).call(1, 1);
+    std::string title = e.get(-1, "Unknown");
+    e.pop(1);
+    title = Utility::toString(uniqueId) + ": " + title;
+
+    SETVF(entity_gui_title, title.c_str());
+
+    // Create the gui
+    std::string command =
+    "GUI.new(\"entity\", [[\n"
+    "    GUI.text(EV.entity_gui_title)\n"
+    "    GUI.bar()\n";
+
+    for (int i = 0; i < GETIV(num_entity_gui_fields); i++)
+    {
+        std::string sI = Utility::toString(i);
+        std::string key = GuiControl::EditedEntity::sortedKeys[i];
+        std::string value = GuiControl::EditedEntity::stateData[key].second;
+
+        if (value.size() > 50)
+        {
+            Logging::log(Logging::WARNING, "Not showing field '%s' as it is overly large for the GUI\r\n", key.c_str());
+            continue; // Do not even try to show overly-large items
+        }
+
+        command +=
+    "    GUI.list([[\n"
+    "        GUI.text(CE.get_gui_label(" + sI + "))\n"
+    "        CV:run(\"new_entity_gui_field_" + sI + " = \" .. CE.get_gui_value(" + sI + "))\n"
+    "        GUI.field(\"new_entity_gui_field_" + sI + "\", " + Utility::toString((int)value.size()+25) + ", [[ CE.set_gui_value(" + sI + ", CV.new_entity_gui_field_" + sI + ") ]], 0)\n"
+    "    ]])\n";
+
+        if ((i+1) % 10 == 0)
+        {
+            command +=
+    "   GUI.tab(" + Utility::toString(i) + ")\n";
+        }
+    }
+
+    command +=
+    "]])\n";
+
+//  printf("Command: %s\r\n", command.c_str());
+    e.exec(command.c_str());
+})
+LUA_BIND_CLIENT(get_entity_gui_label, {
+    std::string ret = GuiControl::EditedEntity::stateData[GuiControl::EditedEntity::sortedKeys[e.get<int>(1)]].first + ": ";
+    e.push(ret.c_str());
+})
+LUA_BIND_CLIENT(get_entity_gui_value, {
+    std::string ret = GuiControl::EditedEntity::stateData[GuiControl::EditedEntity::sortedKeys[e.get<int>(1)]].second;
+    e.push(ret.c_str());
+})
+LUA_BIND_CLIENT(set_entity_gui_value, {
+    const char *key = GuiControl::EditedEntity::sortedKeys[e.get<int>(1)].c_str();
+    const char *ov = GuiControl::EditedEntity::stateData[key].second.c_str();
+    const char *nv = e.get<const char*>(2);
+
+    if (strcmp(ov, nv))
+    {
+        GuiControl::EditedEntity::stateData[key].second = e.get<const char*>(2);
+
+        int uniqueId = GuiControl::EditedEntity::currEntity->getUniqueId();
+        e.getg("__getVariable").push(uniqueId).push(key).call(2, 1);
+        e.t_getraw("fromData").push_index(-2).push(nv).call(2, 1);
+        e.getg("encodeJSON").shift().call(1, 1);
+        const char *nav = e.get(-1, "[]");
+        e.pop(2);
+
+        defformatstring(c)("getEntity(%i).%s = '%s'", uniqueId, key, nav);
+        e.exec(c);
+    }
+})
+
+// Mouse clicks
+
+#define QUOT(arg) #arg
+
+#define MOUSECLICK(num) \
+LUA_BIND_CLIENT(mouse##num##click, { \
+    bool down = (addreleaseaction(QUOT(mouse##num##click)) != 0); \
+\
+    Logging::log(Logging::INFO, "mouse click: %d (down: %d)\r\n", num, down); \
+    if (!(e.hashandle() && ClientSystem::scenarioStarted())) return; \
+\
+    /* A click forces us to check for clicking on entities */ \
+    TargetingControl::determineMouseTarget(true); \
+    vec pos = TargetingControl::targetPosition; \
+\
+    e.getg("ApplicationManager").t_getraw("instance").t_getraw("performClick"); \
+    e.push_index(-2).push(num).push(down).push(pos); \
+    if (TargetingControl::targetLogicEntity.get() && !TargetingControl::targetLogicEntity->isNone()) \
+        e.getref(TargetingControl::targetLogicEntity->luaRef); \
+    else e.push(); \
+    float x; \
+    float y; \
+    g3d_cursorpos(x, y); \
+    e.push(x).push(y).call(7, 0).pop(2); \
+})
+MOUSECLICK(1)
+MOUSECLICK(2)
+MOUSECLICK(3)
+
+// Other client actions - bind these to keys using cubescript (for things like a 'reload' key, 'crouch' key, etc. -
+// specific to each game). TODO: Consider overlap with mouse buttons
+#define ACTIONKEY(num) \
+LUA_BIND_CLIENT(actionkey##num, { \
+    if (e.hashandle()) \
+    { \
+        e.getg("ApplicationManager").t_getraw("instance"); \
+        e.t_getraw("actionKey") \
+         .push_index(-2) \
+         .push(num) \
+         .push(addreleaseaction(QUOT(actionkey##num)) != 0) \
+         .call(3, 0); \
+        e.pop(2); \
+    } \
+})
+
+ACTIONKEY(0);
+ACTIONKEY(1);
+ACTIONKEY(2);
+ACTIONKEY(3);
+ACTIONKEY(4);
+ACTIONKEY(5);
+ACTIONKEY(6);
+ACTIONKEY(7);
+ACTIONKEY(8);
+ACTIONKEY(9);
+ACTIONKEY(10);
+ACTIONKEY(11);
+ACTIONKEY(12);
+ACTIONKEY(13);
+ACTIONKEY(14);
+ACTIONKEY(15);
+ACTIONKEY(16);
+ACTIONKEY(17);
+ACTIONKEY(18);
+ACTIONKEY(19);
+ACTIONKEY(20);
+ACTIONKEY(21);
+ACTIONKEY(22);
+ACTIONKEY(23);
+ACTIONKEY(24);
+ACTIONKEY(25);
+ACTIONKEY(26);
+ACTIONKEY(27);
+ACTIONKEY(28);
+ACTIONKEY(29);
+// 30 action keys should be enough for everybody (TODO: consider speed issues)
+
+// physics
 // Extra player movements
 bool k_turn_left, k_turn_right, k_look_up, k_look_down;
 
@@ -1777,6 +2002,9 @@ LUA_BIND_CLIENT(show_instances, {
 
     Logging::log(Logging::DEBUG, "Instances GUI: %s\r\n", command);
     engine.exec(command);
+
+    command = NULL;
+    free(command);
 })
 
 LUA_BIND_CLIENT(do_upload, {

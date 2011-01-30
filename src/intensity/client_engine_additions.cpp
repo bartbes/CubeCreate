@@ -28,15 +28,6 @@ void CameraControl::incrementCameraDist(int inc_dir)
     if (engine.hashandle()) engine.getg("Global").t_set("cameraDistance", GETIV(cam_dist)).pop(1);
 }
 
-void inc_camera()
-    { CameraControl::incrementCameraDist (+1); };
-void dec_camera()
-    { CameraControl::incrementCameraDist (-1); };
-
-COMMAND(inc_camera, "");
-COMMAND(dec_camera, "");
-
-
 int saved_cam_dist; // Saved from before characterviewing, restored right after
 
 void CameraControl::prepareCharacterViewing()
@@ -284,10 +275,6 @@ void GuiControl::toggleMouselook()
     };
 };
 
-void mouselook() { GuiControl::toggleMouselook(); };
-
-COMMAND(mouselook, "");
-
 bool _isCharacterViewing = false;
 
 bool GuiControl::isCharacterViewing()
@@ -303,179 +290,15 @@ void GuiControl::toggleCharacterViewing()
     _isCharacterViewing = !_isCharacterViewing;
 }
 
-void characterview() { GuiControl::toggleCharacterViewing(); };
-
-COMMAND(characterview, "");
-
 void GuiControl::menuKeyClickTrigger()
 {
     playsound(S_MENUCLICK);
 }
 
-void menu_key_click_trigger() { GuiControl::menuKeyClickTrigger(); };
-
-COMMAND(menu_key_click_trigger, "");
-
-
 // Editing GUI statics
 LogicEntityPtr GuiControl::EditedEntity::currEntity;
 GuiControl::EditedEntity::StateDataMap GuiControl::EditedEntity::stateData;
 std::vector<std::string> GuiControl::EditedEntity::sortedKeys;
-
-// Sets up a GUI for editing an entity's state data
-void prepare_entity_gui()
-{
-    GuiControl::EditedEntity::stateData.clear();
-    GuiControl::EditedEntity::sortedKeys.clear();
-
-    GuiControl::EditedEntity::currEntity = TargetingControl::targetLogicEntity;
-    if (GuiControl::EditedEntity::currEntity->isNone())
-    {
-        Logging::log(Logging::DEBUG, "No entity to show the GUI for\r\n");
-        return;
-    }
-
-    int uniqueId = GuiControl::EditedEntity::currEntity->getUniqueId();
-
-    // we get this beforehand because of further re-use
-    engine.getg("getEntity").push(uniqueId).call(1, 1);
-    // we've got the entity here now (popping getEntity out)
-    engine.t_getraw("createStateDataDict").push_index(-2).call(1, 1);
-    // ok, state data are on stack, popping createStateDataDict out, let's ref it so we can easily get it later
-    int _tempRef = engine.ref();
-    engine.pop(1);
-
-    engine.getg("table").t_getraw("keys").getref(_tempRef).call(1, 1);
-    // we've got keys on stack. let's loop the table now.
-    LUA_TABLE_FOREACH(engine, {
-        // we have array of keys, so the original key is a value in this case
-        const char *key = engine.get<const char*>(-1);
-
-        engine.getg("__getVariableGuiName").push(uniqueId).push(key).call(2, 1);
-        const char *guiName = engine.get<const char*>(-1);
-        engine.pop(1);
-
-        engine.getref(_tempRef);
-        const char *value = engine.t_get<const char*>(key);
-        engine.pop(1);
-
-        GuiControl::EditedEntity::stateData.insert(
-            GuiControl::EditedEntity::StateDataMap::value_type(
-                key,
-                std::pair<std::string, std::string>(
-                    guiName,
-                    value
-                )
-            )
-        );
-
-        GuiControl::EditedEntity::sortedKeys.push_back( key );
-        SETVN(num_entity_gui_fields, GETIV(num_entity_gui_fields)+1); // increment for later loop
-    });
-    engine.pop(2).unref(_tempRef);
-
-    sort( GuiControl::EditedEntity::sortedKeys.begin(), GuiControl::EditedEntity::sortedKeys.end() ); // So order is always the same
-
-    for (int i = 0; i < GETIV(num_entity_gui_fields); i++)
-    {
-        std::string key = GuiControl::EditedEntity::sortedKeys[i];
-        std::string guiName = GuiControl::EditedEntity::stateData[key].first;
-        std::string value = GuiControl::EditedEntity::stateData[key].second;
-
-        std::string fieldName = "entity_gui_field_" + Utility::toString(i);
-        std::string labelName = "entity_gui_label_" + Utility::toString(i);
-
-        var::get(fieldName.c_str())->s(value.c_str(), true, true, true);
-        var::get(labelName.c_str())->s(guiName.c_str(), true, true, true);
-    }
-
-    // Title
-    engine.getg("tostring").getref(GuiControl::EditedEntity::currEntity->luaRef).call(1, 1);
-    std::string title = engine.get(-1, "Unknown");
-    engine.pop(1);
-    title = Utility::toString(uniqueId) + ": " + title;
-
-    SETVF(entity_gui_title, title.c_str());
-
-    // Create the gui
-    std::string command =
-    "GUI.new(\"entity\", [[\n"
-    "    GUI.text(EV.entity_gui_title)\n"
-    "    GUI.bar()\n";
-
-    for (int i = 0; i < GETIV(num_entity_gui_fields); i++)
-    {
-        std::string sI = Utility::toString(i);
-        std::string key = GuiControl::EditedEntity::sortedKeys[i];
-        std::string value = GuiControl::EditedEntity::stateData[key].second;
-
-        if (value.size() > 50)
-        {
-            Logging::log(Logging::WARNING, "Not showing field '%s' as it is overly large for the GUI\r\n", key.c_str());
-            continue; // Do not even try to show overly-large items
-        }
-
-        command +=
-    "    GUI.list([[\n"
-    "        GUI.text(CE.get_gui_label(" + sI + "))\n"
-    "        CV:run(\"new_entity_gui_field_" + sI + " = \" .. CE.get_gui_value(" + sI + "))\n"
-    "        GUI.field(\"new_entity_gui_field_" + sI + "\", " + Utility::toString((int)value.size()+25) + ", [[ CE.set_gui_value(" + sI + ", CV.new_entity_gui_field_" + sI + ") ]], 0)\n"
-    "    ]])\n";
-
-        if ((i+1) % 10 == 0)
-        {
-            command +=
-    "   GUI.tab(" + Utility::toString(i) + ")\n";
-        }
-    }
-
-    command +=
-    "]])\n";
-
-//    printf("Command: %s\r\n", command.c_str());
-    engine.exec(command.c_str());
-}
-
-COMMAND(prepare_entity_gui, "");
-
-void get_entity_gui_label(int *index)
-{
-    std::string ret = GuiControl::EditedEntity::stateData[GuiControl::EditedEntity::sortedKeys[*index]].first + ": ";
-    result(ret.c_str());
-}
-
-COMMAND(get_entity_gui_label, "i");
-
-void get_entity_gui_value(int *index)
-{
-    std::string ret = GuiControl::EditedEntity::stateData[GuiControl::EditedEntity::sortedKeys[*index]].second;
-    result(ret.c_str());
-}
-
-COMMAND(get_entity_gui_value, "i");
-
-void set_entity_gui_value(int *index, char *newValue)
-{
-    const char *key = GuiControl::EditedEntity::sortedKeys[*index].c_str();
-    const char *oldValue = GuiControl::EditedEntity::stateData[key].second.c_str();
-
-    if (strcmp(oldValue, newValue))
-    {
-        GuiControl::EditedEntity::stateData[key].second = newValue;
-
-        int uniqueId = GuiControl::EditedEntity::currEntity->getUniqueId();
-        engine.getg("__getVariable").push(uniqueId).push(key).call(2, 1);
-        engine.t_getraw("fromData").push_index(-2).push(newValue).call(2, 1);
-        engine.getg("encodeJSON").shift().call(1, 1);
-        const char *naturalValue = engine.get(-1, "[]");
-        engine.pop(2);
-
-        defformatstring(c)("getEntity(%i).%s = '%s'", uniqueId, key, naturalValue);
-        engine.exec(c);
-    }
-}
-
-COMMAND(set_entity_gui_value, "is");
 
 // Player movements control - keyboard stuff
 
@@ -677,79 +500,3 @@ void ExtraRendering::renderShadowingMapmodels()
     }
 #endif
 }
-
-
-// Mouse clicks
-
-void mouseclick(int button, bool down)
-{
-    Logging::log(Logging::INFO, "mouse click: %d (down: %d)\r\n", button, down);
-
-    if (! (engine.hashandle() && ClientSystem::scenarioStarted()) )
-        return;
-
-    TargetingControl::determineMouseTarget(true); // A click forces us to check for clicking on entities
-
-    vec pos = TargetingControl::targetPosition;
-
-    engine.getg("ApplicationManager").t_getraw("instance").t_getraw("performClick");
-    engine.push_index(-2).push(button).push(down).push(pos);
-    if (TargetingControl::targetLogicEntity.get() && !TargetingControl::targetLogicEntity->isNone())
-        engine.getref(TargetingControl::targetLogicEntity->luaRef);
-    else
-        engine.push();
-    float x, y;
-    g3d_cursorpos(x, y);
-    engine.push(x).push(y).call(7, 0).pop(2);
-}
-
-ICOMMAND(mouse1click, "D", (int *down), { mouseclick(1, *down!=0); });
-ICOMMAND(mouse2click, "D", (int *down), { mouseclick(2, *down!=0); });
-ICOMMAND(mouse3click, "D", (int *down), { mouseclick(3, *down!=0); });
-
-
-// Other client actions - bind these to keys using cubescript (for things like a 'reload' key, 'crouch' key, etc. -
-// specific to each game). TODO: Consider overlap with mouse buttons
-
-void actionKey(int index, bool down)
-{
-    if (engine.hashandle())
-    {
-        engine.getg("ApplicationManager").t_getraw("instance");
-        engine.t_getraw("actionKey").push_index(-2).push(index).push(down).call(3, 0);
-        engine.pop(2);
-    }
-}
-
-#define ACTIONKEY(i) ICOMMAND(actionkey##i, "D", (int *down), { actionKey(i, *down!=0); });
-ACTIONKEY(0);
-ACTIONKEY(1);
-ACTIONKEY(2);
-ACTIONKEY(3);
-ACTIONKEY(4);
-ACTIONKEY(5);
-ACTIONKEY(6);
-ACTIONKEY(7);
-ACTIONKEY(8);
-ACTIONKEY(9);
-ACTIONKEY(10);
-ACTIONKEY(11);
-ACTIONKEY(12);
-ACTIONKEY(13);
-ACTIONKEY(14);
-ACTIONKEY(15);
-ACTIONKEY(16);
-ACTIONKEY(17);
-ACTIONKEY(18);
-ACTIONKEY(19);
-ACTIONKEY(20);
-ACTIONKEY(21);
-ACTIONKEY(22);
-ACTIONKEY(23);
-ACTIONKEY(24);
-ACTIONKEY(25);
-ACTIONKEY(26);
-ACTIONKEY(27);
-ACTIONKEY(28);
-ACTIONKEY(29); // 30 action keys should be enough for everybody (TODO: consider speed issues)
-
