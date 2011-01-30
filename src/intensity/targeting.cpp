@@ -118,34 +118,6 @@ void TargetingControl::setMouseTargeting(bool on)
     useMouseTargeting = on;
 }
 
-void mouse_targeting(int* on)
-{
-    TargetingControl::setMouseTargeting(*on);
-}
-
-COMMAND(mouse_targeting, "i");
-
-void set_mouse_target_entity(int *uniqueId)
-{
-    TargetingControl::targetLogicEntity = LogicSystem::getLogicEntity(*uniqueId);
-    intret(TargetingControl::targetLogicEntity.get() != NULL );
-}
-
-COMMAND(set_mouse_target_entity, "i");
-
-void set_mouse_target_client(int *clientNumber)
-{
-    dynent *client = FPSClientInterface::getPlayerByNumber(*clientNumber);
-    if (client)
-        TargetingControl::targetLogicEntity = LogicSystem::getLogicEntity(client);
-    else
-        TargetingControl::targetLogicEntity.reset();
-
-    intret(TargetingControl::targetLogicEntity.get() != NULL);
-}
-
-COMMAND(set_mouse_target_client, "i");
-
 void TargetingControl::determineMouseTarget(bool forceEntityCheck)
 {
     TargetingControl::worldPosition = worldpos;

@@ -37,18 +37,18 @@ EV.fullconfilter = 0xFFFF -- display all messages in full console
 
 -- WSAD
 
-Console.binds.add("W", [[CV:run("forward")]])
-Console.binds.add("S", [[CV:run("backward")]])
-Console.binds.add("A", [[CV:run("left")]])
-Console.binds.add("D", [[CV:run("right")]])
+Console.binds.add("W", [[Movement.forward()]])
+Console.binds.add("S", [[Movement.backward()]])
+Console.binds.add("A", [[Movement.left()]])
+Console.binds.add("D", [[Movement.right()]])
 
-Console.binds.add("UP", [[CV:run("forward")]])
-Console.binds.add("DOWN", [[CV:run("backward")]])
-Console.binds.add("LEFT", [[CV:run("left")]])
-Console.binds.add("RIGHT", [[CV:run("right")]])
+Console.binds.add("UP", [[Movement.forward()]])
+Console.binds.add("DOWN", [[Movement.backward()]])
+Console.binds.add("LEFT", [[Movement.left()]])
+Console.binds.add("RIGHT", [[Movement.right()]])
 
-Console.binds.add("SPACE", [[CV:run("jump")]])
-Console.binds.add("MOUSE2", [[CV:run("jump")]])
+Console.binds.add("SPACE", [[Movement.jump()]])
+Console.binds.add("MOUSE2", [[Movement.jump()]])
 Console.binds.add("MOUSE1", [[CV:run("attack")]])
 Console.binds.add("MOUSE3", [[CV:run("weapon")]])
 

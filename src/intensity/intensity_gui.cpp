@@ -59,26 +59,6 @@ void showInputDialog(std::string title, std::string content)
     showgui("input_dialog");
 }
 
-void input_callback(char *input)
-{
-    lua::engine.getg("UserInterface")
-        .t_getraw("inputDialogCallback")
-        .push(input)
-        .call(1, 0)
-        .pop(1);
-}
-
-COMMAND(input_callback, "s");
-
-
-// Entity classes dialog support
-
-ICOMMAND(getentityclass, "i", (int *index), {
-    std::string ret = EditingSystem::entityClasses[*index];
-    assert( Utility::validateAlphaNumeric(ret, "_") ); // Prevent injections
-    result(ret.c_str());
-});
-
     bool canQuit()
     {
         if ( !EditingSystem::madeChanges )
@@ -160,32 +140,3 @@ printf("rels: %f, %f        %f,%f\r\n", xrel, yrel, x, curr_x);
         pushevent(event);
     }
 }
-
-
-// Private edit mode stuff
-
-void request_private_edit_mode()
-{
-    MessageSystem::send_RequestPrivateEditMode();
-}
-
-COMMAND(request_private_edit_mode, "");
-
-void private_edit_mode()
-{
-    intret(ClientSystem::editingAlone);
-}
-
-COMMAND(private_edit_mode, "");
-
-
-// Plugins
-
-void show_plugins()
-{
-    REFLECT_PYTHON( signal_show_components );
-    signal_show_components();
-}
-
-COMMAND(show_plugins, "");
-

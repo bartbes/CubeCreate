@@ -32,7 +32,7 @@ VARF(rate, 0, 0, 25000, setrate);
 VARF(throttle_interval, 0, 5, 30, throttle);
 VARF(throttle_accel, 0, 2, 32, throttle);
 VARF(throttle_decel, 0, 2, 32, throttle);
-SVAR(connectname, NULL);
+SVAR(connectname, "");
 VAR(connectport, 0, 0, 0xFFFF);
 
 #ifdef CLIENT

@@ -303,6 +303,16 @@ void pvsstats();
 void startlistenserver(int *usemaster);
 void stoplistenserver();
 
+void reloadmodel(char* name);
+
+#ifdef CLIENT
+namespace EditingSystem { extern std::vector<std::string> entityClasses; }
+namespace MasterServer { void do_login(char *username, char *password); }
+#endif
+
+bool addzip(const char *name, const char *mount = NULL, const char *strip = NULL);
+bool removezip(const char *name);
+
 /* Here begin the binds. Close them in C++ namespace */
 namespace lua_binds
 {
@@ -1447,7 +1457,7 @@ LUA_BIND_STD(getBlendBrushName, getblendbrushname, e.get<int*>(1))
 LUA_BIND_STD(curBlendBrush, curblendbrush)
 LUA_BIND_STD(rotateBlendBrush, rotateblendbrush, e.get<int*>(1))
 LUA_BIND_DEF(paintBlendMap, {
-    if (addreleaseaction("paintblendmap"))
+    if (addreleaseaction("paintBlendMap"))
     {
         if (!paintingblendmap)
         {
@@ -1639,5 +1649,107 @@ LUA_BIND_STD(pvsStats, pvsstats)
 
 LUA_BIND_STD(startListenServer, startlistenserver, e.get<int*>(1))
 LUA_BIND_STD(stopListenServer, stoplistenserver)
+
+// physics
+
+// Extra player movements
+bool k_turn_left, k_turn_right, k_look_up, k_look_down;
+
+#define DIR(name, v, d, s, os) \
+LUA_BIND_CLIENT(name, { \
+    if (ClientSystem::scenarioStarted()) \
+    { \
+        PlayerControl::flushActions(); /* stop current actions */ \
+        s = addreleaseaction(#name)!=0; \
+        ((fpsent*)player)->v = s ? d : (os ? -(d) : 0); \
+    } \
+})
+
+DIR(turn_left,  turn_move, -1, k_turn_left,  k_turn_right); // New turning motion
+DIR(turn_right, turn_move, +1, k_turn_right, k_turn_left);  // New pitching motion
+DIR(look_down, look_updown_move, -1, k_look_down, k_look_up);
+DIR(look_up,   look_updown_move, +1, k_look_up,   k_look_down);
+
+#define SCRIPT_DIR(name, v, d, s, os) \
+LUA_BIND_CLIENT(name, { \
+    if (ClientSystem::scenarioStarted()) \
+    { \
+        PlayerControl::flushActions(); /* stop current actions */ \
+        s = addreleaseaction(#name)!=0; \
+        e.getg("ApplicationManager").t_getraw("instance"); \
+        e.t_getraw(#v).push_index(-2).push(s ? d : (os ? -(d) : 0)).push(s).call(3, 0); \
+        e.pop(2); \
+    } \
+})
+
+//SCRIPT_DIR(turn_left,  performYaw, -1, k_turn_left,  k_turn_right); // New turning motion
+//SCRIPT_DIR(turn_right, performYaw, +1, k_turn_right, k_turn_left);  // New pitching motion
+// TODO: Enable these. But they do change the protocol (see Character.lua), so forces everyone and everything to upgrade
+//SCRIPT_DIR(look_down, performPitch, -1, k_look_down, k_look_up);
+//SCRIPT_DIR(look_up,   performPitch, +1, k_look_up,   k_look_down);
+
+// Old player movements
+SCRIPT_DIR(backward, performMovement, -1, player->k_down,  player->k_up);
+SCRIPT_DIR(forward,  performMovement,  1, player->k_up,    player->k_down);
+SCRIPT_DIR(left,     performStrafe,    1, player->k_left,  player->k_right);
+SCRIPT_DIR(right,    performStrafe,   -1, player->k_right, player->k_left);
+
+LUA_BIND_CLIENT(jump, {
+    if (ClientSystem::scenarioStarted())
+    {
+        PlayerControl::flushActions(); /* stop current actions */
+        e.getg("ApplicationManager").t_getraw("instance");
+        e.t_getraw("performJump").push_index(-2).push(addreleaseaction("jump") ? true : false).call(2, 0);
+        e.pop(2);
+    }
+})
+
+// intensity/engine_additions.h
+LUA_BIND_STD(reloadmodel, reloadmodel, e.get<char*>(1))
+
+// intensity/intensity_gui.cpp
+
+// Entity classes dialog support
+LUA_BIND_CLIENT(getentityclass, {
+    std::string ret = EditingSystem::entityClasses[e.get<int>(1)];
+    assert( Utility::validateAlphaNumeric(ret, "_") ); // Prevent injections
+    e.push(ret.c_str());
+})
+// Private edit mode stuff
+LUA_BIND_STD_CLIENT(request_private_edit_mode, MessageSystem::send_RequestPrivateEditMode)
+LUA_BIND_STD_CLIENT(private_edit_mode, e.push, ClientSystem::editingAlone)
+// Plugins
+LUA_BIND_CLIENT(show_plugins, {
+    REFLECT_PYTHON(signal_show_components);
+    signal_show_components();
+})
+
+// intensity/master.cpp
+
+LUA_BIND_STD_CLIENT(do_login, MasterServer::do_login, e.get<char*>(1), e.get<char*>(2))
+
+// intensity/targeting.cpp
+
+LUA_BIND_STD_CLIENT(mouse_targeting, TargetingControl::setMouseTargeting, e.get<int>(1))
+LUA_BIND_CLIENT(set_mouse_targeting_entity, {
+    TargetingControl::targetLogicEntity = LogicSystem::getLogicEntity(e.get<int>(1));
+    e.push((int)(TargetingControl::targetLogicEntity.get() != NULL));
+})
+LUA_BIND_CLIENT(set_mouse_target_client, {
+    dynent *client = FPSClientInterface::getPlayerByNumber(e.get<int>(1));
+    if (client)
+        TargetingControl::targetLogicEntity = LogicSystem::getLogicEntity(client);
+    else
+        TargetingControl::targetLogicEntity.reset();
+
+    e.push((int)(TargetingControl::targetLogicEntity.get() != NULL));
+})
+
+// intensity/utility.cpp
+LUA_BIND_STD(get_config, e.push, Utility::Config::getString(e.get<const char*>(1), e.get<const char*>(2), "?").c_str())
+
+// shared/zip.cpp
+LUA_BIND_STD(addzip, addzip, e.get<const char*>(1), e.get<const char*>(2)[0] ? e.get<const char*>(2) : NULL, e.get<const char*>(3)[0] ? e.get<const char*>(3) : NULL)
+LUA_BIND_STD(removezip, removezip, e.get<const char*>(1))
 
 } // namespace lua_binds

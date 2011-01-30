@@ -91,8 +91,6 @@ void run_python(char *code)
 {
     EXEC_PYTHON(code);
 }
-COMMAND(run_python, "s");
-
 
 // TODO: The following shows how we might embed much faster:
 // from examples in the boost::python reference for exec (/execfile)

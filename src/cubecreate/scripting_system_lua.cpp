@@ -168,7 +168,7 @@ namespace lua
 
         Logging::log(Logging::DEBUG, "Setting up lua engine embedding\n");
 
-        //m_runtests = Utility::Config::getInt("Logging", "lua_tests", 1);
+        m_runtests = Utility::Config::getInt("Logging", "lua_tests", 1);
 
         if (m_rantests) m_runtests = false;
         if (m_runtests)

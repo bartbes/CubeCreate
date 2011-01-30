@@ -3,9 +3,9 @@
 
 # variables
 # input file
-IN="scripting_system_lua_def.hpp"
+IN="cubecreate/scripting_system_lua_def.hpp"
 # output file
-OUT="scripting_system_lua_exp.hpp"
+OUT="cubecreate/scripting_system_lua_exp.hpp"
 # temporary preprocessed input
 TMP="tmp_$$.$$"
 # output version

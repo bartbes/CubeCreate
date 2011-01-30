@@ -370,15 +370,15 @@ void LogicSystem::clear()
 
     if (engine.hashandle())
     {
-        engine.getg("removeAllEntities").call(0, 0);
-        assert(logicEntities.size() == 0);
+        //engine.getg("removeAllEntities").call(0, 0);
+        //assert(logicEntities.size() == 0);
 
         // For client, remove player logic entity
-        #ifdef CLIENT
-            ClientSystem::clearPlayerEntity();
-        #endif
+        //#ifdef CLIENT
+        //    ClientSystem::clearPlayerEntity();
+        //#endif
 
-        engine.destroy();
+        //engine.destroy();
     }
 
     PhysicsManager::destroyEngine();
@@ -726,5 +726,4 @@ void reloadmodel(char* name)
             entity->theModel = _new;
     }
 }
-COMMAND(reloadmodel, "s");
 

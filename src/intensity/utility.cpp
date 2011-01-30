@@ -159,16 +159,6 @@ SET_CONFIG(int,         Int)
 SET_CONFIG(float,       Float)
 
 
-// Cubescript accessibility
-
-void get_config(char *section, char *option)
-{
-    result(Utility::Config::getString(section, option, "?").c_str());
-}
-
-COMMAND(get_config, "ss");
-
-
 //==============================
 // System Info
 //==============================

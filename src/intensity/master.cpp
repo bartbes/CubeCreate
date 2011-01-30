@@ -42,8 +42,6 @@ void do_login(char *username, char *password)
     }
 }
 
-COMMAND(do_login, "ss");
-
 void useLogin(std::string userId, std::string sessionId)
 {
     REFLECT_PYTHON( use_master_login );

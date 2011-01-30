@@ -54,8 +54,8 @@ set(SERVER_SOURCES
     ../intensity/steering
     ../intensity/targeting
     ../intensity/network_system
-    ../intensity/scripting_system_lua
-    ../intensity/variable_system
+    ../cubecreate/scripting_system_lua
+    ../cubecreate/variable_system
     ../intensity/fpsserver_interface
     ../intensity/fpsclient_interface
     ../intensity/intensity_physics

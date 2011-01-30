@@ -371,3 +371,15 @@ Character.plugins = {
 		end
 	}
 }
+
+Movement = {
+    turn_left = CAPI.turn_left,
+    turn_right = CAPI.turn_right,
+    look_down = CAPI.look_down,
+    look_up = CAPI.look_up,
+    backward = CAPI.backward,
+    forward = CAPI.forward,
+    left = CAPI.left,
+    right = CAPI.right,
+    jump = CAPI.jump
+}

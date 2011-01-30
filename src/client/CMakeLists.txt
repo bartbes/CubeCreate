@@ -84,8 +84,8 @@ set(CLIENT_SOURCES
     ../intensity/targeting
     ../intensity/steering
     ../intensity/network_system
-    ../intensity/scripting_system_lua
-    ../intensity/variable_system
+    ../cubecreate/scripting_system_lua
+    ../cubecreate/variable_system
     ../intensity/fpsclient_interface
     ../intensity/fpsserver_interface
     ../intensity/master

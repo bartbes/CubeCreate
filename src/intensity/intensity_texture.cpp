@@ -4,10 +4,6 @@
 
 #include <queue>
 
-#ifdef USE_JPEG2000
-#include "openjpeg.h"
-#endif
-
 #include <set>
 
 
@@ -56,138 +52,6 @@ void doBackgroundLoading(bool all)
     }
 }
 
-
-#ifdef USE_JPEG2000
-//#define JP2_ALLOW_HIGH_PRECISION
-
-void info_callback(const char* msg, void*)
-{
-    Logging::log(Logging::DEBUG, "OpenJPEG: %s", msg);
-}
-
-void warning_callback(const char* msg, void*)
-{
-    Logging::log(Logging::WARNING, "OpenJPEG: %s", msg);
-}
-
-void error_callback(const char* msg, void*)
-{
-    Logging::log(Logging::ERROR, "OpenJPEG: %s", msg);
-}
-
-void genopenjpeg(char *infile, char *outfile)
-{
-    //=========================
-    //= Load data
-    //=========================
-
-    stream *file = openfile(infile, "rb");
-    assert(file);
-    long size = file->size();
-    uchar *data = new uchar[size];
-    assert(data);
-    int read = file->read(data, size);
-    assert(read == size);
-
-    Logging::log(Logging::DEBUG, "Converting jpeg2000 '%s', size: %ld\r\n", infile, size);
-
-    //=========================
-    //= Uncompress JPEG2000
-    //=========================
-
-    opj_dparameters_t parameters;
-    opj_set_default_decoder_parameters(&parameters);
-
-    opj_dinfo_t* dinfo = opj_create_decompress(CODEC_JP2);
-    assert(dinfo);
-    opj_setup_decoder(dinfo, &parameters);
-
-    opj_event_mgr_t events;
-    memset(&events, 0, sizeof(opj_event_mgr_t));
-    events.info_handler = info_callback;
-    events.warning_handler = warning_callback;
-    events.error_handler = error_callback;
-    opj_set_event_mgr((opj_common_ptr)dinfo, &events, stderr);            
-
-    opj_cio_t *cio = opj_cio_open((opj_common_ptr)dinfo, data, size);
-    assert(cio);
-
-    opj_image_t *image = opj_decode(dinfo, cio);
-    assert(image);
-
-    opj_cio_close(cio);
-
-    if(dinfo)
-        opj_destroy_decompress(dinfo);
-
-    assert(image->x0 == 0);
-    assert(image->y0 == 0);
-
-    int components = image->numcomps;
-    assert(components);
-    int width = image->x1;
-    int height = image->y1;
-    ImageData sauerimage(width, height, components);
-    uchar *rawData = sauerimage.data;
-
-    Logging::log(Logging::DEBUG, " components: %d  w: %d  h: %d\r\n", components, width, height);
-
-    for (int i = 0; i < components; i++)
-    {
-        opj_image_comp_t& component = image->comps[i];
-        int *componentData = component.data;
-        assert(componentData);
-
-        assert(component.w == width);
-        assert(component.factor == 0);
-        #ifndef JP2_ALLOW_HIGH_PRECISION
-            assert(component.prec == 8);
-        #endif
-
-        Logging::log(Logging::DEBUG, " component %d:  prec: %d  bpp: %d  sgned: %d  resno_d: %d\r\n", i, component.prec, component.bpp, component.sgnd, component.resno_decoded);
-
-        int offset = i;
-        for (int y = (height-1); y >= 0; y--)
-        {
-            int yWidth = y*width;
-            for (int x = 0; x < width; x++)
-            {
-                int value = componentData[yWidth + x];
-                #ifdef JP2_ALLOW_HIGH_PRECISION
-                    if (component.prec > 8)
-                        value >>= (component.prec - 8); // Reduce precision into 8 bits
-                #endif
-                rawData[offset] = value;
-                offset += components;
-            }
-        }
-    }
-
-    opj_image_destroy(image);
-
-    //=========================
-    //= Save as PNG
-    //=========================
-
-    if(!outfile[0])
-    {
-        static string buf;
-        copystring(buf, infile);
-        int len = strlen(buf);
-        if(len > 4 && buf[len-4]=='.') memcpy(&buf[len-4], ".png", 4);
-        else concatstring(buf, ".png");
-        outfile = buf;
-    }
-
-    Logging::log(Logging::DEBUG, "Saving PNG data to: %s\r\n", outfile);
-
-    saveimage(outfile, IMG_PNG, sauerimage, true);
-
-    delete[] data;
-}
-COMMAND(genopenjpeg, "ss");
-#endif
-
 // Publics
 
 #define FIX_PATH(s) \
@@ -197,24 +61,6 @@ COMMAND(genopenjpeg, "ss");
     s = path(__##s); \
     if (!Utility::validateRelativePath(s)) { printf("Relative path not validated: %s\r\n", s.c_str()); assert(0); }; \
     std::string full_##s = findfile(s.c_str(), "wb");
-
-#ifdef USE_JPEG2000
-void convertJP2toPNG(std::string source, std::string dest)
-{
-    FIX_PATH(source);
-    FIX_PATH(dest);
-
-    REFLECT_PYTHON( check_newer_than );
-    if (boost::python::extract<bool>(check_newer_than(full_dest, full_source)))
-        return;
-
-    Logging::log(Logging::DEBUG, "convertJP2toPNG: %s ==> %s\r\n", source.c_str(), dest.c_str());
-
-    renderprogress(0, ("decompressing image: " + source).c_str());
-
-    genopenjpeg((char*)source.c_str(), (char*)dest.c_str());
-}
-#endif
 
 void convertPNGtoDDS(std::string source, std::string dest)
 {

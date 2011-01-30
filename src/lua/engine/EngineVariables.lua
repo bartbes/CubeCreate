@@ -21,25 +21,14 @@ function _VARS:reg(var)
 	self.storage[var.name] = var
 	self:__defineGetter(var.name, function (self, var) return var.curv end, var)
 	self:__defineSetter(var.name .. "_ns", function (self, var, val)
-		--if var:isInReach(val) then -- do not check for minimal or maximal value on _ns, because c++ should've already done the job
-		-- if it's not clamped (smaller than minval or bigger than maxval) then it means the engine wanted to set the value like that
 		local oval = var.curv
 		var.curv = val
-		if var.chng and type(var.chng) == "function" then
-			var:chng(oval, val)
-		end
-		--end
 	end, var)
 	self:__defineSetter(var.name, function (self, var, val)
 		if var:isInReach(val) then
 			local oval = var.curv
 			var.curv = val
-			if var.chng and type(var.chng) == "function" then
-				var:chng(oval, val)
-			end
 			CAPI.syncVariableFromLua(var.name, tostring(var), val)
-		--else
-			--CAPI.syncVariableFromLua(var.name, tostring(var), var.curv) -- run the callback anyway, sync with the same value
 		end
 	end, var)
 end
@@ -55,13 +44,12 @@ end
 EV = _VARS()
 
 _VAR = class()
-function _VAR:__init(name, minv, curv, maxv, onchange, readonly, alias)
+function _VAR:__init(name, minv, curv, maxv, readonly, alias)
 	assert(name, "Cannot register variable: name is missing.")
 	self.name = name
 	self.minv = minv
 	self.maxv = maxv
 	self.curv = curv
-	self.chng = onchange
 	self.read = readonly
 	self.alias = alias
 end
@@ -70,7 +58,7 @@ IVAR = class(_VAR)
 function IVAR:__tostring() return "IVAR" end
 function IVAR:__init(name, minv, curv, maxv, readonly, alias)
 	assert(type(minv) == "number" and type(curv) == "number" and type(maxv) == "number", "Wrong value type provided to IVAR.")
-	self[_VAR].__user_init(self, name, minv, curv, maxv, nil, readonly, alias)
+	self[_VAR].__user_init(self, name, minv, curv, maxv, readonly, alias)
 end
 function IVAR:isInReach(v)
 	if type(v) ~= "number" then
@@ -96,7 +84,7 @@ SVAR = class(_VAR)
 function SVAR:__tostring() return "SVAR" end
 function SVAR:__init(name, curv, readonly, alias)
 	assert(type(curv) == "string" or not curv, "Wrong value type provided to SVAR.")
-	self[_VAR].__user_init(self, name, nil, curv, nil, nil, readonly, alias)
+	self[_VAR].__user_init(self, name, nil, curv, nil, readonly, alias)
 end
 function SVAR:isInReach(v)
 	if type(v) ~= "string" or v then

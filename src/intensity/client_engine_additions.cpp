@@ -477,65 +477,6 @@ void set_entity_gui_value(int *index, char *newValue)
 
 COMMAND(set_entity_gui_value, "is");
 
-
-//
-///
-//// Physics
-///
-//
-
-// Extra player movements
-bool k_turn_left, k_turn_right, k_look_up, k_look_down;
-
-#define dir(name,v,d,s,os) ICOMMAND(name, "D", (int *down),      \
-    if (ClientSystem::scenarioStarted()) \
-    { \
-        PlayerControl::flushActions(); /* Stop current actions */         \
-        s = *down!=0;                                                \
-        dynamic_cast<fpsent*>(player)->v = s ? d : (os ? -(d) : 0);  \
-    } \
-);
-
-dir(turn_left,  turn_move, -1, k_turn_left,  k_turn_right); // New turning motion
-dir(turn_right, turn_move, +1, k_turn_right, k_turn_left);  // New pitching motion
-
-dir(look_down, look_updown_move, -1, k_look_down, k_look_up);
-dir(look_up,   look_updown_move, +1, k_look_up,   k_look_down);
-
-#define script_dir(name,v,d,s,os) ICOMMAND(name, "D", (int *down), \
-    if (ClientSystem::scenarioStarted()) \
-    { \
-        PlayerControl::flushActions(); /* Stop current actions */ \
-        s = *down!=0; \
-        engine.getg("ApplicationManager").t_getraw("instance"); \
-        engine.t_getraw(#v).push_index(-2).push(s ? d : (os ? -(d) : 0)).push(s).call(3, 0); \
-        engine.pop(2); \
-    } \
-);
-
-//script_dir(turn_left,  performYaw, -1, k_turn_left,  k_turn_right); // New turning motion
-//script_dir(turn_right, performYaw, +1, k_turn_right, k_turn_left);  // New pitching motion
-// TODO: Enable these. But they do change the protocol (see Character.lua), so forces everyone and everything to upgrade
-//script_dir(look_down, performPitch, -1, k_look_down, k_look_up);
-//script_dir(look_up,   performPitch, +1, k_look_up,   k_look_down);
-
-// Old player movements
-script_dir(backward, performMovement, -1, player->k_down,  player->k_up);
-script_dir(forward,  performMovement,  1, player->k_up,    player->k_down);
-script_dir(left,     performStrafe,    1, player->k_left,  player->k_right);
-script_dir(right,    performStrafe,   -1, player->k_right, player->k_left);
-
-ICOMMAND(jump, "D", (int *down), {
-  if (ClientSystem::scenarioStarted())
-  {
-    PlayerControl::flushActions(); /* Stop current actions */
-    engine.getg("ApplicationManager").t_getraw("instance");
-    engine.t_getraw("performJump").push_index(-2).push((bool)*down).call(2, 0);
-    engine.pop(2);
-  }
-});
-
-
 // Player movements control - keyboard stuff
 
 void PlayerControl::handleExtraPlayerMovements(int millis)
