@@ -855,11 +855,11 @@ void initserver(bool listen, bool dedicated)
 }
 
 #ifndef STANDALONE
-void startlistenserver(int *usemaster)
+void startlistenserver(int usemaster)
 {
     if(serverhost) { conoutf(CON_ERROR, "listen server is already running"); return; }
 
-    SETV(updatemaster, *usemaster>0 ? 1 : 0);
+    SETV(updatemaster, usemaster>0 ? 1 : 0);
  
     if(!setuplistenserver(false)) return;
     
@@ -867,7 +867,6 @@ void startlistenserver(int *usemaster)
    
     conoutf("listen server started for %d clients%s", maxclients, GETIV(updatemaster) ? " and listed with master server" : ""); 
 }
-COMMAND(startlistenserver, "i");
 
 void stoplistenserver()
 {
@@ -879,7 +878,6 @@ void stoplistenserver()
 
     conoutf("listen server stopped");
 }
-COMMAND(stoplistenserver, "");
 #endif
 
 bool serveroption(char *opt)

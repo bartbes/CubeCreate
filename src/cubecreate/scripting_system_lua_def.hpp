@@ -292,7 +292,37 @@ void clearpvs();
 void testpvs(int *vcsize);
 void genpvs(int *viewcellsize);
 void pvsstats();
-void startlistenserver(int *usemaster);
+
+extern vector<int> htextures;
+extern bool havesel;
+extern int orient, reptex;
+extern ivec cur;
+void cubecancel();
+void reorient();
+void selextend();
+void copy();
+void pastehilite();
+void paste();
+void editundo();
+void editredo();
+void clearbrush();
+void brushvert(int x, int y, int v);
+void pushsel(int *dir);
+void editface(int *dir, int *mode);
+void delcube();
+void mpeditvslot(VSlot &ds, int allfaces, selinfo &sel, bool local);
+void edittex_(int *dir);
+void gettex();
+void getcurtex();
+void getseltex();
+void gettexname(int *tex, int *subslot);
+void replace(bool insel);
+void flip();
+void rotate(int *cw);
+void editmat(char *name, char *filtername);
+void showtexgui(int *n);
+
+void startlistenserver(int usemaster);
 void stoplistenserver();
 
 #ifdef CLIENT
@@ -1708,8 +1738,139 @@ LUA_BIND_STD(testPvs, testpvs, e.get<int*>(1))
 LUA_BIND_STD(clearPvs, clearpvs)
 LUA_BIND_STD(pvsStats, pvsstats)
 
-LUA_BIND_STD(startListenServer, startlistenserver, e.get<int*>(1))
-LUA_BIND_STD(stopListenServer, stoplistenserver)
+// engine/octaedit.cpp
+
+LUA_BIND_STD(edittoggle, toggleedit, false)
+LUA_BIND_STD(entcancel, entcancel)
+LUA_BIND_STD(cubecancel, cubecancel)
+LUA_BIND_STD(cancelsel, cancelsel)
+LUA_BIND_STD(reorient, reorient)
+LUA_BIND_STD(selextend, selextend)
+LUA_BIND_STD(havesel, e.push, havesel ? selchildcount : 0)
+LUA_BIND_STD(clearundos, pruneundos, 0)
+LUA_BIND_STD(copy, copy)
+LUA_BIND_STD(pastehilite, pastehilite)
+LUA_BIND_STD(paste, paste)
+LUA_BIND_STD(undo, editundo)
+LUA_BIND_STD(redo, editredo)
+LUA_BIND_STD(clearbrush, clearbrush)
+LUA_BIND_STD(brushvert, brushvert, e.get<int>(1), e.get<int>(2), e.get<int>(3))
+LUA_BIND_STD(hmapcancel, htextures.setsize, 0)
+LUA_BIND_DEF(hmapselect, {
+    int t = lookupcube(cur.x, cur.y, cur.z).texture[orient];
+    int i = htextures.find(t);
+    if (i < 0)
+        htextures.add(t);
+    else
+        htextures.remove(i);
+})
+LUA_BIND_STD(pushsel, pushsel, e.get<int*>(1))
+LUA_BIND_STD(editface, editface, e.get<int*>(1), e.get<int*>(2))
+LUA_BIND_STD(delcube, delcube)
+LUA_BIND_DEF(vdelta, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    SETVN(usevdelta, GETIV(usevdelta) + 1);
+    execute(e.get<const char*>(1));
+    SETVN(usevdelta, GETIV(usevdelta) - 1);
+})
+LUA_BIND_DEF(vrotate, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_ROTATION;
+    ds.rotation = GETIV(usevdelta) ? e.get<int>(1) : clamp(e.get<int>(1), 0, 5);
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(voffset, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_OFFSET;
+    ds.xoffset = GETIV(usevdelta) ? e.get<int>(1) : max(e.get<int>(1), 0);
+    ds.yoffset = GETIV(usevdelta) ? e.get<int>(2) : max(e.get<int>(2), 0);
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(vscroll, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_SCROLL;
+    ds.scrollS = e.get<float>(1)/1000.0f;
+    ds.scrollT = e.get<float>(2)/1000.0f;
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(vscale, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    float scale = e.get<float>(1);
+    VSlot ds;
+    ds.changed = 1 << VSLOT_SCALE;
+    ds.scale = scale <= 0 ? 1 : (GETIV(usevdelta) ? scale : clamp(scale, 1/8.0f, 8.0f));
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(vlayer, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_LAYER;
+    ds.layer = vslots.inrange(e.get<int>(1)) ? e.get<int>(1) : 0;
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(valpha, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_ALPHA;
+    ds.alphafront = clamp(e.get<float>(1), 0.0f, 1.0f);
+    ds.alphaback  = clamp(e.get<float>(2), 0.0f, 1.0f);
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(vcolor, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_COLOR;
+    ds.colorscale = vec(clamp(e.get<float>(1), 0.0f, 1.0f),
+                        clamp(e.get<float>(2), 0.0f, 1.0f),
+                        clamp(e.get<float>(3), 0.0f, 1.0f));
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(vreset, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_DEF(vshaderparam, {
+    if (noedit() || (GETIV(nompedit) && multiplayer())) return;
+    VSlot ds;
+    ds.changed = 1 << VSLOT_SHPARAM;
+    if(e.get<const char*>(1)[0])
+    {
+        ShaderParam p;
+        p.name = getshaderparamname(e.get<const char*>(1));
+        p.type = SHPARAM_LOOKUP;
+        p.index = -1; p.loc = -1;
+        p.val[0] = e.get<float>(2);
+        p.val[1] = e.get<float>(3);
+        p.val[2] = e.get<float>(4);
+        p.val[3] = e.get<float>(5);
+        ds.params.add(p);
+    }
+    mpeditvslot(ds, GETIV(allfaces), sel, true);
+})
+LUA_BIND_STD(edittex, edittex_, e.get<int*>(1))
+LUA_BIND_STD(gettex, gettex)
+LUA_BIND_STD(getcurtex, getcurtex)
+LUA_BIND_STD(getseltex, getseltex)
+LUA_BIND_DEF(getreptex, {
+    if (!noedit()) e.push(vslots.inrange(reptex) ? reptex : -1);
+})
+LUA_BIND_STD(gettexname, gettexname, e.get<int*>(1), e.get<int*>(2))
+LUA_BIND_STD(replace, replace, false)
+LUA_BIND_STD(replacesel, replace, true)
+LUA_BIND_STD(flip, flip)
+LUA_BIND_STD(rotate, rotate, e.get<int*>(1))
+LUA_BIND_STD(editmat, editmat, e.get<char*>(1), e.get<char*>(2))
+// 0/noargs = toggle, 1 = on, other = off - will autoclose if too far away or exit editmode
+LUA_BIND_STD(showtexgui, showtexgui, e.get<int*>(1))
+
+// engine/server.cpp
+
+LUA_BIND_STD(startlistenserver, startlistenserver, e.get<int>(1))
+LUA_BIND_STD(stoplistenserver, stoplistenserver)
 
 // engine/texture.cpp
 

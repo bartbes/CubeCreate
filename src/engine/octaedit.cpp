@@ -157,13 +157,6 @@ void selextend()
     }
 }
 
-ICOMMAND(edittoggle, "", (), toggleedit(false));
-COMMAND(entcancel, "");
-COMMAND(cubecancel, "");
-COMMAND(cancelsel, "");
-COMMAND(reorient, "");
-COMMAND(selextend, "");
-
 ///////// selection support /////////////
 
 cube &blockcube(int x, int y, int z, const block3 &b, int rgrid) // looks up a world cube, based on coordinates mapped by the block
@@ -182,9 +175,7 @@ cube &blockcube(int x, int y, int z, const block3 &b, int rgrid) // looks up a w
 
 ////////////// cursor ///////////////
 
-int selchildcount=0;
-
-ICOMMAND(havesel, "", (), intret(havesel ? selchildcount : 0));
+int selchildcount = 0;
 
 void countselchild(cube *c, const ivec &cor, int size)
 {
@@ -650,10 +641,6 @@ void pruneundos(int maxremain)                          // bound memory
     }
 }
 
-void clearundos() { pruneundos(0); }
-
-COMMAND(clearundos, "");
-
 undoblock *newundocube(selinfo &s)
 {
     int ssize = s.size(),
@@ -911,12 +898,6 @@ void paste()
     mppaste(localedit, sel, true);
 }
 
-COMMAND(copy, "");
-COMMAND(pastehilite, "");
-COMMAND(paste, "");
-COMMANDN(undo, editundo, "");
-COMMANDN(redo, editredo, "");
-
 static VSlot *editingvslot = NULL;
 
 void compacteditvslots()
@@ -953,32 +934,20 @@ void clearbrush()
     paintbrush = false;
 }
 
-void brushvert(int *x, int *y, int *v)
+void brushvert(int x, int y, int v)
 {
-    *x += MAXBRUSH2 - GETIV(brushx) + 1; // +1 for automatic padding
-    *y += MAXBRUSH2 - GETIV(brushy) + 1;
-    if(*x<0 || *y<0 || *x>=MAXBRUSH || *y>=MAXBRUSH) return;
-    brush[*x][*y] = clamp(*v, 0, 8);
-    paintbrush = paintbrush || (brush[*x][*y] > 0);
-    brushmaxx = min(MAXBRUSH-1, max(brushmaxx, *x+1));
-    brushmaxy = min(MAXBRUSH-1, max(brushmaxy, *y+1));
-    brushminx = max(0,          min(brushminx, *x-1));
-    brushminy = max(0,          min(brushminy, *y-1));
+    x += MAXBRUSH2 - GETIV(brushx) + 1; // +1 for automatic padding
+    y += MAXBRUSH2 - GETIV(brushy) + 1;
+    if(x<0 || y<0 || x>=MAXBRUSH || y>=MAXBRUSH) return;
+    brush[x][y] = clamp(v, 0, 8);
+    paintbrush = paintbrush || (brush[x][y] > 0);
+    brushmaxx = min(MAXBRUSH-1, max(brushmaxx, x+1));
+    brushmaxy = min(MAXBRUSH-1, max(brushmaxy, y+1));
+    brushminx = max(0,          min(brushminx, x-1));
+    brushminy = max(0,          min(brushminy, y-1));
 }
 
 vector<int> htextures;
-
-COMMAND(clearbrush, "");
-COMMAND(brushvert, "iii");
-ICOMMAND(hmapcancel, "", (), htextures.setsize(0); );
-ICOMMAND(hmapselect, "", (), 
-    int t = lookupcube(cur.x, cur.y, cur.z).texture[orient];
-    int i = htextures.find(t);
-    if(i<0)
-        htextures.add(t);
-    else
-        htextures.remove(i);
-);
 
 inline bool ishtexture(int t)
 {    
@@ -1443,10 +1412,6 @@ void delcube()
     mpdelcube(sel, true);
 }
 
-COMMAND(pushsel, "i");
-COMMAND(editface, "ii");
-COMMAND(delcube, "");
-
 /////////// texture editing //////////////////
 
 int curtexindex = -1, lasttex = 0, lasttexmillis = -1;
@@ -1571,110 +1536,6 @@ void mpeditvslot(VSlot &ds, int allfaces, selinfo &sel, bool local)
     }
 }
 
-void vdelta(char *body)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    SETVN(usevdelta, GETIV(usevdelta) + 1);
-    execute(body);
-    SETVN(usevdelta, GETIV(usevdelta) - 1);
-}
-COMMAND(vdelta, "s");
-
-void vrotate(int *n)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_ROTATION;
-    ds.rotation = GETIV(usevdelta) ? *n : clamp(*n, 0, 5);
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vrotate, "i");
-
-void voffset(int *x, int *y)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_OFFSET;
-    ds.xoffset = GETIV(usevdelta) ? *x : max(*x, 0);
-    ds.yoffset = GETIV(usevdelta) ? *y : max(*y, 0);
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(voffset, "ii");
-
-void vscroll(float *s, float *t)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_SCROLL;
-    ds.scrollS = *s/1000.0f;
-    ds.scrollT = *t/1000.0f;
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vscroll, "ff");
-
-void vscale(float *scale)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_SCALE;
-    ds.scale = *scale <= 0 ? 1 : (GETIV(usevdelta) ? *scale : clamp(*scale, 1/8.0f, 8.0f));
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vscale, "f");
-
-void vlayer(int *n)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_LAYER;
-    ds.layer = vslots.inrange(*n) ? *n : 0;
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vlayer, "i");
-
-void valpha(float *front, float *back)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_ALPHA;
-    ds.alphafront = clamp(*front, 0.0f, 1.0f);
-    ds.alphaback = clamp(*back, 0.0f, 1.0f);
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(valpha, "ff");
-
-void vcolor(float *r, float *g, float *b)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_COLOR;
-    ds.colorscale = vec(clamp(*r, 0.0f, 1.0f), clamp(*g, 0.0f, 1.0f), clamp(*b, 0.0f, 1.0f));
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vcolor, "fff");
-
-void vreset()
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vreset, "");
-
-void vshaderparam(const char *name, float *x, float *y, float *z, float *w)
-{
-    if(noedit() || (GETIV(nompedit) && multiplayer())) return;
-    VSlot ds;
-    ds.changed = 1<<VSLOT_SHPARAM;
-    if(name[0])
-    {
-        ShaderParam p = { getshaderparamname(name), SHPARAM_LOOKUP, -1, -1, {*x, *y, *z, *w} };
-        ds.params.add(p);
-    }
-    mpeditvslot(ds, GETIV(allfaces), sel, true);
-}
-COMMAND(vshaderparam, "sffff");
- 
 void mpedittex(int tex, int allfaces, selinfo &sel, bool local)
 {
     if(local)
@@ -1769,7 +1630,7 @@ void getcurtex()
     filltexlist();
     int index = curtexindex < 0 ? 0 : curtexindex;
     if(!texmru.inrange(index)) return;
-    intret(texmru[index]);
+    lua::engine.push(texmru[index]);
 }
 
 void getseltex()
@@ -1777,7 +1638,7 @@ void getseltex()
     if(noedit(true)) return;
     cube &c = lookupcube(sel.o.x, sel.o.y, sel.o.z, -sel.grid);
     if(c.children || isempty(c)) return;
-    intret(c.texture[sel.orient]);
+    lua::engine.push(c.texture[sel.orient]);
 }
 
 void gettexname(int *tex, int *subslot)
@@ -1786,15 +1647,8 @@ void gettexname(int *tex, int *subslot)
     VSlot &vslot = lookupvslot(*tex);
     Slot &slot = *vslot.slot;
     if(!slot.sts.inrange(*subslot)) return;
-    result(slot.sts[*subslot].name);
+    lua::engine.push(slot.sts[*subslot].name);
 }
-
-COMMANDN(edittex, edittex_, "i");
-COMMAND(gettex, "");
-COMMAND(getcurtex, "");
-COMMAND(getseltex, "");
-ICOMMAND(getreptex, "", (), { if(!noedit()) intret(vslots.inrange(reptex) ? reptex : -1); });
-COMMAND(gettexname, "ii");
 
 void replacetexcube(cube &c, int oldtex, int newtex)
 {
@@ -1822,9 +1676,6 @@ void replace(bool insel)
     if(reptex < 0) { conoutf(CON_ERROR, "can only replace after a texture edit"); return; }
     mpreplacetex(reptex, lasttex, insel, sel, true);
 }
-
-ICOMMAND(replace, "", (), replace(false));
-ICOMMAND(replacesel, "", (), replace(true));
 
 ////////// flip and rotate ///////////////
 uint dflip(uint face) { return face==F_EMPTY ? face : 0x88888888 - (((face&0xF0F0F0F0)>>4) | ((face&0x0F0F0F0F)<<4)); }
@@ -1928,9 +1779,6 @@ void rotate(int *cw)
     mprotate(*cw, sel, true);
 }
 
-COMMAND(flip, "");
-COMMAND(rotate, "i");
-
 void setmat(cube &c, uchar mat, uchar matmask, uchar filtermat, uchar filtermask)
 {
     if(c.children)
@@ -1983,8 +1831,6 @@ void editmat(char *name, char *filtername)
     }
     mpeditmat(id, filter, sel, true);
 }
-
-COMMAND(editmat, "ss");
 
 static int lastthumbnail = 0;
 
@@ -2070,9 +1916,6 @@ void showtexgui(int *n)
     if(!editmode) { conoutf(CON_ERROR, "operation only allowed in edit mode"); return; }
     gui.showtextures(*n==0 ? !gui.menuon : *n==1); 
 }
-
-// 0/noargs = toggle, 1 = on, other = off - will autoclose if too far away or exit editmode
-COMMAND(showtexgui, "i");
 
 void rendertexturepanel(int w, int h)
 {
