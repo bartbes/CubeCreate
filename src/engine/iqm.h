@@ -636,7 +636,17 @@ void iqmanimpart(char *maskstr)
     iqm::skelpart *p = (iqm::skelpart *)loadingiqm->parts.last();
 
     vector<char *> bonestrs;
-    explodelist(maskstr, bonestrs);
+
+    // TODO: get rid of this thing
+    maskstr += strspn(maskstr, "\n\t ");
+    while(*maskstr)
+    {
+        const char *elem = maskstr;
+        *maskstr=='"' ? (++maskstr, maskstr += strcspn(maskstr, "\"\n\0"), maskstr += *maskstr=='"') : maskstr += strcspn(maskstr, "\n\t \0");
+        bonestrs.add(*elem=='"' ? newstring(elem+1, maskstr-elem-(maskstr[-1]=='"' ? 2 : 1)) : newstring(elem, maskstr-elem));
+        maskstr += strspn(maskstr, "\n\t ");
+    }
+
     vector<ushort> bonemask;
     loopv(bonestrs)
     {

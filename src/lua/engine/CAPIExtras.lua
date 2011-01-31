@@ -623,21 +623,6 @@ function CAPI.showHUDImage(tex, centerx, centery, width, height, color, alpha)
 	oldShowHUDImage(tex, centerx, centery, width, height, color, alpha)
 end
 
--- variable namespace
-
-local _CV = class()
-function _CV:__get (k) 
-	return CAPI.getVariable(k)
-end
-function _CV:__set (k, v)
-	CAPI.setVariable(k, v)
-	return true
-end
-function _CV:run(c)
-	CAPI.runCS(c)
-end
-CV = _CV()
-
 -- input functions
 
 Console = {

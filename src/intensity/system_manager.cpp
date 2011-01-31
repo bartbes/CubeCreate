@@ -34,7 +34,7 @@ void SystemManager::init()
         if (!haveMaster)
         {
             SETVF(logged_into_master, 1);
-            execute("setup_main_menu");
+            lua::engine.exec("setup_main_menu()");
             Logging::log(Logging::DEBUG, "No master server; working entirely remotely\r\n");
         }
     #endif

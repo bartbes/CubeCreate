@@ -285,32 +285,6 @@ void conoutf(const char *fmt, ...)
     va_end(args); 
 }
 
-// Stubs to avoid 'missing command' warnings on server when executing .cfg's
-void texture(const char *type, const char *name, int rot, int xoffset, int yoffset, float scale, int forcedindex) { }
-COMMAND(texture, "ssiiif");
-
-void setshader(char *t) { }
-COMMAND(setshader, "s");
-
-void loadsky(char *t) { }
-COMMAND(loadsky, "s");
-
-void show_layout(char *t) { }
-COMMAND(show_layout, "s");
-
-void setpixelparam(int *t, float *f1, float *f2, float *f3, float *f4) { }
-COMMAND(setpixelparam, "iffff");
-
-void music(char *t, char *t2) { }
-COMMAND(music, "s");
-
-void materialreset() { }
-COMMAND(materialreset, "");
-
-void autograss(char *t) { }
-COMMAND(autograss, "");
-
-
 // Stuff the client has in various files, which the server needs replacements for
 
 Texture *notexture = NULL; // Replacement for texture.cpp's notexture

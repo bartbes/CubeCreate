@@ -231,9 +231,9 @@ void rdjoint(int *n, int *t, char *v1, char *v2, char *v3)
     ragdollskel::joint &j = ragdoll->joints.add();
     j.bone = *n;
     j.tri = *t;
-    j.vert[0] = v1[0] ? parseint(v1) : -1;
-    j.vert[1] = v2[0] ? parseint(v2) : -1;
-    j.vert[2] = v3[0] ? parseint(v3) : -1;
+    j.vert[0] = v1[0] ? int(strtol(v1, NULL, 0)) : -1;
+    j.vert[1] = v2[0] ? int(strtol(v2, NULL, 0)) : -1;
+    j.vert[2] = v3[0] ? int(strtol(v3, NULL, 0)) : -1;
 }
    
 void rdlimitdist(int *v1, int *v2, float *mindist, float *maxdist)

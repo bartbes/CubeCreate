@@ -171,19 +171,59 @@ namespace var
          * @return An int.
          * 
          * Gets int value of the variable.
+         * @see gmni()
+         * @see gmxi()
          * @see gf()
          * @see gs()
          */
         int gi();
         /**
+         * @brief Get minimal int value of the variable.
+         * @return An int.
+         * 
+         * Gets minimal int value of the variable.
+         * @see gi()
+         * @see gmxi()
+         */
+        int gmni();
+        /**
+         * @brief Get maximal int value of the variable.
+         * @return An int.
+         * 
+         * Gets maximal int value of the variable.
+         * @see gi()
+         * @see gmni()
+         */
+        int gmxi();
+        /**
          * @brief Get float value of the variable.
          * @return A float.
          * 
          * Gets float value of the variable.
+         * @see gmnf()
+         * @see gmxf()
          * @see gi()
          * @see gs()
          */
         float gf();
+        /**
+         * @brief Get minimal float value of the variable.
+         * @return An int.
+         * 
+         * Gets minimal float value of the variable.
+         * @see gf()
+         * @see gmxf()
+         */
+        float gmnf();
+        /**
+         * @brief Get maximal float value of the variable.
+         * @return An int.
+         * 
+         * Gets maximal float value of the variable.
+         * @see gf()
+         * @see gmnf()
+         */
+        float gmxf();
         /**
          * @brief Get string value of the variable.
          * @return A string (const char*).

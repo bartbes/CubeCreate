@@ -35,7 +35,7 @@ void do_login(char *username, char *password)
 
         // Mark as logged in, and continue
         SETVF(logged_into_master, 1);
-        execute("setup_main_menu");
+        lua::engine.exec("setup_main_menu()");
         conoutf("Logged in successfully");
     } else {
         SETVF(hashed_password, ""); // Remove the old saved password, for security
@@ -48,13 +48,13 @@ void useLogin(std::string userId, std::string sessionId)
     use_master_login( userId, sessionId );
 
     SETVF(logged_into_master, 1);
-    execute("setup_main_menu");
+    lua::engine.exec("setup_main_menu()");
 }
 
 void logout()
 {
     SETV(logged_into_master, 0);
-    execute("setup_main_menu");
+    lua::engine.exec("setup_main_menu()");
 }
 
 #endif

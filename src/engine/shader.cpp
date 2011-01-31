@@ -1726,13 +1726,13 @@ void fastshader(char *nice, char *fast, int *detail)
 void isshaderdefined(char *name)
 {
     Shader *s = lookupshaderbyname(name);
-    intret(s ? 1 : 0);
+    lua::engine.push(s ? 1 : 0);
 }
 
 void isshadernative(char *name)
 {
     Shader *s = lookupshaderbyname(name);
-    intret(s && s->native ? 1 : 0);
+    lua::engine.push(s && s->native ? 1 : 0);
 }
 
 static hashset<const char *> shaderparamnames(256);

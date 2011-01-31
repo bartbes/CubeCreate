@@ -190,12 +190,12 @@ void startmusic(char *name, char *cmd)
             if(cmd[0]) musicdonecmd = newstring(cmd);
             Mix_PlayMusic(music, cmd[0] ? 0 : -1);
             Mix_VolumeMusic((GETIV(musicvol)*MAXVOL)/255);
-            intret(1);
+            lua::engine.push(1);
         }
         else
         {
             conoutf(CON_ERROR, "could not play music: %s", file);
-            intret(0); 
+            lua::engine.push(0); 
         }
     }
 }
@@ -240,8 +240,6 @@ int addsound(const char *name, int vol, int maxuses, vector<soundslot> &sounds)
 
 int preload_sound(char *name, int vol); // INTENSITY
 void registersound(char *name, int *vol) { lua::engine.push(preload_sound(name, *vol)); } // INTENSITY
-
-void mapsound(char *name, int *vol, int *maxuses) { intret(addsound(name, *vol, *maxuses < 0 ? 0 : max(1, *maxuses), mapsounds)); }
 
 void resetchannels()
 {

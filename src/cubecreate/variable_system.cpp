@@ -187,11 +187,15 @@ namespace var
 
     cvar::~cvar() { if (type == VAR_S) DELETEA(curv.s); }
 
-    const char *cvar::gn() { return name;  }
-    int         cvar::gt() { return type;  }
-    int         cvar::gi() { return curv.i;  }
-    float       cvar::gf() { return curv.f; }
-    const char *cvar::gs() { return curv.s; }
+    const char *cvar::gn()   { return name;   }
+    int         cvar::gt()   { return type;   }
+    int         cvar::gi()   { return curv.i; }
+    int         cvar::gmni() { return minv.i; }
+    int         cvar::gmxi() { return maxv.i; }
+    float       cvar::gf()   { return curv.f; }
+    float       cvar::gmnf() { return minv.f; }
+    float       cvar::gmxf() { return maxv.f; }
+    const char *cvar::gs()   { return curv.s; }
 
     void cvar::s(int val, bool luasync, bool forcecb, bool clamp)
     {

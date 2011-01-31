@@ -78,7 +78,6 @@ set(CLIENT_SOURCES
     ../engine/decal
     ../engine/sound
     ../engine/pvs
-    ../engine/command
     ../intensity/engine_additions
     ../intensity/world_system
     ../intensity/targeting

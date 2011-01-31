@@ -46,8 +46,6 @@ exposeToPython("run_script_string", wrapLuaEngineRunScriptString);
 exposeToPython("run_script_int", wrapLuaEngineRunScriptInt);
 exposeToPython("run_script_double", wrapLuaEngineRunScriptDouble);
 
-exposeToPython("run_cubescript", execute);
-
 // World
 
 exposeToPython("load_world", load_world_oneparam);

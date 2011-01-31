@@ -568,7 +568,7 @@ namespace game
         maptime = 0;
 //        if(*name) conoutf(CON_GAMEINFO, "\f2game mode is %s", fpsserver::modestr(gamemode));
 
-        if(identexists("mapstart")) execute("mapstart");
+        //if(identexists("mapstart")) execute("mapstart");
 
 #ifdef SERVER
         server::resetScenario();

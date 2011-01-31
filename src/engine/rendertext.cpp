@@ -104,7 +104,7 @@ void tabify(const char *str, int *numtabs)
         w = ((w+PIXELTAB)/PIXELTAB)*PIXELTAB;
     }
     tabbed.add('\0');
-    result(tabbed.getbuf());
+    lua::engine.push(tabbed.getbuf());
 }
   
 void draw_textf(const char *fstr, int left, int top, ...)

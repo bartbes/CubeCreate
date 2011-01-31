@@ -2184,22 +2184,32 @@ void gl_drawhud(int w, int h)
                 abovehud -= FONTH;
                 draw_textf("cube %s%d", FONTH/2, abovehud, selchildcount<0 ? "1/" : "", abs(selchildcount));
 
-                char *editinfo = executeret("edithud");
-                if(editinfo)
+                lua::engine.getg("edithud");
+                if (!lua::engine.is<void>(-1))
                 {
-                    abovehud -= FONTH;
-                    draw_text(editinfo, FONTH/2, abovehud);
-                    DELETEA(editinfo);
+                    lua::engine.call(0, 1);
+                    const char *editinfo = lua::engine.get<const char*>(-1);
+                    if(editinfo)
+                    {
+                        abovehud -= FONTH;
+                        draw_text(editinfo, FONTH/2, abovehud);
+                    }
+                    lua::engine.pop(1);
                 }
             }
-            else if(identexists("gamehud"))
+            else
             {
-                char *gameinfo = executeret("gamehud");
-                if(gameinfo)
+                lua::engine.getg("gamehud");
+                if (!lua::engine.is<void>(-1))
                 {
-                    draw_text(gameinfo, conw-max(5*FONTH, 2*FONTH+text_width(gameinfo)), conh-FONTH*3/2-roffset);
-                    DELETEA(gameinfo);
-                    roffset += FONTH;
+                    lua::engine.call(0, 1);
+                    const char *gameinfo = lua::engine.get<const char*>(-1);
+                    if(gameinfo)
+                    {
+                        draw_text(gameinfo, conw-max(5*FONTH, 2*FONTH+text_width(gameinfo)), conh-FONTH*3/2-roffset);
+                        roffset += FONTH;
+                    }
+                    lua::engine.pop(1);
                 }
             } 
             

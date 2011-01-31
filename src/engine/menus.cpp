@@ -248,11 +248,6 @@ void guibutton(char *name, char *action, char *icon)
         updatelater.add().schedule(action[0] ? action : name);
         if(shouldclearmenu) clearlater = true;
     }
-    else if(ret&G3D_ROLLOVER)
-    {
-        alias("guirollovername", name);
-        alias("guirolloveraction", action);
-    }
 }
 
 void guiimage(char *path, char *action, float *scale, int *overlaid, char *alt)
@@ -272,11 +267,6 @@ void guiimage(char *path, char *action, float *scale, int *overlaid, char *alt)
             updatelater.add().schedule(action);
             if(shouldclearmenu) clearlater = true;
         }
-    }
-    else if(ret&G3D_ROLLOVER)
-    {
-        alias("guirolloverimgpath", path);
-        alias("guirolloverimgaction", action);
     }
 }
 
@@ -375,12 +365,15 @@ static const char *getsval(char *var)
     else
     {
         var::cvar *ev = var::get(var);
+        string ret;
         switch (ev->gt())
         {
-            case var::VAR_I: return intstr(ev->gi()); break;
-            case var::VAR_F: return floatstr(ev->gf()); break;
-            case var::VAR_S: return ev->gs(); break;
+            case var::VAR_I: formatstring(ret)("%d", ev->gi()); break;
+            case var::VAR_F: formatstring(ret)("%f", ev->gi()); break;
+            case var::VAR_S: formatstring(ret)("%s", ev->gs()); break;
+            default: formatstring(ret)(""); break;
         }
+        return newstring(ret);
     }
     return "";
 }
@@ -388,7 +381,7 @@ static const char *getsval(char *var)
 void guislider(char *var, int *min, int *max, char *onchange)
 {
     if(!cgui) return;
-    int oldval = getval(var), val = oldval, vmin = *max ? *min : getvarmin(var), vmax = *max ? *max : getvarmax(var);
+    int oldval = getval(var), val = oldval, vmin = *max ? *min : var::get(var)->gmni(), vmax = *max ? *max : var::get(var)->gmxi();
     cgui->slider(val, vmin, vmax, GUI_TITLE_COLOR);
     if(val != oldval) updateval(var, val, onchange);
 }
@@ -400,7 +393,7 @@ void guilistslider(char *var, char *list, char *onchange)
     list += strspn(list, "\n\t ");
     while(*list)
     {
-        vals.add(parseint(list));
+        vals.add(int(strtol(list, NULL, 0)));
         list += strcspn(list, "\n\t \0");
         list += strspn(list, "\n\t ");
     }
@@ -412,6 +405,29 @@ void guilistslider(char *var, char *list, char *onchange)
     if(offset != oldoffset) updateval(var, vals[offset], onchange);
 }
 
+// TODO: moved from old command.cpp, remove (with new UI)
+#define whitespaceskip s += strspn(s, "\n\t ")
+#define elementskip *s=='"' ? (++s, s += strcspn(s, "\"\n\0"), s += *s=='"') : s += strcspn(s, "\n\t \0")
+
+char *indexlist(const char *s, int pos)
+{
+    whitespaceskip;
+    loopi(pos)
+    {
+        elementskip;
+        whitespaceskip;
+        if(!*s) break;
+    }
+    const char *e = s;
+    elementskip;
+    if(*e=='"')
+    {
+        e++;
+        if(s[-1]=='"') --s;
+    }
+    return newstring(e, s-e);
+}
+
 void guinameslider(char *var, char *names, char *list, char *onchange)
 {
     if(!cgui) return;
@@ -419,7 +435,7 @@ void guinameslider(char *var, char *names, char *list, char *onchange)
     list += strspn(list, "\n\t ");
     while(*list)
     {
-        vals.add(parseint(list));
+        vals.add(int(strtol(list, NULL, 0)));
         list += strcspn(list, "\n\t \0");
         list += strspn(list, "\n\t ");
     }

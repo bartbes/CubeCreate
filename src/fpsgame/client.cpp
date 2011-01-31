@@ -155,27 +155,6 @@ namespace game
         return -1;
     }
 
-    void listclients(bool local)
-    {
-        vector<char> buf;
-        string cn;
-        int numclients = 0;
-        if(local)
-        {
-            formatstring(cn)("%d", player1->clientnum);
-            buf.put(cn, strlen(cn));
-            numclients++;
-        }
-        loopv(players)
-        {
-            formatstring(cn)("%d", players[i]->clientnum);
-            if(numclients++) buf.add(' ');
-            buf.put(cn, strlen(cn));
-        }
-        buf.add('\0');
-        result(buf.getbuf());
-    }
-
     void togglespectator(int val, const char *who)
     {
         if(!remote) return;
@@ -276,30 +255,6 @@ namespace game
         addmsg(N_SAYTEAM, "rs", text);
     }
 #endif
-
-    void printvar(fpsent *d, ident *id)
-    {
-        if(id) switch(id->type)
-        {
-            case ID_VAR:
-            {
-                int val = *id->storage.i;
-                string str;
-                if(id->flags&IDF_HEX && id->maxval==0xFFFFFF)
-                    formatstring(str)("0x%.6X (%d, %d, %d)", val, (val>>16)&0xFF, (val>>8)&0xFF, val&0xFF);
-                else
-                    formatstring(str)(id->flags&IDF_HEX ? "0x%X" : "%d", val);
-                conoutf("%s set map var \"%s\" to %s", colorname(d), id->name, str);
-                break;
-            }
-            case ID_FVAR:
-                conoutf("%s set map var \"%s\" to %s", colorname(d), id->name, floatstr(*id->storage.f));
-                break;
-            case ID_SVAR:
-                conoutf("%s set map var \"%s\" to \"%s\"", colorname(d), id->name, *id->storage.s);
-                break;
-        }
-    }
 
     void sendposition(fpsent *d, bool reliable)
     {
@@ -746,12 +701,6 @@ assert(0); // Kripken: Do not let clients know other clients' pings
 
         // Note that we made changes
         EditingSystem::madeChanges = true;
-    }
-
-    void vartrigger(ident *id)
-    {
-        // We do not use sauer protocol to update mapvars. Use our method to run a script
-        // to make each client update its map vars, or upload/restart the map.
     }
 
     void forceedit(const char *name) { };

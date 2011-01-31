@@ -595,7 +595,7 @@ void updatefrommaster()
     else
     {
         clearservers();
-        execute(data.getbuf());
+        lua::engine.exec(data.getbuf());
     }
     refreshservers();
 }

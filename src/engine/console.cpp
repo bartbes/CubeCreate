@@ -296,8 +296,9 @@ struct hline
     {
         if(action)
         {
-            alias("commandbuf", buf);
-            execute(action);
+            // TODO: finish this
+            //alias("commandbuf", buf);
+            //execute(action);
         }
         else if(buf[0]=='/') lua::engine.exec(buf+1);
         else game::toserver(buf);
@@ -606,9 +607,10 @@ string lastcomplete;
 
 void resetcomplete() { completesize = 0; }
 
+// TODO! COMPLETIONS
 void addcomplete(char *command, int type, char *dir, char *ext)
 {
-    if(var::overridevars)
+    /*if(var::overridevars)
     {
         conoutf(CON_ERROR, "cannot override complete %s", command);
         return;
@@ -641,7 +643,7 @@ void addcomplete(char *command, int type, char *dir, char *ext)
     }
     filesval **hasfiles = completions.access(command);
     if(hasfiles) *hasfiles = *val;
-    else completions[newstring(command)] = *val;
+    else completions[newstring(command)] = *val;*/
 }
 
 void addfilecomplete(char *command, char *dir, char *ext)
@@ -656,7 +658,7 @@ void addlistcomplete(char *command, char *list)
 
 void complete(char *s)
 {
-    if(*s!='/')
+    /*if(*s!='/')
     {
         string t;
         copystring(t, s);
@@ -708,7 +710,7 @@ void complete(char *s)
         concatstring(s, nextcomplete);
         copystring(lastcomplete, nextcomplete);
     }
-    else lastcomplete[0] = '\0';
+    else lastcomplete[0] = '\0';*/
 }
 
 static int sortcompletions(char **x, char **y)

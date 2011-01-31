@@ -41,7 +41,6 @@ set(SERVER_SOURCES
     ../engine/world
     ../engine/worldio
     ../intensity/engine_additions
-    ../engine/command
     ../engine/octa
     ../engine/physics
     ../engine/rendermodel

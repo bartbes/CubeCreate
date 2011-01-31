@@ -35,6 +35,11 @@ struct Utility
     //! Will halt on error (what we want for now, but FIXME)
     static std::string readFile(std::string name);
 
+    //! execute the json cfg file
+    static bool config_exec_json(const char *cfgfile, bool msg);
+    //! write json cfg file
+    static void writecfg(const char *name = NULL);
+
     //! Configuration file management
     struct Config
     {

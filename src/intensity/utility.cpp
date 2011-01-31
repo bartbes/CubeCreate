@@ -101,6 +101,211 @@ std::string Utility::readFile(std::string name)
     }
 }
 
+bool Utility::config_exec_json(const char *cfgfile, bool msg)
+{
+    string s;
+    copystring(s, cfgfile);
+    char *buf = loadfile(path(s), NULL);
+    if(!buf)
+    {
+        if(msg) conoutf(CON_ERROR, "could not read \"%s\"", s);
+        return false;
+    }
+    // let's parse!
+    JSONValue *value = JSON::Parse(buf);
+    // we can delete buf now. It's all safely stored in JSONValue.
+    delete[] buf;
+
+    if (value == NULL)
+    {
+        if(msg) conoutf(CON_ERROR, "could not load \"%s\"", s);
+        return false;
+    }
+    else
+    {
+        JSONObject root;
+        if (value->IsObject() == false)
+        {
+            if(msg) conoutf(CON_ERROR, "could not load JSON root object.");
+            return false;
+        }
+        else
+        {
+            root = value->AsObject();
+            // CROSSHAIRS: TODO!
+            /*if (root.find(L"crosshairs") != root.end() && root[L"crosshairs"]->IsObject())
+            {
+                JSONObject crls = root[L"crosshairs"]->AsObject();
+                for (JSONObject::const_iterator criter = crls.begin(); criter != crls.end(); ++criter)
+                {
+                    defformatstring(aliasc)("loadcrosshair \"%s\" %i", fromwstring(criter->first).c_str(), (int)criter->second->AsNumber());
+                    execute(aliasc);
+                }
+            }*/
+            // PERSISTENT VARIABLE LOAD: TODO!
+            /*if (root.find(L"variables") != root.end() && root[L"variables"]->IsObject())
+            {
+                JSONObject vars = root[L"variables"]->AsObject();
+                for (JSONObject::const_iterator viter = vars.begin(); viter != vars.end(); ++viter)
+                {
+                    ident *ident = idents->access(fromwstring(viter->first).c_str());
+                    if (ident)
+                    {
+                        switch(ident->type)
+                        {
+                            case ID_VAR:
+                                setvarchecked(ident, (int)viter->second->AsNumber());
+                                break;
+                            case ID_FVAR:
+                                setfvarchecked(ident, viter->second->AsNumber());
+                                break;
+                            case ID_SVAR:
+                                setsvarchecked(ident, fromwstring(viter->second->AsString()).c_str());
+                                break;
+                            case ID_ALIAS:
+                                alias(ident->name, fromwstring(viter->second->AsString()).c_str());
+                                break;
+                        }
+                    }
+                }
+            }*/
+            if (root.find(L"binds") != root.end() && root[L"binds"]->IsObject())
+            {
+                JSONObject bnds = root[L"binds"]->AsObject();
+                for (JSONObject::const_iterator biter = bnds.begin(); biter != bnds.end(); ++biter)
+                {
+                    JSONObject bnd = biter->second->AsObject();
+                    for (JSONObject::const_iterator biiter = bnd.begin(); biiter != bnd.end(); ++biiter)
+                    {
+                        defformatstring(bindcmd)("%s(\"%s\", [[%s]])", fromwstring(biiter->first).c_str(), fromwstring(biter->first).c_str(), fromwstring(biiter->second->AsString()).c_str());
+                        lua::engine.exec(bindcmd);
+                    }
+                }
+            }
+            // TODO: aliases
+            /*if (root.find(L"aliases") != root.end() && root[L"aliases"]->IsObject())
+            {
+                JSONObject als = root[L"aliases"]->AsObject();
+                for (JSONObject::const_iterator aiter = als.begin(); aiter != als.end(); ++aiter)
+                {
+                    defformatstring(aliasc)("\"%s\" = [%s]", fromwstring(aiter->first).c_str(), fromwstring(aiter->second->AsString()).c_str());
+                    execute(aliasc);
+                }
+            }*/
+            // TODO: completions
+            /*
+            if (root.find(L"completions") != root.end() && root[L"completions"]->IsObject())
+            {
+                JSONObject cmpl = root[L"completions"]->AsObject();
+                for (JSONObject::const_iterator citer = cmpl.begin(); citer != cmpl.end(); ++citer)
+                {
+                    if (fromwstring(citer->first) == "listcomplete")
+                    {
+                        std::string cmpl;
+                        JSONArray cfa = citer->second->AsArray();
+                        JSONArray cfaa = cfa[1]->AsArray();
+                        for (unsigned int cfai = 0; cfai < cfaa.size(); cfai++)
+                        {
+                            cmpl += fromwstring(cfaa[cfai]->AsString());
+                            if ((cfai + 1) != cfaa.size()) cmpl += " ";
+                        }
+                        defformatstring(listcmplcmd)("listcomplete \"%s\" [%s]", fromwstring(cfa[0]->AsString()).c_str(), cmpl.c_str());
+                        execute(listcmplcmd);
+                    }
+                    else
+                    {
+                        JSONArray cfa = citer->second->AsArray();
+                        defformatstring(cmplcmd)("complete \"%s\" \"%s\" \"%s\"", fromwstring(cfa[0]->AsString()).c_str(), fromwstring(cfa[1]->AsString()).c_str(), fromwstring(cfa[2]->AsString()).c_str());
+                        execute(cmplcmd);
+                    }
+                }
+            }*/
+        }
+    }
+    delete value;
+    return true;
+}
+
+JSONObject writebinds();
+
+void Utility::writecfg(const char *name)
+{
+    JSONObject root, vars, aliases, complet, bnds, crossh; // clientinfo;
+    //vector<ident *> ids;
+    stream *f = openfile(path(name && name[0] ? name : game::savedconfig(), true), "w");
+    if(!f) return;
+
+    //clientinfo = game::writeclientinfo();
+    // root[L"clientinfo"] = new JSONValue(clientinfo);
+
+    /*crossh = writecrosshairs();
+    root[L"crosshairs"] = new JSONValue(crossh);*/
+
+    /*enumerate(*idents, ident, id, ids.add(&id));
+    ids.sort(sortidents);
+    loopv(ids)
+    {
+        ident &id = *ids[i];
+        if(id.flags&IDF_PERSIST) switch(id.type)
+        {
+            case ID_VAR:
+            {
+                vars[towstring(id.name)] = new JSONValue((double)*id.storage.i);
+                break;
+            }
+            case ID_FVAR:
+            {
+                vars[towstring(id.name)] = new JSONValue(*id.storage.f);
+                break;
+            }
+            case ID_SVAR:
+            {
+                std::string v;
+                const char *p = *id.storage.s;
+                while (*p)
+                {
+                    switch(*p)
+                    {
+                        case '\n': v += "^n"; break;
+                        case '\t': v += "^t"; break;
+                        case '\f': v += "^f"; break;
+                        case '"': v += "^\""; break;
+                        default: v += *p; break;
+                    }
+                    p++;
+                }
+                vars[towstring(id.name)] = new JSONValue(towstring(v));
+                break;
+            }
+        }
+    }
+    root[L"variables"] = new JSONValue(vars);*/
+
+    bnds = writebinds();
+    root[L"binds"] = new JSONValue(bnds);
+
+    /*loopv(ids)
+    {
+        ident &id = *ids[i];
+        if(id.type==ID_ALIAS && id.flags&IDF_PERSIST && id.override==NO_OVERRIDE && id.action[0])
+        {
+            // INTENSITY: Additional things to *not* save
+            if (strstr(id.name, "new_entity_gui_field")) continue;
+            // INTENSITY: End additional things to *not* save
+            aliases[towstring(id.name)] = new JSONValue(towstring(id.action));
+        }
+    }
+    root[L"aliases"] = new JSONValue(aliases);
+
+    complet = writecompletions();
+    root[L"completions"] = new JSONValue(complet);*/
+
+    JSONValue *value = new JSONValue(root);
+    f->printf("%ls", value->Stringify().c_str());
+    delete value;
+    delete f;
+}
+
 
 //==============================
 // Config file utilities

@@ -1111,7 +1111,6 @@ void splitocta(cube *c, int size)
 
 void resetmap()
 {
-    clearoverrides();
     clearmapsounds();
     cleanreflections();
     resetblendmap();
@@ -1120,7 +1119,6 @@ void resetmap()
     clearslots();
     clearparticles();
     cleardecals();
-    clearsleep();
     cancelsel();
     pruneundos();
 

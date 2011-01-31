@@ -713,7 +713,7 @@ void reloadmodel(char* name)
 {
     model* old = loadmodel(name);
     if (!old) return;
-    execute(("clearmodel " + std::string(name)).c_str());
+    lua::engine.exec(("CAPI.clearModel(\"" + std::string(name) + "\")").c_str());
     model* _new = loadmodel(name);
 
     // Refresh cached theModel values

@@ -440,14 +440,15 @@ bool save_world(const char *mname, bool nolms)
     hdr.blendmap = shouldsaveblendmap();
     hdr.numvars = 0;
     hdr.numvslots = numvslots;
-    enumerate(*idents, ident, id, 
+    // TODO: save vars!
+    /*enumerate(*idents, ident, id, 
     {
         if((id.type == ID_VAR || id.type == ID_FVAR || id.type == ID_SVAR) && id.flags&IDF_OVERRIDE && !(id.flags&IDF_READONLY) && id.override!=NO_OVERRIDE) hdr.numvars++;
-    });
+    });*/
     lilswap(&hdr.version, 9);
     f->write(&hdr, sizeof(hdr));
    
-    enumerate(*idents, ident, id, 
+    /*enumerate(*idents, ident, id, 
     {
         if((id.type!=ID_VAR && id.type!=ID_FVAR && id.type!=ID_SVAR) || !(id.flags&IDF_OVERRIDE) || id.flags&IDF_READONLY || id.override==NO_OVERRIDE) continue;
         f->putchar(id.type);
@@ -473,7 +474,7 @@ bool save_world(const char *mname, bool nolms)
         }
     });
 
-    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote %d vars", hdr.numvars);
+    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote %d vars", hdr.numvars);*/
 
     f->putchar((int)strlen(game::gameident()));
     f->write(game::gameident(), (int)strlen(game::gameident())+1);
@@ -634,8 +635,9 @@ bool load_world(const char *mname, const char *cname)        // still supports a
         if(hdr.version <= 29) hdr.numvslots = 0;
         else lilswap(&hdr.numvslots, 1);
     }
- 
-    loopi(hdr.numvars)
+
+    // TODO: read vars!
+    /*loopi(hdr.numvars)
     {
         int type = f->getchar(), ilen = f->getlil<ushort>();
         string name;
@@ -675,7 +677,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
             }
         }
     }
-    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read %d vars", hdr.numvars);
+    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read %d vars", hdr.numvars);*/
 
     string gametype;
     copystring(gametype, "fps");

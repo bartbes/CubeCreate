@@ -195,17 +195,6 @@ void fontoffset(char *c);
 void fontchar(int *x, int *y, int *w, int *h);
 void registersound(char *name, int *vol);
 
-typedef hashtable<const char *, ident> identtable;
-extern identtable *idents; // we must extern out ident table.
-// Externing ident table is temporary till proper API is written
-// (which will be done after cubescript is completely out)
-
-// here we must also extern some setters
-void setvarchecked(ident *id, int val);
-void setfvarchecked(ident *id, float val);
-void setsvarchecked(ident *id, const char *val);
-void alias(const char *name, const char *action);
-
 void run_python(char *code);
 
 void showgui(const char *name);
@@ -928,10 +917,10 @@ LUA_BIND_DEF(readFile, {
 
 // Mapping
 
-LUA_BIND_DEF(textureReset, {
+LUA_BIND_CLIENT(textureReset, {
     texturereset(0);
 })
-LUA_BIND_DEF(texture, {
+LUA_BIND_CLIENT(texture, {
     // XXX: arg7 may not be given, in which case it is undefined, and turns into 0.
     texture(e.get<const char*>(1), e.get<const char*>(2), e.get<int>(3), e.get<int>(4), e.get<int>(5), (float)e.get<double>(6), e.get<int>(7));
 })
@@ -1418,28 +1407,6 @@ LUA_BIND_STD_CLIENT(fontChar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<in
 
 // Variable manipulation
 
-LUA_BIND_DEF(getVariable, {
-    ident *id = idents->access(e.get<const char*>(1));
-    if (id) switch(id->type)
-    {
-        case ID_VAR :  e.push(*id->storage.i); break;
-        case ID_FVAR:  e.push(*id->storage.f); break;
-        case ID_SVAR:  e.push(*id->storage.s); break;
-        case ID_ALIAS: e.push(id->action);     break;
-    }
-})
-
-LUA_BIND_DEF(setVariable, {
-    ident *id = idents->access(e.get<const char*>(1));
-    if (id) switch(id->type)
-    {
-        case ID_VAR :   setvarchecked(id, atoi(e.get<const char*>(2))); break;
-        case ID_FVAR:  setfvarchecked(id, strtod(e.get<const char*>(2), NULL)); break;
-        case ID_SVAR:  setsvarchecked(id, e.get<const char*>(2)); break;
-        case ID_ALIAS: alias(id->name, e.get<const char*>(2)); break;
-    }
-})
-
 LUA_BIND_DEF(syncVariableFromLua, {
     const char *name = e.get<const char*>(1);
     std::string type = std::string(e.get<const char*>(2));
@@ -1464,7 +1431,6 @@ LUA_BIND_DEF(syncVariableFromLua, {
     }
 })
 
-LUA_BIND_STD(runCS, execute, e.get<const char*>(1))
 LUA_BIND_DEF(startStopLocalServer, {
     if (e.is<void>(1))
         run_python((char*)"intensity.components.server_runner.stop_server()");
@@ -1738,6 +1704,11 @@ LUA_BIND_STD(testPvs, testpvs, e.get<int*>(1))
 LUA_BIND_STD(clearPvs, clearpvs)
 LUA_BIND_STD(pvsStats, pvsstats)
 
+LUA_BIND_STD(getmillis, e.push, e.get<bool>(1) ? totalmillis : lastmillis)
+
+LUA_BIND_STD(config_exec_json, Utility::config_exec_json, e.get<const char*>(1), e.get<bool>(2))
+LUA_BIND_STD(writecfg, Utility::writecfg, e.get<const char*>(1))
+
 // engine/octaedit.cpp
 
 LUA_BIND_STD(edittoggle, toggleedit, false)
@@ -1770,7 +1741,7 @@ LUA_BIND_STD(delcube, delcube)
 LUA_BIND_DEF(vdelta, {
     if (noedit() || (GETIV(nompedit) && multiplayer())) return;
     SETVN(usevdelta, GETIV(usevdelta) + 1);
-    execute(e.get<const char*>(1));
+    e.exec(e.get<const char*>(1));
     SETVN(usevdelta, GETIV(usevdelta) - 1);
 })
 LUA_BIND_DEF(vrotate, {
@@ -2066,8 +2037,8 @@ LUA_BIND_STD(dropent, dropent)
 LUA_BIND_STD(entcopy, entcopy)
 LUA_BIND_STD(entpaste, entpaste)
 LUA_BIND_STD(enthavesel, addimplicit, e.push(entgroup.length()))
-LUA_BIND_DEF(entselect, if (!noentedit()) addgroup(ent.type != ET_EMPTY && entgroup.find(n)<0 && execute(e.get<const char*>(1))>0);)
-LUA_BIND_DEF(entloop, if(!noentedit()) addimplicit(groupeditloop(((void)ent, execute(e.get<const char*>(1)))));)
+LUA_BIND_DEF(entselect, if (!noentedit()) addgroup(ent.type != ET_EMPTY && entgroup.find(n)<0 && e.exec<bool>(e.get<const char*>(1)) == true);)
+LUA_BIND_DEF(entloop, if(!noentedit()) addimplicit(groupeditloop(((void)ent, e.exec(e.get<const char*>(1)))));)
 LUA_BIND_DEF(insel, entfocus(efocus, e.push(pointinsel(sel, ent.o)));)
 LUA_BIND_DEF(entget, entfocus(efocus, string s; printent(ent, s); e.push(s));)
 LUA_BIND_STD(entindex, e.push, efocus)

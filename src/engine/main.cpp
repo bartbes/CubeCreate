@@ -14,7 +14,7 @@ void cleanup()
     SDL_WM_GrabInput(SDL_GRAB_OFF);
     SDL_SetGamma(1, 1, 1);
     freeocta(worldroot);
-    extern void clear_command(); clear_command();
+    var::clear();
     extern void clear_console(); clear_console();
     extern void clear_mdls();    clear_mdls();
     extern void clear_sound();   clear_sound();
@@ -37,7 +37,7 @@ void force_quit() // INTENSITY - change quit to force_quit
     abortconnect();
     disconnect();
     localdisconnect();
-    writecfg();
+    Utility::writecfg();
     cleanup();
 
     SystemManager::quit(); // INTENSITY
@@ -161,8 +161,8 @@ bool execinitcfg(const char *cfgfile, bool msg)
             root = value->AsObject();
             for (JSONObject::const_iterator iter = root.begin(); iter != root.end(); ++iter)
             {
-                defformatstring(cmd)("%s %i", fromwstring(iter->first).c_str(), (int)iter->second->AsNumber());
-                execute(cmd);
+                defformatstring(cmd)("EV.%s = %i", fromwstring(iter->first).c_str(), (int)iter->second->AsNumber());
+                lua::engine.exec(cmd);
             }
         }
     }
@@ -1085,7 +1085,7 @@ void getfps_(int *raw)
     int fps, bestdiff, worstdiff;
     if(*raw) fps = 1000/fpshistory[(fpspos+MAXFPSHISTORY-1)%MAXFPSHISTORY];
     else getfps(fps, bestdiff, worstdiff);
-    intret(fps);
+    lua::engine.push(fps);
 }
 
 bool inbetweenframes = false, renderedframe = true;
@@ -1241,10 +1241,10 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
     var::persistvars = true;
     
     initing = INIT_LOAD;
-    if(!config_exec_json(game::savedconfig(), false)) 
+    if(!Utility::config_exec_json(game::savedconfig(), false)) 
     {
         lua::engine.execf(game::defaultconfig());
-        writecfg(game::restoreconfig());
+        Utility::writecfg(game::restoreconfig());
     }
     lua::engine.execf(game::autoexec());
     initing = NOT_INITING;
@@ -1265,7 +1265,7 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
         game::changemap(load);
     }
 
-    if(initscript) execute(initscript);
+    if(initscript) lua::engine.execf(initscript);
 
     initlog("mainloop");
 
@@ -1316,8 +1316,6 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
         tryedit();
 
         if(lastmillis) game::updateworld();
-
-        checksleep(lastmillis);
 
         serverslice(false, 0);
 
