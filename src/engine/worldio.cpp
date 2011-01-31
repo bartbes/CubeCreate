@@ -67,20 +67,6 @@ void setmapfilenames(const char *fname, const char *cname = 0)
     path(picname);
 }
 
-void mapcfgname()
-{
-    const char *mname = game::getclientmap();
-    if(!*mname) mname = "untitled";
-
-    string pakname, mapname, mcfgname;
-    getmapfilenames(mname, NULL, pakname, mapname, mcfgname);
-    defformatstring(cfgname)("data/%s/%s.lua", pakname, mcfgname);
-    path(cfgname);
-    result(cfgname);
-}
-
-COMMAND(mapcfgname, "");
-
 enum { OCTSAV_CHILDREN = 0, OCTSAV_EMPTY, OCTSAV_SOLID, OCTSAV_NORMAL, OCTSAV_LODCUBE };
 
 void savec(cube *c, stream *f, bool nolms)
@@ -1093,12 +1079,6 @@ bool finish_load_world() // INTENSITY: Second half, after all entities received
     return true;
 }
 
-void savecurrentmap() { save_world(game::getclientmap()); }
-void savemap(char *mname) { save_world(mname); }
-
-COMMAND(savemap, "s");
-COMMAND(savecurrentmap, "");
-
 static int mtlsort(const int *x, const int *y)
 {
     if(*x < *y) return -1;
@@ -1206,7 +1186,4 @@ void writeobj(char *name)
         f->printf("\n");
     } 
     delete f;
-}  
-    
-COMMAND(writeobj, "s"); 
-
+}

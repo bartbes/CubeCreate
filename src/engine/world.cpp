@@ -379,15 +379,15 @@ void attachentities()
 // e         entity, currently edited ent
 // n         int,    index to currently edited ent
 #define addimplicit(f)  { if(entgroup.empty() && enthover>=0) { entadd(enthover); undonext = (enthover != oldhover); f; entgroup.drop(); } else f; }
-#define entfocus(i, f)  { int n = efocus = (i); if(n>=0) { extentity &e = *entities::getents()[n]; f; } }
+#define entfocus(i, f)  { int n = efocus = (i); if(n>=0) { extentity &ent = *entities::getents()[n]; f; } }
 #define entedit(i, f) \
 { \
     entfocus(i, \
-    int oldtype = e.type; \
+    int oldtype = ent.type; \
     removeentity(n);  \
     f; \
-    if(oldtype!=e.type) detachentity(e); \
-    if(e.type!=ET_EMPTY) { addentity(n); if(oldtype!=e.type) attachentity(e); } \
+    if(oldtype!=ent.type) detachentity(ent); \
+    if(ent.type!=ET_EMPTY) { addentity(n); if(oldtype!=ent.type) attachentity(ent); } \
     entities::editent(n, true)); \
 }
 #define addgroup(exp)   { loopv(entities::getents()) entfocus(i, if(exp) entadd(n)); }
@@ -421,7 +421,7 @@ void pasteundoents(undoblock *u)
 {
     undoent *ue = u->ents();
     loopi(u->numents)
-        entedit(ue[i].i, (entity &)e = ue[i].e);
+        entedit(ue[i].i, (entity &)ent = ue[i].e);
 }
 
 void entflip()
@@ -429,7 +429,7 @@ void entflip()
     if(noentedit()) return;
     int d = dimension(sel.orient);
     float mid = sel.s[d]*sel.grid/2+sel.o[d];
-    groupeditundo(e.o[d] -= (e.o[d]-mid)*2);
+    groupeditundo(ent.o[d] -= (ent.o[d]-mid)*2);
 }
 
 void entrotate(int *cw)
@@ -440,10 +440,10 @@ void entrotate(int *cw)
     float mid = sel.s[dd]*sel.grid/2+sel.o[dd];
     vec s(sel.o.v);
     groupeditundo(
-        e.o[dd] -= (e.o[dd]-mid)*2;
-        e.o.sub(s);
-        swap(e.o[R[d]], e.o[C[d]]);
-        e.o.add(s);
+        ent.o[dd] -= (ent.o[dd]-mid)*2;
+        ent.o.sub(s);
+        swap(ent.o[R[d]], ent.o[C[d]]);
+        ent.o.add(s);
     );
 }
 
@@ -501,21 +501,21 @@ void entdrag(const vec &ray)
         dc= dimcoord(entorient);
 
     entfocus(entgroup.last(),        
-        entselectionbox(e, eo, es);
+        entselectionbox(ent, eo, es);
 
-        editmoveplane(e.o, ray, d, eo[d] + (dc ? es[d] : 0), handle, v, initentdragging);        
+        editmoveplane(ent.o, ray, d, eo[d] + (dc ? es[d] : 0), handle, v, initentdragging);        
 
         ivec g(v);
         int z = g[d]&(~(sel.grid-1));
         g.add(sel.grid/2).mask(~(sel.grid-1));
         g[d] = z;
         
-        r = (GETIV(entselsnap) ? g[R[d]] : v[R[d]]) - e.o[R[d]];
-        c = (GETIV(entselsnap) ? g[C[d]] : v[C[d]]) - e.o[C[d]];       
+        r = (GETIV(entselsnap) ? g[R[d]] : v[R[d]]) - ent.o[R[d]];
+        c = (GETIV(entselsnap) ? g[C[d]] : v[C[d]]) - ent.o[C[d]];       
     );
 
     if(initentdragging) makeundoent();
-    groupeditpure(e.o[R[d]] += r; e.o[C[d]] += c);
+    groupeditpure(ent.o[R[d]] += r; ent.o[C[d]] += c);
     initentdragging = false;
 }
 
@@ -662,13 +662,13 @@ void renderentselection(const vec &o, const vec &ray, bool entmoving)
 
     glColor3ub(0, 40, 0);
     loopv(entgroup) entfocus(entgroup[i],     
-        entselectionbox(e, eo, es);
+        entselectionbox(ent, eo, es);
         boxs3D(eo, es, 1);
     );
 
     if(enthover >= 0)
     {
-        entfocus(enthover, entselectionbox(e, eo, es)); // also ensures enthover is back in focus
+        entfocus(enthover, entselectionbox(ent, eo, es)); // also ensures enthover is back in focus
         boxs3D(eo, es, 1);
         if(entmoving && GETIV(entmovingshadow)==1)
         {
@@ -688,11 +688,11 @@ void renderentselection(const vec &o, const vec &ray, bool entmoving)
     {
         glDepthFunc(GL_GREATER);
         glColor3f(0.25f, 0.25f, 0.25f);
-        loopv(entgroup) entfocus(entgroup[i], renderentradius(e, false));
-        if(enthover>=0) entfocus(enthover, renderentradius(e, false));
+        loopv(entgroup) entfocus(entgroup[i], renderentradius(ent, false));
+        if(enthover>=0) entfocus(enthover, renderentradius(ent, false));
         glDepthFunc(GL_LESS);
-        loopv(entgroup) entfocus(entgroup[i], renderentradius(e, true));
-        if(enthover>=0) entfocus(enthover, renderentradius(e, true));
+        loopv(entgroup) entfocus(entgroup[i], renderentradius(ent, true));
+        if(enthover>=0) entfocus(enthover, renderentradius(ent, true));
     }
 }
 
@@ -725,10 +725,10 @@ void entpush(int *dir)
     int s = dimcoord(entorient) ? -*dir : *dir;
     if(GETIV(entmoving)) 
     {
-        groupeditpure(e.o[d] += float(s*sel.grid)); // editdrag supplies the undo
+        groupeditpure(ent.o[d] += float(s*sel.grid)); // editdrag supplies the undo
     }
     else 
-        groupedit(e.o[d] += float(s*sel.grid));
+        groupedit(ent.o[d] += float(s*sel.grid));
     if(GETIV(entitysurf)==1)
     {
         player->o[d] += float(s*sel.grid);
@@ -748,29 +748,24 @@ void entautoview(int *dir)
     s = abs(t) % entgroup.length();
     if(t<0 && s>0) s = entgroup.length() - s;
     entfocus(entgroup[s],
-        v.add(e.o);
+        v.add(ent.o);
         player->o = v;
         player->resetinterp();
     );
 }
 
-COMMAND(entautoview, "i");
-COMMAND(entflip, "");
-COMMAND(entrotate, "i");
-COMMAND(entpush, "i");
-
 void delent()
 {
 #if 0 // INTENSITY - use our own deleting
     if(noentedit()) return;
-    groupedit(e.type = ET_EMPTY;);
+    groupedit(ent.type = ET_EMPTY;);
     entcancel();
 #else
     if(noentedit()) return;
 
     loopv(entgroup) entfocus(
         entgroup[i],
-        MessageSystem::send_RequestLogicEntityRemoval(e.uniqueId)
+        MessageSystem::send_RequestLogicEntityRemoval(ent.uniqueId)
     );
 
     entcancel();
@@ -836,16 +831,14 @@ bool dropentity(entity &e, int drop = -1)
 void dropent()
 {
     if(noentedit()) return;
-    groupedit(dropentity(e));
+    groupedit(dropentity(ent));
 }
 
 void attachent()
 {
     if(noentedit()) return;
-    groupedit(attachentity(e));
+    groupedit(attachentity(ent));
 }
-
-COMMAND(attachent, "");
 
 extentity *newentity(bool local, const vec &o, int type, int v1, int v2, int v3, int v4, int v5)
 {
@@ -890,7 +883,7 @@ void newentity(int type, int a1, int a2, int a3, int a4, int a5)
     t->type = ET_EMPTY;
     enttoggle(i);
     makeundoent();
-    entedit(i, e.type = type);
+    entedit(i, ent.type = type);
 }
 
 void newent(char *what, int *a1, int *a2, int *a3, int *a4, int *a5)
@@ -921,7 +914,7 @@ void entcopy()
     entcopygrid = sel.grid;
     entcopybuf.shrink(0);
     loopv(entgroup) 
-        entfocus(entgroup[i], entcopybuf.add(e).o.sub(sel.o.tovec()));
+        entfocus(entgroup[i], entcopybuf.add(ent).o.sub(sel.o.tovec()));
 }
 
 void entpaste()
@@ -966,22 +959,16 @@ void entpaste()
 // INTENSITY   groupeditundo(e.type = entcopybuf[j++].type;);
 }
 
-COMMAND(newent, "siiiii");
-COMMAND(delent, "");
-COMMAND(dropent, "");
-COMMAND(entcopy, "");
-COMMAND(entpaste, "");
-
 void entset(char *what, int *a1, int *a2, int *a3, int *a4, int *a5)
 {
     if(noentedit()) return;
     int type = findtype(what);
-    groupedit(e.type=type;
-              e.attr1=*a1;
-              e.attr2=*a2;
-              e.attr3=*a3;
-              e.attr4=*a4;
-              e.attr5=*a5);
+    groupedit(ent.type=type;
+              ent.attr1=*a1;
+              ent.attr2=*a2;
+              ent.attr3=*a3;
+              ent.attr4=*a4;
+              ent.attr5=*a5);
 }
 
 void printent(extentity &e, char *buf)
@@ -1018,16 +1005,6 @@ void nearestent()
     }
     if(closest >= 0) entadd(closest);
 }    
-            
-ICOMMAND(enthavesel,"",  (), addimplicit(intret(entgroup.length())));
-ICOMMAND(entselect, "s", (char *body), if(!noentedit()) addgroup(e.type != ET_EMPTY && entgroup.find(n)<0 && execute(body)>0));
-ICOMMAND(entloop,   "s", (char *body), if(!noentedit()) addimplicit(groupeditloop(((void)e, execute(body)))));
-ICOMMAND(insel,     "",  (), entfocus(efocus, intret(pointinsel(sel, e.o))));
-ICOMMAND(entget,    "",  (), entfocus(efocus, string s; printent(e, s); result(s)));
-ICOMMAND(entindex,  "",  (), intret(efocus));
-COMMAND(entset, "siiiii");
-COMMAND(nearestent, "");
-
 
 std::string intensityCopiedClass = "", intensityCopiedStateData = ""; // INTENSITY: Save these here safely,
                                                                       // not in a cubescript var that could be
@@ -1060,14 +1037,11 @@ void intensityentcopy() // INTENSITY
 
     engine.exec("__intensityentcopy__TEMP = nil");
 }
-COMMAND(intensityentcopy, ""); // INTENSITY
 
 void intensitypasteent() // INTENSITY
 {
     EditingSystem::newEntity(intensityCopiedClass, intensityCopiedStateData);
 }
-COMMAND(intensitypasteent, ""); // INTENSITY
-
 
 int findentity(int type, int index, int attr1, int attr2)
 {
@@ -1269,16 +1243,6 @@ void shrinkmap()
 
 void newmap(int *i) { bool force = !isconnected() && !haslocalclients(); if(force) game::forceedit(""); if(emptymap(*i, force, NULL)) game::newmap(max(*i, 0)); }
 void mapenlarge() { if(enlargemap(false)) game::newmap(-1); }
-COMMAND(newmap, "i");
-COMMAND(mapenlarge, "");
-COMMAND(shrinkmap, "");
-
-void mapname()
-{
-    result(game::getclientmap());
-}
-
-COMMAND(mapname, "");
 
 void mpeditent(int i, const vec &o, int type, int attr1, int attr2, int attr3, int attr4, int attr5, bool local)
 {
@@ -1308,16 +1272,3 @@ void mpeditent(int i, const vec &o, int type, int attr1, int attr2, int attr3, i
 
 int getworldsize() { return GETIV(mapsize); }
 int getmapversion() { return GETIV(mapversion); }
-
-// INTENSITY: In our new system, this is called when dragging concludes. Only then do we update the server.
-// This facilitates smooth dragging on the client, and a single bandwidth use at the end.
-void finish_dragging()
-{
-    groupeditpure(
-        defformatstring(c)("getEntity(%i).position = {%f,%f,%f}", LogicSystem::getUniqueId(&e), e.o[0], e.o[1], e.o[2]);
-        lua::engine.exec(c);
-    );
-}
-
-COMMAND(finish_dragging, "");
-
