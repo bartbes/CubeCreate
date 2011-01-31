@@ -306,6 +306,7 @@ const LE_reg CAPI[] = {
     LUAREG(font),
     LUAREG(fontOffset),
     LUAREG(fontChar),
+    LUAREG(resetvar),
     LUAREG(syncVariableFromLua),
     LUAREG(startStopLocalServer),
     LUAREG(showMessage),

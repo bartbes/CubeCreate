@@ -1407,6 +1407,8 @@ LUA_BIND_STD_CLIENT(fontChar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<in
 
 // Variable manipulation
 
+LUA_BIND_DEF(resetvar, var::get(e.get<const char*>(1))->r();)
+
 LUA_BIND_DEF(syncVariableFromLua, {
     const char *name = e.get<const char*>(1);
     std::string type = std::string(e.get<const char*>(2));

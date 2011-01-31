@@ -1111,6 +1111,7 @@ void splitocta(cube *c, int size)
 
 void resetmap()
 {
+    var::clear();
     clearmapsounds();
     cleanreflections();
     resetblendmap();

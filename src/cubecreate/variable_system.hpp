@@ -264,7 +264,12 @@ namespace var
          * Sets string value of the variable.
          */
         void s(const char *val, bool luasync = true, bool forcecb = false, bool clamp = true);
-
+        /**
+         * @brief Reset the variable.
+         * 
+         * Resets the variable to defaults.
+         */
+        void r();
         /**
          * @brief Is the variable persistent?
          * @return True if it is, otherwise false.
@@ -286,6 +291,13 @@ namespace var
          * Gets if the variable is overridable.
          */
         bool isoverridable();
+        /**
+         * @brief Is the variable overriden?
+         * @return True if it is, otherwise false.
+         * 
+         * Gets if the variable is overriden.
+         */
+        bool isoverriden();
         /**
          * @brief Is the variable alias?
          * @return True if it is, otherwise false.
@@ -326,7 +338,7 @@ namespace var
         bool persistent, hascb;
         const char *name;
         int type;
-        bool readonly, override, alias;
+        bool readonly, override, overriden, alias;
 
         /* Unions for value storage (min, cur, max) */
         union gval_t
@@ -334,7 +346,8 @@ namespace var
             int i;
             float f;
             char *s;
-        } curv;
+        };
+        gval_t oldv, curv;
 
         union nsval_t
         {
@@ -356,7 +369,7 @@ namespace var
     typedef hashtable<const char*, cvar*> vartable;
 
     /// Variable and persistent variable tables.
-    extern vartable *vars, *pvars;
+    extern vartable *vars;
     /// Force persisting / overriding with these.
     extern bool persistvars, overridevars;
 
@@ -383,24 +396,17 @@ namespace var
      */
     void filllua();
     /**
-     * @brief Clear the variables, keeping persistent in pvars.
+     * @brief Reset values of all variables to defaults.
      * 
-     * Clears the vars table, keeping persistent
-     * ones in pvars table for later reusage.
+     * Resets values of all variables to their defaults.
      */
     void clear();
     /**
      * @brief Clear the variables completely.
      * 
-     * Clears the vars and pvars tables.
+     * Clears the vars table.
      */
     void flush();
-    /**
-     * @brief Fill vars from pvars.
-     * 
-     * Fills vars table with variables saved in pvars.
-     */
-    void fillfp();
     /**
      * @brief Sync int variable from Lua.
      * @param name Name of C++ var to set.

@@ -75,18 +75,19 @@ namespace var
         name(vname),
         type(VAR_I),
         override(overridable),
+        overriden(false),
         alias(false)
     {
         vcb.i = cb;
         if (minvi > maxvi)
         {
             readonly = true;
-            minv.i = maxvi; curv.i = curvi; maxv.i = minvi;
+            oldv.i = curvi; minv.i = maxvi; curv.i = curvi; maxv.i = minvi;
         }
         else
         {
             readonly = false;
-            minv.i = minvi; curv.i = curvi; maxv.i = maxvi;
+            oldv.i = curvi; minv.i = minvi; curv.i = curvi; maxv.i = maxvi;
         }
         hascb = cb ? true : false;
     }
@@ -103,18 +104,19 @@ namespace var
         name(vname),
         type(VAR_F),
         override(overridable),
+        overriden(false),
         alias(false)
     {
         vcb.f = cb;
         if (minvf > maxvf)
         {
             readonly = true;
-            minv.f = maxvf; curv.f = curvf; maxv.f = minvf;
+            oldv.f = curvf; minv.f = maxvf; curv.f = curvf; maxv.f = minvf;
         }
         else
         {
             readonly = false;
-            minv.f = minvf; curv.f = curvf; maxv.f = maxvf;
+            oldv.f = curvf; minv.f = minvf; curv.f = curvf; maxv.f = maxvf;
         }
         hascb = cb ? true : false;
     }
@@ -130,7 +132,13 @@ namespace var
         type(VAR_S),
         readonly(false),
         override(overridable),
-        alias(false) { vcb.s = cb; hascb = cb ? true : false; curv.s = (curvs ? newstring(curvs) : NULL); }
+        overriden(false),
+        alias(false)
+    {
+        vcb.s = cb; hascb = cb ? true : false;
+        curv.s = (curvs ? newstring(curvs) : NULL);
+        oldv.s = (curvs ? newstring(curvs) : NULL);
+    }
 
     cvar::cvar(
         const char *aname,
@@ -142,11 +150,12 @@ namespace var
         type(VAR_I),
         readonly(false),
         override(false),
+        overriden(false),
         alias(true)
     {
         vcb.i = NULL;
         minv.i = maxv.i = -1;
-        curv.i = val;
+        oldv.i = curv.i = val;
         if (reglua && lua::engine.hashandle()) regliv();
     }
 
@@ -160,11 +169,12 @@ namespace var
         type(VAR_F),
         readonly(false),
         override(false),
+        overriden(false),
         alias(true)
     {
         vcb.f = NULL;
         minv.f = maxv.f = -1.0f;
-        curv.f = val;
+        oldv.f = curv.f = val;
         if (reglua && lua::engine.hashandle()) reglfv();
     }
 
@@ -178,14 +188,16 @@ namespace var
         type(VAR_S),
         readonly(false),
         override(false),
+        overriden(false),
         alias(true)
     {
         vcb.s = NULL;
         curv.s = (val ? newstring(val) : NULL);
+        oldv.s = (val ? newstring(val) : NULL);
         if (reglua && lua::engine.hashandle()) reglsv();
     }
 
-    cvar::~cvar() { if (type == VAR_S) DELETEA(curv.s); }
+    cvar::~cvar() { if (type == VAR_S) { DELETEA(curv.s); DELETEA(oldv.s); } }
 
     const char *cvar::gn()   { return name;   }
     int         cvar::gt()   { return type;   }
@@ -199,6 +211,11 @@ namespace var
 
     void cvar::s(int val, bool luasync, bool forcecb, bool clamp)
     {
+        if (override || overridevars)
+        {
+            overriden = true;
+            oldv.i = curv.i;
+        }
         if (clamp && (val < minv.i || val > maxv.i) && !alias) curv.i = clamp(val, minv.i, maxv.i);
         else curv.i = val;
         callcb(luasync, forcecb);
@@ -206,6 +223,11 @@ namespace var
 
     void cvar::s(float val, bool luasync, bool forcecb, bool clamp)
     {
+        if (override || overridevars)
+        {
+            overriden = true;
+            oldv.f = curv.f;
+        }
         if (clamp && (val < minv.f || val > maxv.f) && !alias) curv.f = clamp(val, minv.f, maxv.f);
         else curv.f = val;
         callcb(luasync, forcecb);
@@ -214,13 +236,38 @@ namespace var
     void cvar::s(const char *val, bool luasync, bool forcecb, bool clamp)
     {
         (void)clamp;
+        if (override || overridevars)
+        {
+            overriden = true;
+            if (oldv.s) DELETEA(oldv.s);
+            oldv.s = (curv.s ? newstring(curv.s) : NULL);
+        }
         curv.s = (val ? newstring(val) : NULL);
         callcb(luasync, forcecb);
+    }
+
+    void cvar::r()
+    {
+        if (!overriden) return;
+        switch (type)
+        {
+            case VAR_I: curv.i = oldv.i; break;
+            case VAR_F: curv.f = oldv.f; break;
+            case VAR_S:
+            {
+                DELETEA(curv.s);
+                curv.s = (oldv.s ? newstring(oldv.s) : NULL);
+                break;
+            }
+            default: break;
+        }
+        overriden = false;
     }
 
     bool cvar::ispersistent()  { return persistent; }
     bool cvar::isreadonly()    { return readonly;   }
     bool cvar::isoverridable() { return override;   }
+    bool cvar::isoverriden()   { return overriden;  }
     bool cvar::isalias()       { return alias;      }
 
     void cvar::regliv()
@@ -298,8 +345,8 @@ namespace var
      * STORAGE FOR VARIABLES
      */
 
-    vartable *vars = NULL, *pvars = NULL;
-    bool persistvars = false, overridevars = false;
+    vartable *vars = NULL;
+    bool persistvars = true, overridevars = false;
 
     cvar *reg(const char *name, cvar *var)
     {
@@ -310,7 +357,6 @@ namespace var
 
     void fill()
     {
-        fillfp();
         #include "variable_system_def.hpp"
     }
 
@@ -342,13 +388,7 @@ namespace var
     void clear()
     {
         if (!vars) return;
-        if (!pvars) pvars = new vartable;
-        enumerate(*vars, cvar*, v, {
-            if (v->isalias() || !v->isoverridable())
-                pvars->access(v->gn(), v);
-            else delete v;
-        });
-        delete vars;
+        enumerate(*vars, cvar*, v, v->r(););
     }
 
     void flush()
@@ -358,18 +398,6 @@ namespace var
             enumerate(*vars,  cvar*, v, { if (v) delete v; });
             delete vars;
         }
-        if (pvars)
-        {
-            enumerate(*pvars, cvar*, v, { if (v) delete v; });
-            delete pvars;
-        }
-    }
-
-    void fillfp()
-    {
-        if (!vars) return;
-        if (!pvars) pvars = new vartable;
-        enumerate(*pvars, cvar*, v, { vars->access(v->gn(), v); });
     }
 
     void syncfl(const char *name, int         val) { (*vars->access(name))->s(val, false); }

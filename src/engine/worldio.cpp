@@ -440,41 +440,43 @@ bool save_world(const char *mname, bool nolms)
     hdr.blendmap = shouldsaveblendmap();
     hdr.numvars = 0;
     hdr.numvslots = numvslots;
-    // TODO: save vars!
-    /*enumerate(*idents, ident, id, 
-    {
-        if((id.type == ID_VAR || id.type == ID_FVAR || id.type == ID_SVAR) && id.flags&IDF_OVERRIDE && !(id.flags&IDF_READONLY) && id.override!=NO_OVERRIDE) hdr.numvars++;
-    });*/
+    enumerate(*var::vars, var::cvar*, v, {
+        if (v->isoverridable() && !v->isreadonly() && v->isoverriden()) hdr.numvars++;
+    });
     lilswap(&hdr.version, 9);
     f->write(&hdr, sizeof(hdr));
    
-    /*enumerate(*idents, ident, id, 
+    enumerate(*var::vars, var::cvar*, v,
     {
-        if((id.type!=ID_VAR && id.type!=ID_FVAR && id.type!=ID_SVAR) || !(id.flags&IDF_OVERRIDE) || id.flags&IDF_READONLY || id.override==NO_OVERRIDE) continue;
-        f->putchar(id.type);
-        f->putlil<ushort>(strlen(id.name));
-        f->write(id.name, strlen(id.name));
-        switch(id.type)
+        if(!v->isoverridable() || v->isreadonly() || !v->isoverriden()) continue;
+        f->putchar(v->gt());
+        f->putlil<ushort>(strlen(v->gn()));
+        f->write(v->gn(), strlen(v->gn()));
+        switch(v->gt())
         {
-            case ID_VAR:
-                if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote var %s: %d", id.name, *id.storage.i);
-                f->putlil<int>(*id.storage.i);
+            case var::VAR_I:
+            {
+                if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote var %s: %d", v->gn(), v->gi());
+                f->putlil<int>(v->gi());
                 break;
-
-            case ID_FVAR:
-                if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote fvar %s: %f", id.name, *id.storage.f);
-                f->putlil<float>(*id.storage.f);
+            }
+            case var::VAR_F:
+            {
+                if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote fvar %s: %f", v->gn(), v->gf());
+                f->putlil<float>(v->gf());
                 break;
-
-            case ID_SVAR:
-                if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote svar %s: %s", id.name, *id.storage.s);
-                f->putlil<ushort>(strlen(*id.storage.s));
-                f->write(*id.storage.s, strlen(*id.storage.s));
+            }
+            case var::VAR_S:
+            {
+                if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote svar %s: %s", v->gn(), v->gs());
+                f->putlil<ushort>(strlen(v->gs()));
+                f->write(v->gs(), strlen(v->gs()));
                 break;
+            }
         }
     });
 
-    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote %d vars", hdr.numvars);*/
+    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "wrote %d vars", hdr.numvars);
 
     f->putchar((int)strlen(game::gameident()));
     f->write(game::gameident(), (int)strlen(game::gameident())+1);
@@ -636,7 +638,6 @@ bool load_world(const char *mname, const char *cname)        // still supports a
         else lilswap(&hdr.numvslots, 1);
     }
 
-    // TODO: read vars!
     loopi(hdr.numvars)
     {
         int type = f->getchar(), ilen = f->getlil<ushort>();
