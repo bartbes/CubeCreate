@@ -1004,14 +1004,6 @@ void texturereset(int n)
     slots.setsize(limit);
 }
 
-void materialreset()
-{
-    if(!var::overridevars && !game::allowedittoggle()) return;
-    loopi(MATF_VOLUME+1) materialslots[i].reset();
-}
-
-COMMAND(materialreset, "");
-
 static int compactedvslots = 0, compactvslotsprogress = 0, clonedvslots = 0;
 static bool markingvslots = false;
 
@@ -1133,13 +1125,6 @@ int compactvslots()
     return total;
 }
 
-ICOMMAND(compactvslots, "", (),
-{
-    if(GETIV(nompedit) && multiplayer()) return;
-    compactvslots();
-    allchanged();
-});
-
 static Slot &loadslot(Slot &s, bool forceload);
 
 static void clampvslotoffset(VSlot &dst, Slot *slot = NULL)
@@ -1160,7 +1145,7 @@ static void clampvslotoffset(VSlot &dst, Slot *slot = NULL)
     }
 }
 
-static void propagatevslot(VSlot &dst, const VSlot &src, int diff, bool edit = false)
+void propagatevslot(VSlot &dst, const VSlot &src, int diff, bool edit = false)
 {
     if(diff & (1<<VSLOT_SHPARAM)) loopv(src.params) dst.params.add(src.params[i]);
     if(diff & (1<<VSLOT_SCALE)) dst.scale = src.scale;
@@ -1189,7 +1174,7 @@ static void propagatevslot(VSlot &dst, const VSlot &src, int diff, bool edit = f
     if(diff & (1<<VSLOT_COLOR)) dst.colorscale = src.colorscale;
 }
 
-static void propagatevslot(VSlot *root, int changed)
+void propagatevslot(VSlot *root, int changed)
 {
     for(VSlot *vs = root->next; vs; vs = vs->next)
     {
@@ -1331,7 +1316,7 @@ VSlot *editvslot(const VSlot &src, const VSlot &delta)
     return clonevslot(src, delta);
 }
 
-static void fixinsidefaces(cube *c, const ivec &o, int size, int tex)
+void fixinsidefaces(cube *c, const ivec &o, int size, int tex)
 {
     loopi(8) 
     {
@@ -1341,13 +1326,6 @@ static void fixinsidefaces(cube *c, const ivec &o, int size, int tex)
             c[i].texture[j] = tex;
     }
 }
-
-ICOMMAND(fixinsidefaces, "i", (int *tex),
-{
-    if(noedit(true) || (GETIV(nompedit) && multiplayer())) return;
-    fixinsidefaces(worldroot, ivec(0, 0, 0), GETIV(mapsize)>>1, *tex && vslots.inrange(*tex) ? *tex : DEFAULT_GEOM);
-    allchanged();
-});
 
 void texture(const char *type, const char *name, int rot, int xoffset, int yoffset, float scale, int forcedindex) // INTENSITY: forcedindex
 {
@@ -1398,92 +1376,6 @@ void texture(const char *type, const char *name, int rot, int xoffset, int yoffs
         propagatevslot(&vs, (1<<VSLOT_NUM)-1);
     }
 }
-
-void autograss(char *name)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    DELETEA(s.autograss);
-    s.autograss = name[0] ? newstring(makerelpath("data", name)) : NULL;
-}
-COMMAND(autograss, "s");
-
-void texscroll(float *scrollS, float *scrollT)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->scrollS = *scrollS/1000.0f;
-    s.variants->scrollT = *scrollT/1000.0f;
-    propagatevslot(s.variants, 1<<VSLOT_SCROLL);
-}
-COMMAND(texscroll, "ff");
-
-void texoffset_(int *xoffset, int *yoffset)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->xoffset = max(*xoffset, 0);
-    s.variants->yoffset = max(*yoffset, 0);
-    propagatevslot(s.variants, 1<<VSLOT_OFFSET);
-}
-COMMANDN(texoffset, texoffset_, "ii");
-
-void texrotate_(int *rot)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->rotation = clamp(*rot, 0, 5);
-    propagatevslot(s.variants, 1<<VSLOT_ROTATION);
-}
-COMMANDN(texrotate, texrotate_, "i");
-
-void texscale(float *scale)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->scale = *scale <= 0 ? 1 : *scale;
-    propagatevslot(s.variants, 1<<VSLOT_SCALE);
-}
-COMMAND(texscale, "f");
-
-void texlayer(int *layer, char *name, int *mode, float *scale)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->layer = *layer < 0 ? max(slots.length()-1+*layer, 0) : *layer;
-    s.layermaskname = name[0] ? newstring(path(makerelpath("data", name))) : NULL; 
-    s.layermaskmode = *mode;
-    s.layermaskscale = *scale <= 0 ? 1 : *scale;
-    propagatevslot(s.variants, 1<<VSLOT_LAYER);
-}
-COMMAND(texlayer, "isif");
-
-void texalpha(float *front, float *back)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->alphafront = clamp(*front, 0.0f, 1.0f);
-    s.variants->alphaback = clamp(*back, 0.0f, 1.0f);
-    propagatevslot(s.variants, 1<<VSLOT_ALPHA);
-}
-COMMAND(texalpha, "ff");
-
-void texcolor(float *r, float *g, float *b)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.variants->colorscale = vec(clamp(*r, 0.0f, 1.0f), clamp(*g, 0.0f, 1.0f), clamp(*b, 0.0f, 1.0f));
-    propagatevslot(s.variants, 1<<VSLOT_COLOR);
-}
-COMMAND(texcolor, "fff");
-
-void texffenv(int *ffenv)
-{
-    if(slots.empty()) return;
-    Slot &s = *slots.last();
-    s.ffenv = *ffenv>0;
-}
-COMMAND(texffenv, "i");
 
 static int findtextype(Slot &s, int type, int last = -1)
 {
@@ -2208,8 +2100,6 @@ void reloadtex(char *name)
     }
 }
 
-COMMAND(reloadtex, "s");
-
 void reloadtextures()
 {
     int reloaded = 0;
@@ -2418,7 +2308,6 @@ void gendds(char *infile, char *outfile)
 
     setuptexcompress();
 }
-COMMAND(gendds, "ss");
 
 void writepngchunk(stream *f, const char *type, uchar *data = NULL, uint len = 0)
 {
@@ -2699,35 +2588,6 @@ void screenshot(char *filename)
     glReadPixels(0, 0, screen->w, screen->h, GL_RGB, GL_UNSIGNED_BYTE, image.data);
     saveimage(path(buf), format, image, true);
 }
-
-COMMAND(screenshot, "s");
-
-void flipnormalmapy(char *destfile, char *normalfile) // jpg/png /tga-> tga
-{
-    ImageData ns;
-    if(!loadimage(normalfile, ns)) return;
-    ImageData d(ns.w, ns.h, 3);
-    readwritetex(d, ns,
-        dst[0] = src[0];
-        dst[1] = 255 - src[1];
-        dst[2] = src[2];
-    );
-    saveimage(destfile, guessimageformat(destfile, IMG_TGA), d);
-}
-
-void mergenormalmaps(char *heightfile, char *normalfile) // jpg/png/tga + tga -> tga
-{
-    ImageData hs, ns;
-    if(!loadimage(heightfile, hs) || !loadimage(normalfile, ns) || hs.w != ns.w || hs.h != ns.h) return;
-    ImageData d(ns.w, ns.h, 3);
-    read2writetex(d, hs, srch, ns, srcn,
-        *(bvec *)dst = bvec(((bvec *)srcn)->tovec().mul(2).add(((bvec *)srch)->tovec()).normalize());
-    );
-    saveimage(normalfile, guessimageformat(normalfile, IMG_TGA), d);
-}
-
-COMMAND(flipnormalmapy, "ss");
-COMMAND(mergenormalmaps, "ss");
 
 #include "intensity_texture.cpp" // INTENSITY
 

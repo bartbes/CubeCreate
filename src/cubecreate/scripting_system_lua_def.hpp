@@ -48,14 +48,6 @@ void mmodel(char *name);
 extern vector<mapmodelinfo> mapmodels;
 void clearmodel(char *name);
 
-void autograss(char *name);
-void texlayer(int *layer, char *name, int *mode, float *scale);
-void texalpha(float *front, float *back);
-void texcolor(float *r, float *g, float *b);
-void texscroll(float *scrollS, float *scrollT);
-void texffenv(int *ffenv);
-void materialreset();
-
 void shader(int *type, char *name, char *vs, char *ps);
 void variantshader(int *type, char *name, int *row, char *vs, char *ps);
 void setshader(char *name);
@@ -302,6 +294,26 @@ void genpvs(int *viewcellsize);
 void pvsstats();
 void startlistenserver(int *usemaster);
 void stoplistenserver();
+
+#ifdef CLIENT
+extern MSlot materialslots[MATF_VOLUME+1];
+enum
+{
+    IMG_BMP = 0,
+    IMG_TGA = 1,
+    IMG_PNG = 2,
+    NUMIMG
+};
+
+void fixinsidefaces(cube *c, const ivec &o, int size, int tex);
+void propagatevslot(VSlot &dst, const VSlot &src, int diff, bool edit = false);
+void propagatevslot(VSlot *root, int changed);
+void reloadtex(char *name);
+void gendds(char *infile, char *outfile);
+void screenshot(char *filename);
+int guessimageformat(const char *filename, int format = IMG_BMP);
+void saveimage(const char *filename, int format, ImageData &image, bool flip = false);
+#endif
 
 extern int entlooplevel, efocus, enthover, oldhover;
 extern bool undonext;
@@ -897,13 +909,6 @@ LUA_BIND_DEF(mapmodelReset, mapmodelreset(e.get<int*>(1));)
 LUA_BIND_DEF(mapmodel, mmodel(e.get<char*>(1));)
 LUA_BIND_DEF(numMapModels, e.push(mapmodels.length());)
 LUA_BIND_STD(clearModel, clearmodel, e.get<char*>(1))
-LUA_BIND_DEF(autograss, autograss(e.get<char*>(1));)
-LUA_BIND_STD_CLIENT(texLayer, texlayer, e.get<int*>(1), (char*)"", new int(0), new float(0))
-LUA_BIND_STD_CLIENT(texAlpha, texalpha, e.get<float*>(1), e.get<float*>(2))
-LUA_BIND_STD_CLIENT(texColor, texcolor, e.get<float*>(1), e.get<float*>(2), e.get<float*>(3))
-LUA_BIND_STD_CLIENT(texScroll, texscroll, e.get<float*>(1), e.get<float*>(2))
-LUA_BIND_STD_CLIENT(texFFenv, texffenv, e.get<int*>(1))
-LUA_BIND_STD(materialReset, materialreset)
 
 // shaders
 
@@ -1705,6 +1710,167 @@ LUA_BIND_STD(pvsStats, pvsstats)
 
 LUA_BIND_STD(startListenServer, startlistenserver, e.get<int*>(1))
 LUA_BIND_STD(stopListenServer, stoplistenserver)
+
+// engine/texture.cpp
+
+LUA_BIND_CLIENT(materialreset, {
+    if (!var::overridevars && !game::allowedittoggle()) return;
+    loopi(MATF_VOLUME+1) materialslots[i].reset();
+})
+
+LUA_BIND_CLIENT(compactvslosts, {
+    if (GETIV(nompedit) && multiplayer()) return;
+    compactvslots();
+    allchanged();
+})
+
+LUA_BIND_CLIENT(fixinsidefaces, {
+    if (noedit(true) || (GETIV(nompedit) && multiplayer())) return;
+    int tex = e.get<int>(1);
+    fixinsidefaces(worldroot, ivec(0, 0, 0), GETIV(mapsize)>>1, tex && vslots.inrange(tex) ? tex : DEFAULT_GEOM);
+    allchanged();
+})
+
+LUA_BIND_CLIENT(autograss, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    DELETEA(s.autograss);
+    s.autograss = e.get<char*>(1) ? newstring(makerelpath("data", e.get<char*>(1))) : NULL;
+})
+
+LUA_BIND_CLIENT(texscroll, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    s.variants->scrollS = e.get<float>(1)/1000.0f;
+    s.variants->scrollT = e.get<float>(2)/1000.0f;
+    propagatevslot(s.variants, 1<<VSLOT_SCROLL);
+})
+
+LUA_BIND_CLIENT(texoffset, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    s.variants->xoffset = max(e.get<int>(1), 0);
+    s.variants->yoffset = max(e.get<int>(2), 0);
+    propagatevslot(s.variants, 1<<VSLOT_OFFSET);
+})
+
+LUA_BIND_CLIENT(texrotate, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    s.variants->rotation = clamp(e.get<int>(1), 0, 5);
+    propagatevslot(s.variants, 1<<VSLOT_ROTATION);
+})
+
+LUA_BIND_CLIENT(texscale, {
+    if(slots.empty()) return;
+    Slot &s = *slots.last();
+    s.variants->scale = e.get<float>(1) <= 0 ? 1 : e.get<float>(1);
+    propagatevslot(s.variants, 1<<VSLOT_SCALE);
+})
+
+LUA_BIND_CLIENT(texlayer, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+
+    int layer = e.get<int>(1);
+    char *name = e.get<char*>(2);
+    float scale = e.get<float>(4);
+
+    s.variants->layer = layer < 0 ? max(slots.length()-1+layer, 0) : layer;
+    s.layermaskname = name[0] ? newstring(path(makerelpath("data", name))) : NULL; 
+    s.layermaskmode = e.get<int>(3);
+    s.layermaskscale = scale <= 0 ? 1 : scale;
+    propagatevslot(s.variants, 1<<VSLOT_LAYER);
+
+    delete name;
+})
+
+LUA_BIND_CLIENT(texalpha, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    s.variants->alphafront = clamp(e.get<float>(1), 0.0f, 1.0f);
+    s.variants->alphaback = clamp(e.get<float>(2), 0.0f, 1.0f);
+    propagatevslot(s.variants, 1<<VSLOT_ALPHA);
+})
+
+LUA_BIND_CLIENT(texcolor, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    s.variants->colorscale = vec(clamp(e.get<float>(1), 0.0f, 1.0f),
+                                 clamp(e.get<float>(2), 0.0f, 1.0f),
+                                 clamp(e.get<float>(3), 0.0f, 1.0f));
+    propagatevslot(s.variants, 1<<VSLOT_COLOR);
+})
+
+LUA_BIND_CLIENT(texffenv, {
+    if (slots.empty()) return;
+    Slot &s = *slots.last();
+    s.ffenv = (e.get<int>(1) > 0);
+})
+
+LUA_BIND_STD_CLIENT(reloadtex, reloadtex, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(gendds, gendds, e.get<char*>(1), e.get<char*>(2))
+LUA_BIND_STD_CLIENT(screenshot, screenshot, e.get<char*>(1))
+
+// TODO: REMOVE
+#define readwritetex(t, s, body) \
+    { \
+        uchar *dstrow = t.data; \
+        uchar *srcrow = s.data; \
+        loop(y, t.h) \
+        { \
+            for(uchar *dst = dstrow, *src = srcrow, *end = &srcrow[s.w*s.bpp]; src < end; dst += t.bpp, src += s.bpp) \
+            { \
+                body; \
+            } \
+            dstrow += t.pitch; \
+            srcrow += s.pitch; \
+        } \
+    }
+
+#define read2writetex(t, s1, src1, s2, src2, body) \
+    { \
+        uchar *dstrow = t.data; \
+        uchar *src1row = s1.data; \
+        uchar *src2row = s2.data; \
+        loop(y, t.h) \
+        { \
+            for(uchar *dst = dstrow, *end = &dstrow[t.w*t.bpp], *src1 = src1row, *src2 = src2row; dst < end; dst += t.bpp, src1 += s1.bpp, src2 += s2.bpp) \
+            { \
+                body; \
+            } \
+            dstrow += t.pitch; \
+            src1row += s1.pitch; \
+            src2row += s2.pitch; \
+        } \
+    }
+
+LUA_BIND_CLIENT(flipnormalmapy, {
+    ImageData ns;
+    if(!loadimage(e.get<char*>(2), ns)) return;
+    ImageData d(ns.w, ns.h, 3);
+    readwritetex(d, ns,
+        dst[0] = src[0];
+        dst[1] = 255 - src[1];
+        dst[2] = src[2];
+    );
+    saveimage(e.get<char*>(1), guessimageformat(e.get<char*>(1), IMG_TGA), d);
+})
+
+LUA_BIND_CLIENT(mergenormalmaps, {
+    char *normalfile = e.get<char*>(2);
+    ImageData hs;
+    ImageData ns;
+
+    if(!loadimage(e.get<char*>(1), hs) || !loadimage(normalfile, ns) || hs.w != ns.w || hs.h != ns.h) return;
+    ImageData d(ns.w, ns.h, 3);
+    read2writetex(d, hs, srch, ns, srcn,
+        *(bvec *)dst = bvec(((bvec *)srcn)->tovec().mul(2).add(((bvec *)srch)->tovec()).normalize());
+    );
+    saveimage(normalfile, guessimageformat(normalfile, IMG_TGA), d);
+
+    delete normalfile;
+})
 
 // engine/world.cpp
 
