@@ -637,47 +637,47 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     }
 
     // TODO: read vars!
-    /*loopi(hdr.numvars)
+    loopi(hdr.numvars)
     {
         int type = f->getchar(), ilen = f->getlil<ushort>();
         string name;
         f->read(name, min(ilen, MAXSTRLEN-1));
         name[min(ilen, MAXSTRLEN-1)] = '\0';
         if(ilen >= MAXSTRLEN) f->seek(ilen - (MAXSTRLEN-1), SEEK_CUR);
-        ident *id = getident(name);
-        bool exists = id && id->type == type;
+        var::cvar *v = var::get(name);
+        bool exists = v && v->gt() == type;
         switch(type)
         {
-            case ID_VAR:
+            case var::VAR_I:
             {
                 int val = f->getlil<int>();
-                if(exists && id->minval <= id->maxval) var::get(name)->s(val, true, true, false);
+                if(exists && v->gmni() <= v->gmxi()) v->s(val, true, true, false);
                 if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read var %s: %d", name, val);
                 break;
             }
  
-            case ID_FVAR:
+            case var::VAR_F:
             {
                 float val = f->getlil<float>();
-                if(exists && id->minvalf <= id->maxvalf) var::get(name)->s(val, true, true, false);
+                if(exists && v->gmnf() <= v->gmxf()) v->s(val, true, true, false);
                 if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read fvar %s: %f", name, val);
                 break;
             }
     
-            case ID_SVAR:
+            case var::VAR_S:
             {
                 int slen = f->getlil<ushort>();
                 string val;
                 f->read(val, min(slen, MAXSTRLEN-1));
                 val[min(slen, MAXSTRLEN-1)] = '\0';
                 if(slen >= MAXSTRLEN) f->seek(slen - (MAXSTRLEN-1), SEEK_CUR);
-                if(exists) var::get(name)->s(val, true, true, false);
+                if(exists) v->s(val, true, true, false);
                 if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read svar %s: %s", name, val);
                 break;
             }
         }
     }
-    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read %d vars", hdr.numvars);*/
+    if(GETIV(dbgvars)) conoutf(CON_DEBUG, "read %d vars", hdr.numvars);
 
     string gametype;
     copystring(gametype, "fps");
