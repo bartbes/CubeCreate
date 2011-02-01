@@ -416,12 +416,12 @@ void disconnectmaster()
 
 ENetSocket connectmaster()
 {
-    if(!GETSV(mastername)) return ENET_SOCKET_NULL;
+    if(!GETSV(mastername)[0]) return ENET_SOCKET_NULL;
 
     if(masteraddress.host == ENET_HOST_ANY)
     {
 #ifdef STANDALONE
-        printf("looking up %s...\n", GETSV(mastername).c_str());
+        printf("looking up %s...\n", GETSV(mastername));
 #endif
         masteraddress.port = server::masterport();
         if(!resolverwait(GETSV(mastername), &masteraddress)) return ENET_SOCKET_NULL;
@@ -795,7 +795,7 @@ bool servererror(bool dedicated, const char *desc)
 bool setuplistenserver(bool dedicated)
 {
     ENetAddress address = { ENET_HOST_ANY, GETIV(serverport) <= 0 ? enet_uint16(server::serverport()) : enet_uint16(GETIV(serverport)) };
-    if(GETSV(serverip))
+    if(GETSV(serverip)[0])
     {
         if(enet_address_set_host(&address, GETSV(serverip))<0) conoutf(CON_WARN, "WARNING: server ip not resolved");
         else serveraddress.host = address.host;

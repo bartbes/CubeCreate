@@ -28,7 +28,7 @@ function _VARS:reg(var)
 		if var:isInReach(val) then
 			local oval = var.curv
 			var.curv = val
-			CAPI.syncVariableFromLua(var.name, tostring(var), val)
+			CAPI.svfl(var.name, tostring(var), val)
 		end
 	end, var)
 end

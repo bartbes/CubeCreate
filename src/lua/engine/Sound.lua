@@ -1,6 +1,6 @@
 -- Sound management functions for CC/Lua
 
-Sound = {
+sound = {
 	-- if done on the server, a message is sent to clients to play the sound
 	play = function (_name, position, volume, clientNumber)
 		position = defaultValue(position, Vector3(0, 0, 0))
@@ -34,23 +34,23 @@ Sound = {
 		end
 	end,
 
-	playMusic = CAPI.music,
+	playmusic = CAPI.music,
 
-	setMusicHandler = function(func)
-		Sound.musicHandler = func
-		Sound.musicCallback() -- start playing now
+	setmusichandler = function(func)
+		Sound.musichandler = func
+		Sound.musiccallback() -- start playing now
 	end,
 
-	musicCallback = function()
-		if Sound.musicHandler then
-			Sound.musicHandler()
+	musiccallback = function()
+		if Sound.musichandler then
+			Sound.musichandler()
 		end
 	end,
 
-	register = function(sound, vol)
+	reg = function(sound, vol)
 		vol = defaultValue(vol, 0)
-		CAPI.registerSound(sound, vol)
+		CAPI.registersound(sound, vol)
 	end,
 
-	reset = CAPI.resetSound
+	reset = CAPI.resetsound
 }

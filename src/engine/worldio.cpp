@@ -1068,7 +1068,7 @@ bool finish_load_world() // INTENSITY: Second half, after all entities received
     initlights();
     allchanged(true);
 
-//    if(!GETSV(maptitle).empty() && GETSV(maptitle).compare("Untitled Map by Unknown")) conoutf(CON_ECHO, "%s", GETSV(maptitle).c_str()); // INTENSITY
+//    if(GETSV(maptitle)[0] && strcmp(GETSV(maptitle), "Untitled Map by Unknown")) conoutf(CON_ECHO, "%s", GETSV(maptitle).c_str()); // INTENSITY
 
     startmap(cname ? cname : mname);
     

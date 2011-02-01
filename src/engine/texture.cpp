@@ -1966,7 +1966,7 @@ void initenvmaps()
 {
     if(!hasCM) return;
     clearenvmaps();
-    skyenvmap = GETSV(skybox) ? cubemapload(GETSV(skybox), true, false, true) : NULL;
+    skyenvmap = GETSV(skybox)[0] ? cubemapload(GETSV(skybox), true, false, true) : NULL;
     const vector<extentity *> &ents = entities::getents();
     loopv(ents)
     {
@@ -2560,7 +2560,7 @@ void screenshot(char *filename)
     static string buf;
     int format = -1;
     copystring(buf, GETSV(screenshotdir));
-    if(GETSV(screenshotdir))
+    if(GETSV(screenshotdir)[0])
     {
         int len = strlen(buf);
         if(buf[len] != '/' && buf[len] != '\\' && len+1 < (int)sizeof(buf)) { buf[len] = '/'; buf[len+1] = '\0'; }

@@ -2,11 +2,11 @@
 -- do not modify
 
 -- Cubescript ugliness to replace
-Console.binds.add("ESCAPE", [[
-	CV:run("menu_key_click_trigger")
-	if GUI.clear() ~= 1 then
-		CV:run("save_mouse_pos") -- Useful for New Light GUI and so forth.
-		GUI.show("main")
+console.binds.add("ESCAPE", [[
+	CAPI.menu_key_click_trigger()
+	if gui.clear() ~= 1 then
+		CAPI.save_mouse_pos() -- Useful for New Light GUI and so forth.
+		gui.show("main")
 	end
 ]])
 
@@ -14,30 +14,30 @@ Console.binds.add("ESCAPE", [[
 
 function setup_main_menu()
 	if EV.logged_into_master == 0 then
-		GUI.new("main", [[
-			GUI.button("log in...", [=[ show_login() ]=], "menu")
-			GUI.bar()
-			GUI.button("plugins...", [=[ GUI.show("plugins") ]=])
-			GUI.button("options...", [=[ GUI.show("options") ]=])
-			GUI.button("help...", [=[ GUI.show("help") ]=])
-			GUI.button("quit", [=[ Engine.quit() ]=], "exit")
+		gui.new("main", [[
+			gui.button("log in...", [=[ show_login() ]=], "menu")
+			gui.bar()
+			gui.button("plugins...", [=[ gui.show("plugins") ]=])
+			gui.button("options...", [=[ gui.show("options") ]=])
+			gui.button("help...", [=[ gui.show("help") ]=])
+			gui.button("quit", [=[ engine.quit() ]=], "exit")
 		]])
 	end
 	if EV.logged_into_master == 1 then
-		GUI.new("main", [[
+		gui.new("main", [[
 			if EV.have_master ~= 0 then
-				GUI.button("^f2connect to lobby...^f~", "CV:run('connect_to_lobby')")
-				GUI.bar()
-				GUI.button("connect to selected...", "CV:run('connect_to_selected_instance')")
+				gui.button("^f2connect to lobby...^f~", "CV:run('connect_to_lobby')")
+				gui.bar()
+				gui.button("connect to selected...", "CV:run('connect_to_selected_instance')")
 			end
-			GUI.button("local connection...", "CV:run('connect 127.0.0.1 28787')")
-			GUI.button("manual connection...", "GUI.show('manual_connect')")
-			GUI.bar()
-			GUI.button("plugins...", [=[ GUI.show("plugins") ]=])
-			GUI.button("options...", [=[ GUI.show("options") ]=])
-			GUI.button("special...", [=[ GUI.show("special") ]=])
-			GUI.button("help...", [=[ GUI.show("help") ]=])
-			GUI.button("quit", [=[ Engine.quit() ]=], "exit")
+			gui.button("local connection...", "CV:run('connect 127.0.0.1 28787')")
+			gui.button("manual connection...", "gui.show('manual_connect')")
+			gui.bar()
+			gui.button("plugins...", [=[ gui.show("plugins") ]=])
+			gui.button("options...", [=[ gui.show("options") ]=])
+			gui.button("special...", [=[ gui.show("special") ]=])
+			gui.button("help...", [=[ gui.show("help") ]=])
+			gui.button("quit", [=[ engine.quit() ]=], "exit")
 		]])
 	end
 end
@@ -47,13 +47,13 @@ function show_login()
 		EV.entered_password = '--------' -- 8 '-'s: means "use existing hashed password"
 											  -- which we need if there was a password entered before
 	end
-	GUI.show("login")
+	gui.show("login")
 end
 
-GUI.new("login", [[
-	GUI.text(string.format("master server: ^f2%s")) -- (get_config "Network" "master_server") TODO
-	GUI.bar()
-	GUI.list([=[
+gui.new("login", [[
+	gui.text(string.format("master server: ^f2%s")) -- (get_config "Network" "master_server") TODO
+	gui.bar()
+	gui.list([=[
 	]=])
 ]])
 --[[
@@ -93,33 +93,33 @@ newgui login [
 ]]
 
 -- Special
-GUI.new("special", [[
+gui.new("special", [[
 	if EV.last_uploaded_map_asset ~= "" then
-		GUI.button("repeat last map upload...", "CV:run('repeat_upload')")
+		gui.button("repeat last map upload...", "CV:run('repeat_upload')")
 	end
 ]])
 
 -- Help
-GUI.new("help", [[
-	GUI.text("press Escape to exit a menu / go back")
-	GUI.bar()
-	GUI.text("some useful commands:")
-	GUI.text("   M - toggle mouselook mode")
-	GUI.text("   9 - toggle thirdperson mode")
-	GUI.text("   mouse wheel - zoom in/out")
-	GUI.bar()
-	GUI.text("camera control vars:")
-	GUI.text("   cameraheight, smoothcamera, cameraavoid")
+gui.new("help", [[
+	gui.text("press Escape to exit a menu / go back")
+	gui.bar()
+	gui.text("some useful commands:")
+	gui.text("   M - toggle mouselook mode")
+	gui.text("   9 - toggle thirdperson mode")
+	gui.text("   mouse wheel - zoom in/out")
+	gui.bar()
+	gui.text("camera control vars:")
+	gui.text("   cameraheight, smoothcamera, cameraavoid")
 
-	GUI.tab("about")
-	GUI.text("CubeCreate - developer build")
-	GUI.text("http://cubecreate.com")
-	GUI.bar()
-	GUI.text("Licensed under MIT/X11")
-	GUI.text("(see README.txt and COPYING.txt)")
-	GUI.bar()
-	GUI.text("Thanks to Cube 2, Syntensity, Lua, SDL,")
-	GUI.text("   Python, love2d, zlib")
+	gui.tab("about")
+	gui.text("CubeCreate - developer build")
+	gui.text("http://cubecreate.com")
+	gui.bar()
+	gui.text("Licensed under MIT/X11")
+	gui.text("(see README.txt and COPYING.txt)")
+	gui.bar()
+	gui.text("Thanks to Cube 2, Syntensity, Lua, SDL,")
+	gui.text("   Python, love2d, zlib")
 ]])
 
 --[[// Login error
@@ -133,23 +133,23 @@ newgui error [
 -- Options - split up into submenus for speed
 
 function resbutton(w, h)
-	GUI.button(
+	gui.button(
 		string.format("%sx%s", w, h),
 		string.format("CV:run('screenres %s %s')", w, h),
 		(EV.scr_w == w and EV.scr_h == h) and "radio_on" or "radio_off"
 	)
 end
 
-GUI.new("options", [[
-	GUI.button("general", "GUI.show('general')")
-	GUI.button("video",   "GUI.show('video')")
-	GUI.button("audio",   "GUI.show('audio')")
-	GUI.button("input",   "GUI.show('input')")
+gui.new("options", [[
+	gui.button("general", "gui.show('general')")
+	gui.button("video",   "gui.show('video')")
+	gui.button("audio",   "gui.show('audio')")
+	gui.button("input",   "gui.show('input')")
 ]])
 
 
-GUI.new("plugins", [[
-	CV:run("show_plugins")
+gui.new("plugins", [[
+	CAPI.show_plugins()
 ]])
 
 setup_main_menu()

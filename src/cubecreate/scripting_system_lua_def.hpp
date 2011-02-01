@@ -1400,16 +1400,16 @@ LUA_BIND_DUMMY(removeNPC)
 // dummies are needed because we don't want to check further in CAPIExtras.
 
 LUA_BIND_STD_CLIENT(keymap, keymap, e.get<int*>(1), e.get<char*>(2))
-LUA_BIND_STD_CLIENT(registerSound, registersound, e.get<char*>(1), e.get<int*>(2))
+LUA_BIND_STD_CLIENT(registersound, registersound, e.get<char*>(1), e.get<int*>(2))
 LUA_BIND_STD_CLIENT(font, newfont, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<int*>(4), e.get<int*>(5), e.get<int*>(6), e.get<int*>(7), e.get<int*>(8))
-LUA_BIND_STD_CLIENT(fontOffset, fontoffset, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(fontChar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
+LUA_BIND_STD_CLIENT(fontoffset, fontoffset, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(fontchar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
 
 // Variable manipulation
 
 LUA_BIND_DEF(resetvar, var::get(e.get<const char*>(1))->r();)
 
-LUA_BIND_DEF(syncVariableFromLua, {
+LUA_BIND_DEF(svfl, {
     const char *name = e.get<const char*>(1);
     std::string type = std::string(e.get<const char*>(2));
     switch (type[0])
@@ -1433,7 +1433,7 @@ LUA_BIND_DEF(syncVariableFromLua, {
     }
 })
 
-LUA_BIND_DEF(startStopLocalServer, {
+LUA_BIND_DEF(ssls, {
     if (e.is<void>(1))
         run_python((char*)"intensity.components.server_runner.stop_server()");
     else
@@ -1448,68 +1448,68 @@ LUA_BIND_DEF(startStopLocalServer, {
 
 // GUI
 
-LUA_BIND_STD_CLIENT(showMessage, IntensityGUI::showMessage, "Script message", std::string(e.get<const char*>(1)))
-LUA_BIND_STD_CLIENT(showInputDialog, IntensityGUI::showInputDialog, "Script input", std::string(e.get<const char*>(1)))
-LUA_BIND_CLIENT(setDefaultThirdpersonMode, {
+LUA_BIND_STD_CLIENT(showmessage, IntensityGUI::showMessage, "Script message", e.get<const char*>(1))
+LUA_BIND_STD_CLIENT(showinputdialog, IntensityGUI::showInputDialog, "Script input", e.get<const char*>(1))
+LUA_BIND_CLIENT(setdeftpm, {
     // Only allow this to be done once
-    if (!lua::engine["setDefaultThirdpersonMode"])
+    if (!lua::engine["setdeftpm"])
     {
-        lua::engine["setDefaultThirdpersonMode"] = "set";
+        lua::engine["setdeftpm"] = "set";
         SETV(thirdperson, e.get<int>(1));
     } else
         Logging::log(Logging::WARNING, "Can only set default thirdperson mode once per map\r\n");
 })
 
-LUA_BIND_STD_CLIENT(newGUI, newgui, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(GUIButton, guibutton, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(GUIText, guitext, e.get<char*>(1), e.get<char*>(2))
-LUA_BIND_STD_CLIENT(clearGUI, e.push, cleargui(e.get<int>(1)))
-LUA_BIND_STD_CLIENT(showGUI, showgui, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUIOnClear, guionclear, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUIStayOpen, guistayopen, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUINoAutoTab, guinoautotab, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUIList, guilist, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUIAlign, guialign, e.get<int*>(1), e.get<char*>(2))
-LUA_BIND_STD_CLIENT(GUITitle, guititle, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUIBar, guibar)
-LUA_BIND_STD_CLIENT(GUIStrut, guistrut, e.get<float*>(1), e.get<int*>(2))
-LUA_BIND_STD_CLIENT(GUIImage, guiimage, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<int*>(4), e.get<char*>(5))
-LUA_BIND_STD_CLIENT(GUISlider, guislider, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(GUIListSlider, guilistslider, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(GUINameSlider, guinameslider, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(GUIRadio, guiradio, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(GUIBitfield, guibitfield, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(GUICheckBox, guicheckbox, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<float*>(4), e.get<char*>(5))
-LUA_BIND_STD_CLIENT(GUITab, guitab, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(GUIField, guifield, e.get<char*>(1), e.get<int*>(2), e.get<char*>(3), e.get<int*>(4))
-LUA_BIND_STD_CLIENT(GUIKeyfield, guikeyfield, e.get<char*>(1), e.get<int*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(GUIEditor, guieditor, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
-LUA_BIND_STD_CLIENT(GUIColor, guicolor, e.get<int*>(1))
-LUA_BIND_STD_CLIENT(GUITextBox, guitextbox, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
+LUA_BIND_STD_CLIENT(newgui, newgui, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
+LUA_BIND_STD_CLIENT(guibutton, guibutton, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
+LUA_BIND_STD_CLIENT(guitext, guitext, e.get<char*>(1), e.get<char*>(2))
+LUA_BIND_STD_CLIENT(cleargui, e.push, cleargui(e.get<int>(1)))
+LUA_BIND_STD_CLIENT(showgui, showgui, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guionclear, guionclear, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guistayopen, guistayopen, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guinoautotab, guinoautotab, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guilist, guilist, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guialign, guialign, e.get<int*>(1), e.get<char*>(2))
+LUA_BIND_STD_CLIENT(guititle, guititle, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guibar, guibar)
+LUA_BIND_STD_CLIENT(guistrut, guistrut, e.get<float*>(1), e.get<int*>(2))
+LUA_BIND_STD_CLIENT(guiimage, guiimage, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<int*>(4), e.get<char*>(5))
+LUA_BIND_STD_CLIENT(guislider, guislider, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<char*>(4))
+LUA_BIND_STD_CLIENT(guilistslider, guilistslider, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
+LUA_BIND_STD_CLIENT(guinameslider, guinameslider, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3), e.get<char*>(4))
+LUA_BIND_STD_CLIENT(guiradio, guiradio, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<char*>(4))
+LUA_BIND_STD_CLIENT(guibitfield, guibitfield, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<char*>(4))
+LUA_BIND_STD_CLIENT(guicheckbox, guicheckbox, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<float*>(4), e.get<char*>(5))
+LUA_BIND_STD_CLIENT(guitab, guitab, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(guifield, guifield, e.get<char*>(1), e.get<int*>(2), e.get<char*>(3), e.get<int*>(4))
+LUA_BIND_STD_CLIENT(guikeyfield, guikeyfield, e.get<char*>(1), e.get<int*>(2), e.get<char*>(3))
+LUA_BIND_STD_CLIENT(guieditor, guieditor, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
+LUA_BIND_STD_CLIENT(guicolor, guicolor, e.get<int*>(1))
+LUA_BIND_STD_CLIENT(guitextbox, guitextbox, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
 
 LUA_BIND_STD_CLIENT(quit, quit)
-LUA_BIND_STD_CLIENT(forceQuit, force_quit)
-LUA_BIND_STD_CLIENT(screenRes, screenres, e.get<int*>(1), e.get<int*>(2))
-LUA_BIND_STD_CLIENT(resetGl, resetgl)
-LUA_BIND_STD_CLIENT(getFps, getfps_, e.get<int*>(1))
+LUA_BIND_STD_CLIENT(force_quit, force_quit)
+LUA_BIND_STD_CLIENT(screenres, screenres, e.get<int*>(1), e.get<int*>(2))
+LUA_BIND_STD_CLIENT(resetgl, resetgl)
+LUA_BIND_STD_CLIENT(getfps, getfps_, e.get<int*>(1))
 
-LUA_BIND_STD_CLIENT(resetLightMaps, resetlightmaps, e.get<bool>(1))
-LUA_BIND_STD_CLIENT(calcLight, calclight, e.get<int*>(1))
-LUA_BIND_STD_CLIENT(patchLight, patchlight, e.get<int*>(1))
-LUA_BIND_STD_CLIENT(clearLightMaps, clearlightmaps)
-LUA_BIND_STD_CLIENT(dumpLms, dumplms)
+LUA_BIND_STD_CLIENT(resetlightmaps, resetlightmaps, e.get<bool>(1))
+LUA_BIND_STD_CLIENT(calclight, calclight, e.get<int*>(1))
+LUA_BIND_STD_CLIENT(patchlight, patchlight, e.get<int*>(1))
+LUA_BIND_STD_CLIENT(clearlightmaps, clearlightmaps)
+LUA_BIND_STD_CLIENT(dumplms, dumplms)
 
 // blendmap
 
-LUA_BIND_STD(clearBlendBrushes, clearblendbrushes)
-LUA_BIND_STD(delBlendBrush, delblendbrush, e.get<const char*>(1))
-LUA_BIND_STD(addBlendBrush, addblendbrush, e.get<const char*>(1), e.get<const char*>(2))
-LUA_BIND_STD(nextBlendBrush, nextblendbrush, e.get<int*>(1))
-LUA_BIND_STD(setBlendBrush, setblendbrush, e.get<const char*>(1))
-LUA_BIND_STD(getBlendBrushName, getblendbrushname, e.get<int*>(1))
-LUA_BIND_STD(curBlendBrush, curblendbrush)
-LUA_BIND_STD(rotateBlendBrush, rotateblendbrush, e.get<int*>(1))
-LUA_BIND_DEF(paintBlendMap, {
+LUA_BIND_STD(clearblendbrushes, clearblendbrushes)
+LUA_BIND_STD(delblendbrush, delblendbrush, e.get<const char*>(1))
+LUA_BIND_STD(addblendbrush, addblendbrush, e.get<const char*>(1), e.get<const char*>(2))
+LUA_BIND_STD(nextblendbrush, nextblendbrush, e.get<int*>(1))
+LUA_BIND_STD(setblendbrush, setblendbrush, e.get<const char*>(1))
+LUA_BIND_STD(getblendbrushname, getblendbrushname, e.get<int*>(1))
+LUA_BIND_STD(curblendbrush, curblendbrush)
+LUA_BIND_STD(rotateblendbrush, rotateblendbrush, e.get<int*>(1))
+LUA_BIND_DEF(paintblendmap, {
     if (addreleaseaction("paintBlendMap"))
     {
         if (!paintingblendmap)
@@ -1520,12 +1520,12 @@ LUA_BIND_DEF(paintBlendMap, {
     }
     else stoppaintblendmap();
 })
-LUA_BIND_STD(clearBlendMapSel, clearblendmapsel)
-LUA_BIND_STD(invertBlendMapSel, invertblendmapsel)
-LUA_BIND_STD(invertBlendMap, invertblendmap)
-LUA_BIND_STD(showBlendMap, showblendmap)
-LUA_BIND_STD(optimizeBlendMap, optimizeblendmap)
-LUA_BIND_DEF(clearBlendMap, {
+LUA_BIND_STD(clearblendmapsel, clearblendmapsel)
+LUA_BIND_STD(invertblendmapsel, invertblendmapsel)
+LUA_BIND_STD(invertblendmap, invertblendmap)
+LUA_BIND_STD(showblendmap, showblendmap)
+LUA_BIND_STD(optimizeblendmap, optimizeblendmap)
+LUA_BIND_DEF(clearblendmap, {
     if(noedit(true) || (GETIV(nompedit) && multiplayer())) return;
     resetblendmap();
     showblendmap();
@@ -1533,20 +1533,20 @@ LUA_BIND_DEF(clearBlendMap, {
 
 // console
 
-LUA_BIND_STD_CLIENT(toggleConsole, SETV, fullconsole, GETIV(fullconsole) ^ 1)
-LUA_BIND_STD_CLIENT(conSkip, setconskip, conskip, GETIV(fullconsole) ? GETIV(fullconfilter) : GETIV(confilter), e.get<int>(1))
-LUA_BIND_STD_CLIENT(miniConSkip, setconskip, miniconskip, GETIV(miniconfilter), e.get<int>(1))
-LUA_BIND_CLIENT(clearConsole, while(conlines.length()) delete[] conlines.pop().line;)
+LUA_BIND_STD_CLIENT(toggleconsole, SETV, fullconsole, GETIV(fullconsole) ^ 1)
+LUA_BIND_STD_CLIENT(conskip, setconskip, conskip, GETIV(fullconsole) ? GETIV(fullconfilter) : GETIV(confilter), e.get<int>(1))
+LUA_BIND_STD_CLIENT(miniconskip, setconskip, miniconskip, GETIV(miniconfilter), e.get<int>(1))
+LUA_BIND_CLIENT(clearconsole, while(conlines.length()) delete[] conlines.pop().line;)
 LUA_BIND_STD_CLIENT(bind, bindkey, e.get<char*>(1), e.get<char*>(2), keym::ACTION_DEFAULT, "bind")
-LUA_BIND_STD_CLIENT(specBind, bindkey, e.get<char*>(1), e.get<char*>(2), keym::ACTION_SPECTATOR, "specbind")
-LUA_BIND_STD_CLIENT(editBind, bindkey, e.get<char*>(1), e.get<char*>(2), keym::ACTION_EDITING, "editbind")
-LUA_BIND_STD_CLIENT(getBind, getbind, e.get<char*>(1), keym::ACTION_DEFAULT)
-LUA_BIND_STD_CLIENT(getSpecBind, getbind, e.get<char*>(1), keym::ACTION_SPECTATOR)
-LUA_BIND_STD_CLIENT(getEditBind, getbind, e.get<char*>(1), keym::ACTION_EDITING)
-LUA_BIND_STD_CLIENT(searchBinds, searchbinds, e.get<char*>(1), keym::ACTION_DEFAULT)
-LUA_BIND_STD_CLIENT(searchSpecBinds, searchbinds, e.get<char*>(1), keym::ACTION_SPECTATOR)
-LUA_BIND_STD_CLIENT(searchEditBinds, searchbinds, e.get<char*>(1), keym::ACTION_EDITING)
-LUA_BIND_CLIENT(sayCommand, {
+LUA_BIND_STD_CLIENT(specbind, bindkey, e.get<char*>(1), e.get<char*>(2), keym::ACTION_SPECTATOR, "specbind")
+LUA_BIND_STD_CLIENT(editbind, bindkey, e.get<char*>(1), e.get<char*>(2), keym::ACTION_EDITING, "editbind")
+LUA_BIND_STD_CLIENT(getbind, getbind, e.get<char*>(1), keym::ACTION_DEFAULT)
+LUA_BIND_STD_CLIENT(getspecbind, getbind, e.get<char*>(1), keym::ACTION_SPECTATOR)
+LUA_BIND_STD_CLIENT(geteditbind, getbind, e.get<char*>(1), keym::ACTION_EDITING)
+LUA_BIND_STD_CLIENT(searchbinds, searchbinds, e.get<char*>(1), keym::ACTION_DEFAULT)
+LUA_BIND_STD_CLIENT(searchspecbinds, searchbinds, e.get<char*>(1), keym::ACTION_SPECTATOR)
+LUA_BIND_STD_CLIENT(searcheditbinds, searchbinds, e.get<char*>(1), keym::ACTION_EDITING)
+LUA_BIND_CLIENT(saycommand, {
     int n = e.gettop();
     switch (n)
     {
@@ -1568,11 +1568,11 @@ LUA_BIND_CLIENT(sayCommand, {
         }
     }
 })
-LUA_BIND_STD_CLIENT(inputCommand, inputcommand, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
+LUA_BIND_STD_CLIENT(inputcommand, inputcommand, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
 LUA_BIND_STD_CLIENT(history, history_, e.get<int*>(1))
-LUA_BIND_STD_CLIENT(onRelease, onrelease, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(onrelease, onrelease, e.get<char*>(1))
 LUA_BIND_STD_CLIENT(complete, addfilecomplete, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(listComplete, addlistcomplete, e.get<char*>(1), e.get<char*>(2))
+LUA_BIND_STD_CLIENT(listcomplete, addlistcomplete, e.get<char*>(1), e.get<char*>(2))
 
 // textedit
 
@@ -1583,7 +1583,7 @@ LUA_BIND_CLIENT(n, { \
     c \
 })
 // return list of all editors
-LUA_BIND_CLIENT(textList, {
+LUA_BIND_CLIENT(textlist, {
     std::string s;
     loopv(editors)
     {
@@ -1593,14 +1593,14 @@ LUA_BIND_CLIENT(textList, {
     e.push(s.c_str());
 })
 // return the start of the buffer
-LUA_BIND_TEXT(textShow, {
+LUA_BIND_TEXT(textshow, {
     editline line;
     line.combinelines(top->lines);
     e.push(line.text);
     line.clear();
 })
 // focus on a (or create a persistent) specific editor, else returns current name
-LUA_BIND_CLIENT(textFocus, {
+LUA_BIND_CLIENT(textfocus, {
     if (e.is<const char*>(1))
     {
         int arg2 = e.get<int>(2);
@@ -1610,9 +1610,9 @@ LUA_BIND_CLIENT(textFocus, {
     else e.push();
 })
 // return to the previous editor
-LUA_BIND_TEXT(textPrev, editors.insert(0, top); editors.pop();)
+LUA_BIND_TEXT(textprev, editors.insert(0, top); editors.pop();)
 // (1 = keep while focused, 2 = keep while used in gui, 3 = keep forever (i.e. until mode changes)) topmost editor, return current setting if no args
-LUA_BIND_TEXT(textMode, {
+LUA_BIND_TEXT(textmode, {
     int arg1 = e.get<int>(2);
     if (arg1)
     {
@@ -1622,12 +1622,12 @@ LUA_BIND_TEXT(textMode, {
     else e.push(top->mode);
 })
 // saves the topmost (filename is optional)
-LUA_BIND_TEXT(textSave, {
+LUA_BIND_TEXT(textsave, {
     const char *arg1 = e.get<const char*>(1);
     if (arg1) top->setfile(path(arg1, true));
     top->save();
 })
-LUA_BIND_TEXT(textLoad, {
+LUA_BIND_TEXT(textload, {
     const char *arg1 = e.get<const char*>(1);
     if (arg1)
     {
@@ -1638,7 +1638,7 @@ LUA_BIND_TEXT(textLoad, {
     else if (top->filename) e.push(top->filename);
     else e.push();
 })
-LUA_BIND_TEXT(textInit, {
+LUA_BIND_TEXT(textinit, {
     editor *ed = NULL;
     const char *arg2 = e.get<const char*>(2);
     loopv(editors) if(!strcmp(e.get<const char*>(1), editors[i]->name))
@@ -1655,9 +1655,9 @@ LUA_BIND_TEXT(textInit, {
  
 #define PASTEBUFFER "#pastebuffer"
 
-LUA_BIND_TEXT(textCopy, editor *b = useeditor(PASTEBUFFER, EDITORFOREVER, false); top->copyselectionto(b);)
-LUA_BIND_TEXT(textPaste, editor *b = useeditor(PASTEBUFFER, EDITORFOREVER, false); top->insertallfrom(b);)
-LUA_BIND_TEXT(textMark, {
+LUA_BIND_TEXT(textcopy, editor *b = useeditor(PASTEBUFFER, EDITORFOREVER, false); top->copyselectionto(b);)
+LUA_BIND_TEXT(textpaste, editor *b = useeditor(PASTEBUFFER, EDITORFOREVER, false); top->insertallfrom(b);)
+LUA_BIND_TEXT(textmark, {
     editor *b = useeditor(PASTEBUFFER, EDITORFOREVER, false); top->insertallfrom(b);
     int arg1 = e.get<int>(1);
     if (arg1)
@@ -1667,44 +1667,44 @@ LUA_BIND_TEXT(textMark, {
     }
     else e.push(top->region() ? 1 : 2);
 })
-LUA_BIND_TEXT(textSelectAll, top->selectall();)
-LUA_BIND_TEXT(textClear, top->clear();)
-LUA_BIND_TEXT(textCurrentLine, e.push(top->currentline().text);)
-LUA_BIND_TEXT(textExec, e.exec(e.get<int>(1) ? top->selectiontostring() : top->tostring());)
+LUA_BIND_TEXT(textselectall, top->selectall();)
+LUA_BIND_TEXT(textclear, top->clear();)
+LUA_BIND_TEXT(textcurrentline, e.push(top->currentline().text);)
+LUA_BIND_TEXT(textexec, e.exec(e.get<int>(1) ? top->selectiontostring() : top->tostring());)
 
 // various commands
 
 LUA_BIND_STD_CLIENT(movie, movie, e.get<char*>(1))
 LUA_BIND_STD_CLIENT(recalc, recalc)
-LUA_BIND_STD_CLIENT(glExt, glext, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(getCamPos, e.push, camera1->o)
-LUA_BIND_STD_CLIENT(loadCrosshair, loadcrosshair_, e.get<char*>(1), e.get<int*>(2))
+LUA_BIND_STD_CLIENT(glext, glext, e.get<char*>(1))
+LUA_BIND_STD_CLIENT(getcampos, e.push, camera1->o)
+LUA_BIND_STD_CLIENT(loadcrosshair, loadcrosshair_, e.get<char*>(1), e.get<int*>(2))
 LUA_BIND_STD_CLIENT(tabify, tabify, e.get<char*>(1), e.get<int*>(2))
-LUA_BIND_STD_CLIENT(resetSound, resetsound)
+LUA_BIND_STD_CLIENT(resetsound, resetsound)
 
-LUA_BIND_STD(isConnected, e.push, isconnected(e.get<int>(1) > 0) ? 1 : 0)
-LUA_BIND_DEF(connectedIP, {
+LUA_BIND_STD(isconnected, e.push, isconnected(e.get<int>(1) > 0) ? 1 : 0)
+LUA_BIND_DEF(connectedip, {
     const ENetAddress *address = connectedpeer();
     string hostname;
     e.push(address && enet_address_get_host_ip(address, hostname, sizeof(hostname)) >= 0 ? hostname : "");
 })
-LUA_BIND_DEF(connectedPort, {
+LUA_BIND_DEF(connectedport, {
     const ENetAddress *address = connectedpeer();
     e.push(address ? address->port : -1);
 })
-LUA_BIND_STD(connectServ, connectserv, e.get<const char*>(1), e.get<int>(2), e.get<const char*>(3))
-LUA_BIND_STD(lanConnect, connectserv, NULL, e.get<int>(1), e.get<const char*>(2))
+LUA_BIND_STD(connectserv, connectserv, e.get<const char*>(1), e.get<int>(2), e.get<const char*>(3))
+LUA_BIND_STD(lanconnect, connectserv, NULL, e.get<int>(1), e.get<const char*>(2))
 LUA_BIND_STD(disconnect, trydisconnect)
-LUA_BIND_STD(localConnect, if(!isconnected() && !haslocalclients()) localconnect)
-LUA_BIND_STD(localDisconnect, if(haslocalclients()) localdisconnect)
+LUA_BIND_STD(localconnect, if(!isconnected() && !haslocalclients()) localconnect)
+LUA_BIND_STD(localdisconnect, if(haslocalclients()) localdisconnect)
 
-LUA_BIND_STD(printCube, printcube)
+LUA_BIND_STD(printcube, printcube)
 LUA_BIND_STD(remip, remip_)
-LUA_BIND_STD(physTest, phystest)
-LUA_BIND_STD(genPvs, genpvs, e.get<int*>(1))
-LUA_BIND_STD(testPvs, testpvs, e.get<int*>(1))
-LUA_BIND_STD(clearPvs, clearpvs)
-LUA_BIND_STD(pvsStats, pvsstats)
+LUA_BIND_STD(phystest, phystest)
+LUA_BIND_STD(genpvs, genpvs, e.get<int*>(1))
+LUA_BIND_STD(testpvs, testpvs, e.get<int*>(1))
+LUA_BIND_STD(clearpvs, clearpvs)
+LUA_BIND_STD(pvsstats, pvsstats)
 
 LUA_BIND_STD(getmillis, e.push, e.get<bool>(1) ? totalmillis : lastmillis)
 

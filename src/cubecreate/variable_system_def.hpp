@@ -406,27 +406,27 @@ VAR(dbgpcull, 0, 0, 1);
 FVARFP(editpartsize, 0.0f, 2.0f, 100.0f, particleinit);
 
 // engine/rendersky.cpp
-SVARFR(starbox, NULL, loadstars); // INTENSITY: SkyManager: various star and sun variables
+SVARFR(starbox, "", loadstars); // INTENSITY: SkyManager: various star and sun variables
 VARR(starboxtint, 0, 0xFFFFFF, 0xFFFFFF);
 FVARR(spinstars, -720.0f, 0.0f, 720.0f);
 VARR(yawstars, 0, 0, 360); // end INTENSITY
-SVARFR(skybox, NULL, loadsky);
+SVARFR(skybox, "", loadsky);
 FVARR(skyboxalpha, 0.0f, 0.999f, 1.0f); // INTENSITY: Less than one so it won't occlude and cause starbox to be culled.
 VAR(skyboxtint, 0, 0xFFFFFF, 0xFFFFFF); // INTENSITY: was skyboxcolour
 FVARR(spinsky, -720.0f, 0.0f, 720.0f);
 VARR(yawsky, 0, 0, 360);
-SVARFR(sunbox, NULL, loadsun);
+SVARFR(sunbox, "", loadsun);
 FVARR(sunboxalpha, 0.0f, 1.0f, 1.0f);
 VARR(sunboxtint, 0, 0xFFFFFF, 0xFFFFFF);
 FVAR(spinsun, -720.0f, 0.0f, 720.0f);
 VARFR(yawsun, 0, 0, 360, skymillis);
-SVARFR(cloudbox, NULL, loadclouds);
+SVARFR(cloudbox, "", loadclouds);
 FVARR(cloudboxalpha, 0.0f, 0.999f, 1.0f); // INTENSITY: was 1
 VARR(cloudboxtint, 0, 0xFFFFFF, 0xFFFFFF);
 FVARR(spinclouds, -720.0f, 0.0f, 720.0f);
 VARR(yawclouds, 0, 0, 360);
 FVARR(cloudclip, 0.0f, 0.5f, 1.0f);
-SVARFR(cloudlayer, NULL, cloudoverlay);
+SVARFR(cloudlayer, "", cloudoverlay);
 FVARR(cloudscrollx, -16.0f, 0.0f, 16.0f);
 FVARR(cloudscrolly, -16.0f, 0.0f, 16.0f);
 FVARR(cloudscale, 0.001f, 1.0f, 64.0f);
@@ -437,7 +437,7 @@ FVARR(cloudfade, 0.0f, 0.2f, 1.0f);
 FVARR(cloudalpha, 0.0f, 1.0f, 1.0f);
 VARR(cloudsubdiv, 4, 16, 64);
 VARR(cloudtint, 0, 0xFFFFFF, 0xFFFFFF);
-SVARFR(altcloudlayer, NULL, altcloudoverlay);
+SVARFR(altcloudlayer, "", altcloudoverlay);
 FVARR(altcloudscrollx, -16.0f, 0.0f, 16.0f);
 FVARR(altcloudscrolly, -16.0f, 0.0f, 16.0f);
 FVARR(altcloudscale, 0.001f, 1.0f, 64.0f);
@@ -493,7 +493,7 @@ VARP(maxservpings, 0, 10, 1000);
 VAR(updatemaster, 0, 1, 1); // globalname was allowupdatemaster
 SVARF(mastername, server::defaultmaster(), disconnectmaster);
 VAR(serveruprate, 0, 0, INT_MAX);
-SVAR(serverip, NULL);
+SVAR(serverip, "");
 VARFP(serverport, 0, server::serverport(), 0xFFFF, serverport); // not hex var
 
 #ifdef CLIENT
@@ -589,7 +589,7 @@ VAR(aaenvmap, 0, 2, 4);
 VARP(compresspng, 0, 9, 9);
 VARP(compresstga, 0, 1, 1);
 VARP(screenshotformat, 0, IMG_PNG, NUMIMG-1);
-SVARP(screenshotdir, NULL);
+SVARP(screenshotdir, "");
 
 // engine/water.cpp
 VARFP(waterreflect, 0, 1, 1, preloadwaters);
@@ -690,7 +690,7 @@ VAR(cam_dist, 0, 50, 200); // How much higher than the player to set the camera
 FVARP(cameraheight, 0.0f, 10.0f, 50.0f); // How much higher than the player to set the camera
 FVAR(smoothcamera, 0.0f, 0.2f, 100.0f); // Smoothing factor for the smooth camera. 0 means no smoothing
 FVARP(cameraavoid, 0.0f, 0.33f, 1.0f); // 1 means the camera is 100% away from the closest obstacle (and therefore on the player). 0 means it is on that obstacle. 0.5 means it is midway between them.
-SVAR(entity_gui_title, NULL);
+SVAR(entity_gui_title, "");
 VAR(num_entity_gui_fields, 0, 0, 13);
 
 // intensity/client_system.cpp
@@ -698,26 +698,26 @@ VAR(num_entity_gui_fields, 0, 0, 13);
 VAR(can_edit, 0, 0, 1);
 // The asset ID of the last saved map. This is useful if we want to reload it (if it
 // crashed the server, for example
-SVARP(last_uploaded_map_asset, NULL);
+SVARP(last_uploaded_map_asset, "");
 
 // intensity/intensity_gui.cpp
 
-SVAR(message_title, NULL);
-SVAR(message_content, NULL);
-SVAR(input_title, NULL);
-SVAR(input_content, NULL);
-SVAR(input_data, NULL);
+SVAR(message_title, "");
+SVAR(message_content, "");
+SVAR(input_title, "");
+SVAR(input_content, "");
+SVAR(input_data, "");
 #endif
 
 // intensity/master.cpp
 
-SVARP(entered_username, NULL); // Persisted - uses "-" instead of "@, to get around sauer issue
-SVAR(true_username, NULL); // Has "@, can be sent to server to login
-SVAR(entered_password, NULL);
-SVARP(hashed_password, NULL);
+SVARP(entered_username, ""); // Persisted - uses "-" instead of "@, to get around sauer issue
+SVAR(true_username, ""); // Has "@, can be sent to server to login
+SVAR(entered_password, "");
+SVARP(hashed_password, "");
 VAR(have_master, 0, 1, 1);
 VAR(logged_into_master, 0, 0, 1);
-SVAR(error_message, NULL);
+SVAR(error_message, "");
 
 // intensity/scripting_system_lua_def.hpp
 

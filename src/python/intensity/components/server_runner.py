@@ -118,41 +118,41 @@ def show_gui(sender, **kwargs):
     if has_server():
         if check_server_ready():
             CModule.run_script('''
-                GUI.text("Local server: Running")
-                GUI.stayOpen([[ GUI.button("  stop", [=[ Engine.startStopLocalServer() ]=]) ]])
-                GUI.button("  show output", [[ GUI.show("local_server_output") ]])
-                GUI.stayOpen([[ GUI.button("  save map", [=[ CV:run("do_upload") ]=]) ]])
-                GUI.button("  restart map", [[ GUI.show("restart_map") ]])
-                GUI.button("  editing commands", [[ GUI.show("editing") ]])
+                gui.text("Local server: Running")
+                gui.stayopen([[ gui.button("  stop", [=[ engine.ssls() ]=]) ]])
+                gui.button("  show output", [[ gui.show("local_server_output") ]])
+                gui.stayopen([[ gui.button("  save map", [=[ CV:run("do_upload") ]=]) ]])
+                gui.button("  restart map", [[ gui.show("restart_map") ]])
+                gui.button("  editing commands", [[ gui.show("editing") ]])
             ''')
         elif check_server_terminated():
             Module.server_proc = None
             log(logging.ERROR, "Local server terminated due to an error")
         else:
             CModule.run_script('''
-                GUI.text("Local server: ...preparing...")
-                GUI.stayOpen([[ GUI.button("  stop", [=[ Engine.startStopLocalServer() ]=]) ]])
+                gui.text("Local server: ...preparing...")
+                gui.stayopen([[ gui.button("  stop", [=[ engine.ssls() ]=]) ]])
             ''')
     else:
         CModule.run_script('''
-            GUI.text("Local server: (not active)")
+            gui.text("Local server: (not active)")
             if EV.logged_into_master == 0 then
-				GUI.text("   << not logged into master >>")
+				gui.text("   << not logged into master >>")
 			end
 
-            GUI.list([[
-                GUI.text("Map location to run: base/")
-                GUI.field("local_server_location", 30, "")
-                GUI.text(".tar.gz")
+            gui.list([[
+                gui.text("Map location to run: base/")
+                gui.field("local_server_location", 30, "")
+                gui.text(".tar.gz")
             ]])
-            GUI.stayOpen([[
-			    GUI.button("  start", [=[
-					Engine.startStopLocalServer(EV.local_server_location)
+            gui.stayopen([[
+			    gui.button("  start", [=[
+					engine.ssls(EV.local_server_location)
 			    ]=])
             ]])
-            GUI.button("  show output", [[ GUI.show("local_server_output") ]])
+            gui.button("  show output", [[ gui.show("local_server_output") ]])
         ''')
-    CModule.run_script('GUI.bar()')
+    CModule.run_script('gui.bar()')
 
 show_components.connect(show_gui, weak=False)
 
@@ -163,16 +163,16 @@ def request_private_edit(sender, **kwargs):
 map_load_finish.connect(request_private_edit, weak=False)
 
 CModule.run_script('''
-    GUI.new("local_server_output", [[
-        GUI.noAutotab([=[
-            GUI.bar()
-            GUI.editor("%(name)s", -80, 20)
-            GUI.bar()
-            GUI.stayOpen([==[
-                GUI.button("refresh", [===[
-                    GUI.textfocus("%(name)s")
-                    GUI.textload("%(name)s")
-                    GUI.show("-1")
+    gui.new("local_server_output", [[
+        gui.noAutotab([=[
+            gui.bar()
+            gui.editor("%(name)s", -80, 20)
+            gui.bar()
+            gui.stayopen([==[
+                gui.button("refresh", [===[
+                    gui.textfocus("%(name)s")
+                    gui.textload("%(name)s")
+                    gui.show("-1")
                 ]===])
             ]==])
         ]=])

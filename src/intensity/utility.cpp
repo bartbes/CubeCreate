@@ -132,43 +132,32 @@ bool Utility::config_exec_json(const char *cfgfile, bool msg)
         else
         {
             root = value->AsObject();
-            // CROSSHAIRS: TODO!
-            /*if (root.find(L"crosshairs") != root.end() && root[L"crosshairs"]->IsObject())
+            if (root.find(L"crosshairs") != root.end() && root[L"crosshairs"]->IsObject())
             {
                 JSONObject crls = root[L"crosshairs"]->AsObject();
                 for (JSONObject::const_iterator criter = crls.begin(); criter != crls.end(); ++criter)
                 {
-                    defformatstring(aliasc)("loadcrosshair \"%s\" %i", fromwstring(criter->first).c_str(), (int)criter->second->AsNumber());
-                    execute(aliasc);
+                    defformatstring(aliasc)("CAPI.loadcrosshair(\"%s\", %i)", fromwstring(criter->first).c_str(), (int)criter->second->AsNumber());
+                    lua::engine.exec(aliasc);
                 }
-            }*/
-            // PERSISTENT VARIABLE LOAD: TODO!
-            /*if (root.find(L"variables") != root.end() && root[L"variables"]->IsObject())
+            }
+            if (root.find(L"variables") != root.end() && root[L"variables"]->IsObject())
             {
                 JSONObject vars = root[L"variables"]->AsObject();
                 for (JSONObject::const_iterator viter = vars.begin(); viter != vars.end(); ++viter)
                 {
-                    ident *ident = idents->access(fromwstring(viter->first).c_str());
-                    if (ident)
+                    var::cvar *v = var::get(fromwstring(viter->first).c_str());
+                    if (v)
                     {
-                        switch(ident->type)
+                        switch (v->gt())
                         {
-                            case ID_VAR:
-                                setvarchecked(ident, (int)viter->second->AsNumber());
-                                break;
-                            case ID_FVAR:
-                                setfvarchecked(ident, viter->second->AsNumber());
-                                break;
-                            case ID_SVAR:
-                                setsvarchecked(ident, fromwstring(viter->second->AsString()).c_str());
-                                break;
-                            case ID_ALIAS:
-                                alias(ident->name, fromwstring(viter->second->AsString()).c_str());
-                                break;
+                            case var::VAR_I: v->s((int)viter->second->AsNumber()); break;
+                            case var::VAR_F: v->s((float)viter->second->AsNumber()); break;
+                            case var::VAR_S: v->s(fromwstring(viter->second->AsString()).c_str()); break;
                         }
                     }
                 }
-            }*/
+            }
             if (root.find(L"binds") != root.end() && root[L"binds"]->IsObject())
             {
                 JSONObject bnds = root[L"binds"]->AsObject();
@@ -177,21 +166,20 @@ bool Utility::config_exec_json(const char *cfgfile, bool msg)
                     JSONObject bnd = biter->second->AsObject();
                     for (JSONObject::const_iterator biiter = bnd.begin(); biiter != bnd.end(); ++biiter)
                     {
-                        defformatstring(bindcmd)("%s(\"%s\", [[%s]])", fromwstring(biiter->first).c_str(), fromwstring(biter->first).c_str(), fromwstring(biiter->second->AsString()).c_str());
+                        defformatstring(bindcmd)("CAPI.%s(\"%s\", [[%s]])", fromwstring(biiter->first).c_str(), fromwstring(biter->first).c_str(), fromwstring(biiter->second->AsString()).c_str());
                         lua::engine.exec(bindcmd);
                     }
                 }
             }
-            // TODO: aliases
-            /*if (root.find(L"aliases") != root.end() && root[L"aliases"]->IsObject())
+            if (root.find(L"aliases") != root.end() && root[L"aliases"]->IsObject())
             {
                 JSONObject als = root[L"aliases"]->AsObject();
                 for (JSONObject::const_iterator aiter = als.begin(); aiter != als.end(); ++aiter)
                 {
-                    defformatstring(aliasc)("\"%s\" = [%s]", fromwstring(aiter->first).c_str(), fromwstring(aiter->second->AsString()).c_str());
-                    execute(aliasc);
+                    defformatstring(aliasc)("EV.%s = \"%s\"", fromwstring(aiter->first).c_str(), fromwstring(aiter->second->AsString()).c_str());
+                    lua::engine.exec(aliasc);
                 }
-            }*/
+            }
             // TODO: completions
             /*
             if (root.find(L"completions") != root.end() && root[L"completions"]->IsObject())
@@ -227,78 +215,109 @@ bool Utility::config_exec_json(const char *cfgfile, bool msg)
 }
 
 JSONObject writebinds();
+JSONObject writecrosshairs();
+JSONObject writecompletions();
+
+static int sortvars(var::cvar **x, var::cvar **y)
+{
+    return strcmp((*x)->gn(), (*y)->gn());
+}
 
 void Utility::writecfg(const char *name)
 {
     JSONObject root, vars, aliases, complet, bnds, crossh; // clientinfo;
-    //vector<ident *> ids;
+    vector<var::cvar*> varv;
     stream *f = openfile(path(name && name[0] ? name : game::savedconfig(), true), "w");
     if(!f) return;
 
     //clientinfo = game::writeclientinfo();
-    // root[L"clientinfo"] = new JSONValue(clientinfo);
+    //root[L"clientinfo"] = new JSONValue(clientinfo);
 
-    /*crossh = writecrosshairs();
-    root[L"crosshairs"] = new JSONValue(crossh);*/
+    crossh = writecrosshairs();
+    if (!crossh.empty()) root[L"crosshairs"] = new JSONValue(crossh);
 
-    /*enumerate(*idents, ident, id, ids.add(&id));
-    ids.sort(sortidents);
-    loopv(ids)
+    enumerate(*var::vars, var::cvar*, v, varv.add(v));
+    varv.sort(sortvars);
+    loopv(varv)
     {
-        ident &id = *ids[i];
-        if(id.flags&IDF_PERSIST) switch(id.type)
+        var::cvar *v = varv[i];
+        if (v->ispersistent()) switch(v->gt())
         {
-            case ID_VAR:
+            case var::VAR_I:
             {
-                vars[towstring(id.name)] = new JSONValue((double)*id.storage.i);
+                vars[towstring(v->gn())] = new JSONValue((double)v->gi());
                 break;
             }
-            case ID_FVAR:
+            case var::VAR_F:
             {
-                vars[towstring(id.name)] = new JSONValue(*id.storage.f);
+                vars[towstring(v->gn())] = new JSONValue(v->gf());
                 break;
             }
-            case ID_SVAR:
+            case var::VAR_S:
             {
-                std::string v;
-                const char *p = *id.storage.s;
-                while (*p)
+                char *wval = (char*)malloc(1);
+                const char *p = v->gs();
+                for (int i = 0; *p; i++)
                 {
                     switch(*p)
                     {
-                        case '\n': v += "^n"; break;
-                        case '\t': v += "^t"; break;
-                        case '\f': v += "^f"; break;
-                        case '"': v += "^\""; break;
-                        default: v += *p; break;
+                        case '\n':
+                        {
+                            wval = (char*)realloc(wval, i + 3);
+                            strcat(wval, "^n"); i++;
+                            break;
+                        }
+                        case '\t':
+                        {
+                            wval = (char*)realloc(wval, i + 3);
+                            strcat(wval, "^t"); i++;
+                            break;
+                        }
+                        case '\f':
+                        {
+                            wval = (char*)realloc(wval, i + 3);
+                            strcat(wval, "^f"); i++;
+                            break;
+                        }
+                        case '"':
+                        {
+                            wval = (char*)realloc(wval, i + 3);
+                            strcat(wval, "^\""); i++;
+                            break;
+                        }
+                        default:
+                        {
+                            wval = (char*)realloc(wval, i + 2);
+                            wval[i] = *p; wval[i+1] = '\0';
+                            break;
+                        }
                     }
                     p++;
                 }
-                vars[towstring(id.name)] = new JSONValue(towstring(v));
+                vars[towstring(v->gn())] = new JSONValue(towstring(wval ? wval : ""));
+                wval = NULL; free(wval);
                 break;
             }
         }
     }
-    root[L"variables"] = new JSONValue(vars);*/
+    if (!vars.empty()) root[L"variables"] = new JSONValue(vars);
 
     bnds = writebinds();
-    root[L"binds"] = new JSONValue(bnds);
+    if (!bnds.empty()) root[L"binds"] = new JSONValue(bnds);
 
-    /*loopv(ids)
+    loopv(varv)
     {
-        ident &id = *ids[i];
-        if(id.type==ID_ALIAS && id.flags&IDF_PERSIST && id.override==NO_OVERRIDE && id.action[0])
+        var::cvar *v = varv[i];
+        if (v->isalias() && v->ispersistent() && !v->isoverriden() && v->gs()[0])
         {
-            // INTENSITY: Additional things to *not* save
-            if (strstr(id.name, "new_entity_gui_field")) continue;
-            // INTENSITY: End additional things to *not* save
-            aliases[towstring(id.name)] = new JSONValue(towstring(id.action));
+            if (strstr(v->gn(), "new_entity_gui_field")) continue;
+            aliases[towstring(v->gn())] = new JSONValue(towstring(v->gs()));
         }
     }
-    root[L"aliases"] = new JSONValue(aliases);
+    if (!aliases.empty()) root[L"aliases"] = new JSONValue(aliases);
 
     complet = writecompletions();
-    root[L"completions"] = new JSONValue(complet);*/
+    if (!complet.empty()) root[L"completions"] = new JSONValue(complet);
 
     JSONValue *value = new JSONValue(root);
     f->printf("%ls", value->Stringify().c_str());

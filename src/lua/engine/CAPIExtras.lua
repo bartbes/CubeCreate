@@ -625,60 +625,60 @@ end
 
 -- input functions
 
-Console = {
-	toggle = CAPI.toggleConsole,
-	skip = CAPI.conSkip,
-	miniSkip = CAPI.miniConSkip,
-	clear = CAPI.clearConsole,
+console = {
+	toggle = CAPI.toggleconsole,
+	skip = CAPI.conskip,
+	miniskip = CAPI.miniconskip,
+	clear = CAPI.clearconsole,
 	binds = {
 		add = CAPI.bind,
-		addSpec = CAPI.specBind,
-		addEdit = CAPI.editBind,
-		get = CAPI.getBind,
-		getSpec = CAPI.getSpecBind,
-		getEdit = CAPI.getEditBind,
-		search = CAPI.searchBinds,
-		searchSpec = CAPI.searchSpecBinds,
-		searchEdit = CAPI.searchEditBinds,
+		addspec = CAPI.specbind,
+		addedit = CAPI.editbind,
+		get = CAPI.getbind,
+		getspec = CAPI.getspecbind,
+		getedit = CAPI.geteditbind,
+		search = CAPI.searchbinds,
+		searchspec = CAPI.searchspecbinds,
+		searchedit = CAPI.searcheditbinds,
 	},
-	sayCommand = CAPI.sayCommand,
-	inputCommand = CAPI.inputCommand,
+	saycommand = CAPI.saycommand,
+	inputcommand = CAPI.inputcommand,
 	history = CAPI.history,
-	onRelease = CAPI.onRelease,
+	onrelease = CAPI.onrelease,
 	complete = CAPI.complete,
-	listComplete = CAPI.listComplete,
+	listcomplete = CAPI.listcomplete,
 	keymap = CAPI.keymap,
 }
 
 -- user interface functions
 
-GUI = {
-	new = CAPI.newGUI,
-	button = CAPI.GUIButton,
-	text = CAPI.GUIText,
-	clear = CAPI.clearGUI,
-	show = CAPI.showGUI,
-	onClear = CAPI.GUIOnClear,
-	stayOpen = CAPI.GUIStayOpen,
-	noAutotab = CAPI.GUINoAutoTab,
-	list = CAPI.GUIList,
-	align = CAPI.GUIAlign,
-	title = CAPI.GUITitle,
-	bar = CAPI.GUIBar,
-	strut = CAPI.GUIStrut,
-	image = CAPI.GUIImage,
-	slider = CAPI.GUISlider,
-	listSlider = CAPI.GUIListSlider,
-	nameSlider = CAPI.GUINameSlider,
-	radio = CAPI.GUIRadio,
-	bitField = CAPI.GUIBitfield,
-	checkBox = CAPI.GUICheckBox,
-	tab = CAPI.GUITab,
-	field = CAPI.GUIField,
-	keyField = CAPI.GUIKeyfield,
-	editor = CAPI.GUIEditor,
-	color = CAPI.GUIColor,
-	textBox = CAPI.GUITextBox,
+gui = {
+	new = CAPI.newgui,
+	button = CAPI.guibutton,
+	text = CAPI.guitext,
+	clear = CAPI.cleargui,
+	show = CAPI.showgui,
+	onclear = CAPI.guionclear,
+	stayopen = CAPI.guistayopen,
+	noautotab = CAPI.guinoautotab,
+	list = CAPI.guilist,
+	align = CAPI.guialign,
+	title = CAPI.guititle,
+	bar = CAPI.guibar,
+	strut = CAPI.guistrut,
+	image = CAPI.guiimage,
+	slider = CAPI.guislider,
+	listslider = CAPI.guilistslider,
+	nameslider = CAPI.guinameslider,
+	radio = CAPI.guiradio,
+	bitfield = CAPI.guibitfield,
+	checkbox = CAPI.guicheckbox,
+	tab = CAPI.guitab,
+	field = CAPI.guifield,
+	keyfield = CAPI.guikeyfield,
+	editor = CAPI.guieditor,
+	color = CAPI.guicolor,
+	textbox = CAPI.guitextbox,
 	font = function(name, tex, defaultw, defaulth, offsetx, offsety, offsetw, offseth)
 		offsetx = defaultValue(offsetx, 0)
 		offsety = defaultValue(offsety, 0)
@@ -687,60 +687,60 @@ GUI = {
 		CAPI.font(name, tex, defaultw, defaulth, offsetx, offsety, offsetw, offseth)
 	end,
 
-	fontOffset = CAPI.fontOffset,
+	fontoffset = CAPI.fontoffset,
 
-	fontChar = function(x, y, w, h)
+	fontchar = function(x, y, w, h)
 		h = defaultValue(h, 0)
-		CAPI.fontChar(x, y, w, h)
+		CAPI.fontchar(x, y, w, h)
 	end
 }
 
 -- Engine functions
 
-Engine = {
+engine = {
 	quit = CAPI.quit,
-	forceQuit = CAPI.forceQuit,
+	force_quit = CAPI.force_quit,
 
-	screenRes = CAPI.screenRes,
-	resetGl = CAPI.resetGl,
-	getFps = CAPI.getFps,
+	screenres = CAPI.screenres,
+	resetgl = CAPI.resetgl,
+	getfps = CAPI.getfps,
 
-	startStopLocalServer = CAPI.startStopLocalServer,
+	ssls = CAPI.ssls,
 
 	recalc = CAPI.recalc,
-	glExt = CAPI.glExt
+	glext = CAPI.glext
 }
 
 -- Lightmap functions
 
-Lightmap = {
-	resetMaps = CAPI.resetLightMaps,
-	calc = CAPI.calcLight,
-	patch = CAPI.patchLight,
-	clearMaps = CAPI.clearLightMaps,
-	dumpLms = CAPI.dumpLms
+lightmap = {
+	resetmaps = CAPI.resetlightmaps,
+	calc = CAPI.calclight,
+	patch = CAPI.patchlight,
+	clearmaps = CAPI.clearlightmaps,
+	dumplms = CAPI.dumplms
 }
 
 -- Blending functions
 
-Blend = {
+blend = {
 	brush = {
-		clearAll = CAPI.clearBlendBrushes,
-		del = CAPI.delBlendBrush,
-		add = CAPI.addBlendBrush,
-		next = CAPI.nextBlendBrush,
-		set = CAPI.setBlendBrush,
-		getName = CAPI.getBlendBrushName,
-		cur = CAPI.curBlendBrush,
-		rotate = CAPI.rotateBlendBrush
+		clearall = CAPI.clearblendbrushes,
+		del = CAPI.delblendbrush,
+		add = CAPI.addblendbrush,
+		next = CAPI.nextblendbrush,
+		set = CAPI.setblendbrush,
+		getname = CAPI.getblendbrushName,
+		cur = CAPI.curblendbrush,
+		rotate = CAPI.rotateblendbrush
 	},
 	map = {
-		paint = CAPI.paintBlendMap,
-		clearSel = CAPI.clearBlendMapSel,
-		invertSel = CAPI.invertBlendMapSel,
-		invert = CAPI.invertBlendMap,
-		show = CAPI.showBlendMap,
-		optimize = CAPI.optimizeBlendMap,
-		clear = CAPI.claerBlendMap
+		paint = CAPI.paintblendmap,
+		clearsel = CAPI.clearblendmapsel,
+		invertsel = CAPI.invertblendmapsel,
+		invert = CAPI.invertblendmap,
+		show = CAPI.showblendmap,
+		optimize = CAPI.optimizeblendmap,
+		clear = CAPI.claerblendmap
 	}
 }
