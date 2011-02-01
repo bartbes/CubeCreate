@@ -36,22 +36,6 @@ using namespace lua;
 void texturereset(int n);
 void texture(const char *type, const char *name, int rot, int xoffset, int yoffset, float scale, int forcedindex);
 
-void shader(int *type, char *name, char *vs, char *ps);
-void variantshader(int *type, char *name, int *row, char *vs, char *ps);
-void setshader(char *name);
-void addshaderparam(const char *name, int type, int n, float x, float y, float z, float w);
-void altshader(char *origname, char *altname);
-void fastshader(char *nice, char *fast, int *detail);
-void defershader(int *type, const char *name, const char *contents);
-Shader *useshaderbyname(const char *name);
-
-void isshaderdefined(char *name);
-void isshadernative(char *name);
-
-void addpostfx(const char *name, int bind, int scale, const char *inputs, float x, float y, float z, float w);
-void setpostfx(const char *name, float x, float y, float z, float w);
-void clearpostfx();
-
 extern bool getkeydown();
 extern bool getkeyup();
 extern bool getmousedown();
@@ -64,33 +48,6 @@ void fontchar(int *x, int *y, int *w, int *h);
 void registersound(char *name, int *vol);
 
 void run_python(char *code);
-
-void showgui(const char *name);
-int cleargui(int n);
-void guionclear(char *action);
-void guistayopen(char *contents);
-void guinoautotab(char *contents);
-void guibutton(char *name, char *action, char *icon);
-void guiimage(char *path, char *action, float *scale, int *overlaid, char *alt);
-void guicolor(int *color);
-void guitextbox(char *text, int *width, int *height, int *color);
-void guitext(char *name, char *icon);
-void guititle(char *name);
-void guitab(char *name);
-void guibar();
-void guistrut(float *strut, int *alt);
-void guislider(char *var, int *min, int *max, char *onchange);
-void guilistslider(char *var, char *list, char *onchange);
-void guinameslider(char *var, char *names, char *list, char *onchange);
-void guicheckbox(char *name, char *var, float *on, float *off, char *onchange);
-void guiradio(char *name, char *var, float *n, char *onchange);
-void guibitfield(char *name, char *var, int *mask, char *onchange);
-void guifield(char *var, int *maxlength, char *onchange, int *password);
-void guieditor(char *name, int *maxlength, int *height, int *mode);
-void guikeyfield(char *var, int *maxlength, char *onchange);
-void guilist(char *contents);
-void guialign(int *align, char *contents);
-void newgui(char *name, char *contents, char *header);
 
 void force_quit();
 void quit();
@@ -265,6 +222,9 @@ bool removezip(const char *name);
 #include "luabind_world.hpp"
 #include "luabind_sound.hpp"
 #include "luabind_model.hpp"
+#include "luabind_shaders.hpp"
+#include "luabind_parthud.hpp"
+#include "luabind_gui.hpp"
 
 /* Here begin the binds. Close them in C++ namespace */
 namespace lua_binds
@@ -293,141 +253,6 @@ LUA_BIND_CLIENT(combineImages, {
     assert(Utility::validateRelativePath(arg3));
     IntensityTexture::combineImages(arg1, arg2, arg3);
 })
-
-// Effects
-
-LUA_BIND_CLIENT(addDecal, {
-    vec  center(e.get<double>(2), e.get<double>(3), e.get<double>(4));
-    vec  surface(e.get<double>(5), e.get<double>(6), e.get<double>(7));
-    bvec color(e.get<int>(9), e.get<int>(10), e.get<int>(11));
-
-    adddecal(e.get<int>(1), center, surface, e.get<double>(8), color, e.get<int>(12));
-})
-
-LUA_BIND_CLIENT(particleSplash, {
-    if (e.get<int>(1) == PART_BLOOD && !GETIV(blood)) return;
-    vec p(e.get<double>(4), e.get<double>(5), e.get<double>(6));
-    particle_splash(
-        e.get<int>(1),
-        e.get<int>(2),
-        e.get<int>(3),
-        p,
-        e.get<int>(7),
-        e.get<double>(8),
-        e.get<int>(9),
-        e.get<int>(10),
-        e.get<bool>(11),
-        e.get<int>(12),
-        e.get<bool>(13),
-        e.get<int>(14)
-    );
-})
-
-LUA_BIND_CLIENT(particleSplashRegular, {
-    if (e.get<int>(1) == PART_BLOOD && !GETIV(blood)) return;
-    vec p(e.get<double>(4), e.get<double>(5), e.get<double>(6));
-    regular_particle_splash(
-        e.get<int>(1),
-        e.get<int>(2),
-        e.get<int>(3),
-        p,
-        e.get<int>(7),
-        e.get<double>(8),
-        e.get<int>(9),
-        e.get<int>(10),
-        e.get<int>(11),
-        e.get<bool>(12),
-        e.get<int>(13)
-    );
-})
-
-LUA_BIND_CLIENT(particleFireball, {
-    vec dest(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    particle_fireball(dest, e.get<double>(4), e.get<int>(5), e.get<int>(6), e.get<int>(7), e.get<double>(8));
-})
-
-LUA_BIND_CLIENT(particleExplodeSplash, {
-    vec o(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    particle_explodesplash(o, e.get<int>(4), e.get<int>(5), e.get<int>(6), e.get<int>(7), e.get<int>(8), e.get<int>(9));
-})
-
-LUA_BIND_CLIENT(particleFlare, {
-    vec p(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    vec dest(e.get<double>(4), e.get<double>(5), e.get<double>(6));
-    if (e.get<int>(12) < 0)
-        particle_flare(p, dest, e.get<int>(7), e.get<int>(8), e.get<int>(9), e.get<double>(10), NULL, e.get<int>(11));
-    else
-    {
-        LogicEntityPtr owner = LogicSystem::getLogicEntity(e.get<int>(12));
-        assert(owner.get()->dynamicEntity);
-        particle_flare(p, dest, e.get<int>(7), e.get<int>(8), e.get<int>(9), e.get<double>(10), (fpsent*)(owner.get()->dynamicEntity), e.get<int>(11));
-    }
-})
-
-LUA_BIND_CLIENT(particleFlyingFlare, {
-    vec p(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    vec dest(e.get<double>(4), e.get<double>(5), e.get<double>(6));
-    particle_flying_flare(p, dest, e.get<int>(7), e.get<int>(8), e.get<int>(9), e.get<double>(10), e.get<int>(11));
-})
-
-LUA_BIND_CLIENT(particleTrail, {
-    vec from(e.get<double>(3), e.get<double>(4), e.get<double>(5));
-    vec to(e.get<double>(6), e.get<double>(7), e.get<double>(8));
-    particle_trail(e.get<int>(1), e.get<int>(2), from, to, e.get<int>(9), e.get<double>(10), e.get<int>(11), e.get<bool>(12));
-})
-
-LUA_BIND_CLIENT(particleFlame, {
-    regular_particle_flame(
-        e.get<int>(1),
-        vec(e.get<double>(2), e.get<double>(3), e.get<double>(4)),
-        e.get<double>(5),
-        e.get<double>(6),
-        e.get<int>(7),
-        e.get<int>(8),
-        e.get<double>(9),
-        e.get<double>(10),
-        e.get<double>(11),
-        e.get<int>(12)
-    );
-})
-
-LUA_BIND_CLIENT(addDynlight, {
-    vec o(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    vec color(float(e.get<double>(5))/255.0, float(e.get<double>(6))/255.0, float(e.get<double>(7))/255.0);
-    vec initcolor(float(e.get<double>(12))/255.0, float(e.get<double>(13))/255.0, float(e.get<double>(14))/255.0);
-
-    LightControl::queueDynamicLight(o, e.get<double>(4), color, e.get<int>(8), e.get<int>(9), e.get<int>(10), e.get<double>(11), initcolor, NULL);
-})
-
-LUA_BIND_CLIENT(spawnDebris, {
-    vec v(e.get<double>(2), e.get<double>(3), e.get<double>(4));
-    vec debrisvel(e.get<double>(6), e.get<double>(7), e.get<double>(8));
-
-    LogicEntityPtr owner = LogicSystem::getLogicEntity(e.get<int>(9));
-    assert(owner->dynamicEntity);
-    FPSClientInterface::spawnDebris(e.get<int>(1), v, e.get<int>(5), debrisvel, (dynent*)(owner->dynamicEntity));
-})
-
-LUA_BIND_CLIENT(particleMeter, {
-    vec s(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    particle_meter(s, e.get<double>(4), e.get<int>(5), e.get<int>(6));
-})
-
-LUA_BIND_CLIENT(particleText, {
-    vec s(e.get<double>(1), e.get<double>(2), e.get<double>(3));
-    particle_textcopy(s, e.get<const char*>(4), e.get<int>(5), e.get<int>(6), e.get<int>(7), e.get<double>(8), e.get<int>(9));
-})
-
-LUA_BIND_CLIENT(clientDamageEffect, {
-    ((fpsent*)player)->damageroll(e.get<int>(1));
-    damageblend(e.get<int>(2));
-})
-
-LUA_BIND_CLIENT(showHUDRect,  ClientSystem::addHUDRect (e.get<double>(1), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<int>(5), e.get<double>(6));)
-LUA_BIND_CLIENT(showHUDImage, ClientSystem::addHUDImage(std::string(e.get<const char*>(1)), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<double>(5), e.get<int>(6), e.get<double>(7));)
-
-// text, x, y, scale, color
-LUA_BIND_CLIENT(showHUDText, ClientSystem::addHUDText(std::string(e.get<const char*>(1)), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<int>(5));)
 
 // Messages
 
@@ -488,31 +313,6 @@ LUA_BIND_CLIENT(texture, {
     // XXX: arg7 may not be given, in which case it is undefined, and turns into 0.
     texture(e.get<const char*>(1), e.get<const char*>(2), e.get<int>(3), e.get<int>(4), e.get<int>(5), (float)e.get<double>(6), e.get<int>(7));
 })
-
-// shaders
-
-LUA_BIND_STD_CLIENT(shader, shader, e.get<int*>(1), e.get<char*>(2), e.get<char*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(variantShader, variantshader, e.get<int*>(1), e.get<char*>(2), e.get<int*>(3), e.get<char*>(4), e.get<char*>(5))
-LUA_BIND_STD_CLIENT(setShader, setshader, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(altShader, altshader, e.get<char*>(1), e.get<char*>(2))
-LUA_BIND_STD_CLIENT(fastShader, fastshader, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3))
-LUA_BIND_STD_CLIENT(deferShader, defershader, e.get<int*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(forceShader, useshaderbyname, e.get<char*>(1))
-
-LUA_BIND_STD_CLIENT(isShaderDefined, isshaderdefined, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(isShaderNative, isshadernative, e.get<char*>(1))
-
-LUA_BIND_STD_CLIENT(setVertexParam, addshaderparam, NULL, SHPARAM_VERTEX, e.get<int>(1), e.get<float>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5))
-LUA_BIND_STD_CLIENT(setPixelParam, addshaderparam, NULL, SHPARAM_VERTEX, e.get<int>(1), e.get<float>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5))
-LUA_BIND_STD_CLIENT(setUniformParam, addshaderparam, e.get<char*>(1), SHPARAM_UNIFORM, -1, e.get<float>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5))
-LUA_BIND_STD_CLIENT(setShaderParam, addshaderparam, e.get<char*>(1), SHPARAM_LOOKUP, -1, e.get<float>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5))
-LUA_BIND_STD_CLIENT(defVertexParam, addshaderparam, e.get<char*>(1)[0] ? e.get<char*>(1) : NULL, SHPARAM_VERTEX, e.get<int>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5), e.get<float>(6))
-LUA_BIND_STD_CLIENT(defPixelParam, addshaderparam, e.get<char*>(1)[0] ? e.get<char*>(1) : NULL, SHPARAM_PIXEL, e.get<int>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5), e.get<float>(6))
-LUA_BIND_STD_CLIENT(defUniformParam, addshaderparam, e.get<char*>(1), SHPARAM_UNIFORM, -1, e.get<float>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5))
-
-LUA_BIND_STD_CLIENT(addPostFX, addpostfx, e.get<const char*>(1), e.get<int>(2), e.get<int>(3), e.get<const char*>(4), e.get<float>(5), e.get<float>(6), e.get<float>(7), e.get<float>(8))
-LUA_BIND_STD_CLIENT(setPostFX, setpostfx, e.get<const char*>(1), e.get<float>(2), e.get<float>(3), e.get<float>(4), e.get<float>(5))
-LUA_BIND_STD_CLIENT(clearPostFX, clearpostfx)
 
 // Keyboard
 
@@ -692,47 +492,6 @@ LUA_BIND_DEF(ssls, {
         run_python((char*)cmd);
     }
 })
-
-// GUI
-
-LUA_BIND_STD_CLIENT(showmessage, IntensityGUI::showMessage, "Script message", e.get<const char*>(1))
-LUA_BIND_STD_CLIENT(showinputdialog, IntensityGUI::showInputDialog, "Script input", e.get<const char*>(1))
-LUA_BIND_CLIENT(setdeftpm, {
-    // Only allow this to be done once
-    if (!lua::engine["setdeftpm"])
-    {
-        lua::engine["setdeftpm"] = "set";
-        SETV(thirdperson, e.get<int>(1));
-    } else
-        Logging::log(Logging::WARNING, "Can only set default thirdperson mode once per map\r\n");
-})
-
-LUA_BIND_STD_CLIENT(newgui, newgui, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(guibutton, guibutton, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(guitext, guitext, e.get<char*>(1), e.get<char*>(2))
-LUA_BIND_STD_CLIENT(cleargui, e.push, cleargui(e.get<int>(1)))
-LUA_BIND_STD_CLIENT(showgui, showgui, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guionclear, guionclear, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guistayopen, guistayopen, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guinoautotab, guinoautotab, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guilist, guilist, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guialign, guialign, e.get<int*>(1), e.get<char*>(2))
-LUA_BIND_STD_CLIENT(guititle, guititle, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guibar, guibar)
-LUA_BIND_STD_CLIENT(guistrut, guistrut, e.get<float*>(1), e.get<int*>(2))
-LUA_BIND_STD_CLIENT(guiimage, guiimage, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<int*>(4), e.get<char*>(5))
-LUA_BIND_STD_CLIENT(guislider, guislider, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(guilistslider, guilistslider, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(guinameslider, guinameslider, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(guiradio, guiradio, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(guibitfield, guibitfield, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<char*>(4))
-LUA_BIND_STD_CLIENT(guicheckbox, guicheckbox, e.get<char*>(1), e.get<char*>(2), e.get<float*>(3), e.get<float*>(4), e.get<char*>(5))
-LUA_BIND_STD_CLIENT(guitab, guitab, e.get<char*>(1))
-LUA_BIND_STD_CLIENT(guifield, guifield, e.get<char*>(1), e.get<int*>(2), e.get<char*>(3), e.get<int*>(4))
-LUA_BIND_STD_CLIENT(guikeyfield, guikeyfield, e.get<char*>(1), e.get<int*>(2), e.get<char*>(3))
-LUA_BIND_STD_CLIENT(guieditor, guieditor, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
-LUA_BIND_STD_CLIENT(guicolor, guicolor, e.get<int*>(1))
-LUA_BIND_STD_CLIENT(guitextbox, guitextbox, e.get<char*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
 
 LUA_BIND_STD_CLIENT(quit, quit)
 LUA_BIND_STD_CLIENT(force_quit, force_quit)
