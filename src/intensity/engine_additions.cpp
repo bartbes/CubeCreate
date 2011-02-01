@@ -704,26 +704,3 @@ void LogicSystem::dismantleCharacter(int ref)
 #endif
     }
 }
-
-// Tools
-
-//! /clearmodel will crash because of how we cache theModel values. Instead,
-//! /reloadmodel will reload a model properly.
-void reloadmodel(char* name)
-{
-    model* old = loadmodel(name);
-    if (!old) return;
-    lua::engine.exec(("CAPI.clearModel(\"" + std::string(name) + "\")").c_str());
-    model* _new = loadmodel(name);
-
-    // Refresh cached theModel values
-    for (LogicSystem::LogicEntityMap::iterator iter = LogicSystem::logicEntities.begin();
-         iter != LogicSystem::logicEntities.end();
-         iter++)
-    {
-        LogicEntityPtr entity = iter->second;
-        if (entity->theModel == old)
-            entity->theModel = _new;
-    }
-}
-
