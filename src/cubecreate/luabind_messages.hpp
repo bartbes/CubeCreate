@@ -122,7 +122,7 @@ namespace lua_binds
         try
         {
             REFLECT_PYTHON( signal_signal_component );
-            boost::python::object data = signal_signal_component(std::string(e.get<const char*>(1)), std::string(e.get<const char*>(2)));
+            boost::python::object data = signal_signal_component(e.get<const char*>(1), e.get<const char*>(2));
             e.push(boost::python::extract<const char*>(data));
         }
         catch(boost::python::error_already_set const &)

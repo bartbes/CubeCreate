@@ -45,7 +45,7 @@ namespace MasterServer
 
 namespace lua_binds
 {
-    LUA_BIND_STD_CLIENT(connect, ClientSystem::connect, std::string(e.get<const char*>(1)), e.get<int>(2))
+    LUA_BIND_STD_CLIENT(connect, ClientSystem::connect, e.get<const char*>(1), e.get<int>(2))
     LUA_BIND_STD(isconnected, e.push, isconnected(e.get<int>(1) > 0) ? 1 : 0)
 
     LUA_BIND_DEF(connectedip, {

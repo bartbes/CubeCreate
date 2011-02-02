@@ -252,7 +252,7 @@ namespace lua_binds
     LUA_BIND_STD(showtexgui, showtexgui, e.get<int*>(1))
 
     LUA_BIND_SERVER(npcadd, {
-        int _ref = NPC::add(std::string(e.get<const char*>(1)));
+        int _ref = NPC::add(e.get<const char*>(1));
         if (_ref >= 0) e.getref(_ref);
         else e.push();
     })

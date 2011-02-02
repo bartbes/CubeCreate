@@ -127,7 +127,7 @@ namespace lua_binds
         {
             REFLECT_PYTHON( read_file_safely );
 
-            boost::python::object data = read_file_safely(std::string(e.get<const char*>(1)));
+            boost::python::object data = read_file_safely(e.get<const char*>(1));
             const char *text = boost::python::extract<const char*>(data);
 
             e.push(text);

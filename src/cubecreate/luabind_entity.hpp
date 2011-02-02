@@ -66,13 +66,13 @@ namespace lua_binds
     LUA_BIND_LE(setmodelname, {
         Logging::log(Logging::DEBUG, "setmodelname(%s)\n", e.get<const char*>(2));
 
-        self.get()->setModel(std::string(e.get<const char*>(2)));
+        self.get()->setModel(e.get<const char*>(2));
     })
 
     LUA_BIND_LE(setsoundname, {
         Logging::log(Logging::DEBUG, "setsoundname(%s)\n", e.get<const char*>(2));
 
-        self.get()->setSound(std::string(e.get<const char*>(2)));
+        self.get()->setSound(e.get<const char*>(2));
     })
 
     LUA_BIND_LE(setsoundvol, {
@@ -92,7 +92,7 @@ namespace lua_binds
     LUA_BIND_LE(setattachments_raw, self.get()->setAttachments(e.get<const char*>(2));)
 
     LUA_BIND_LE(getattachmentpos, {
-        vec& vp = self->getAttachmentPosition(std::string(e.get<const char*>(2)));
+        vec& vp = self->getAttachmentPosition(e.get<const char*>(2));
         e.push(vp);
     })
 
