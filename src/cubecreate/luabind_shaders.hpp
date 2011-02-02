@@ -1,5 +1,5 @@
 /*
- * luabinds_shaders.hpp, version 1
+ * luabind_shaders.hpp, version 1
  * Shader system exports for Lua
  *
  * author: q66 <quaker66@gmail.com>

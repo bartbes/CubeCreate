@@ -11,6 +11,12 @@
 -- @copyright 2010 CubeCreate project
 -------------------------------------------------------------------------------
 
+-- Variable types
+
+VAR_I = 0
+VAR_F = 1
+VAR_S = 2
+
 -- Class storing actual vars and managing getters/setters for them + storage table.
 _VARS = class()
 _VARS.storage = {}
@@ -28,7 +34,7 @@ function _VARS:reg(var)
 		if var:isInReach(val) then
 			local oval = var.curv
 			var.curv = val
-			CAPI.svfl(var.name, tostring(var), val)
+			CAPI.svfl(var.name, var.type, val)
 		end
 	end, var)
 end
@@ -59,6 +65,7 @@ function IVAR:__tostring() return "IVAR" end
 function IVAR:__init(name, minv, curv, maxv, readonly, alias)
 	assert(type(minv) == "number" and type(curv) == "number" and type(maxv) == "number", "Wrong value type provided to IVAR.")
 	self[_VAR].__user_init(self, name, minv, curv, maxv, readonly, alias)
+    self.type = VAR_I
 end
 function IVAR:isInReach(v)
 	if type(v) ~= "number" then
@@ -79,12 +86,18 @@ end
 
 FVAR = class(IVAR)
 function FVAR:__tostring() return "FVAR" end
+function FVAR:__init(name, minv, curv, maxv, readonly, alias)
+	assert(type(minv) == "number" and type(curv) == "number" and type(maxv) == "number", "Wrong value type provided to FVAR.")
+	self[_VAR].__user_init(self, name, minv, curv, maxv, readonly, alias)
+    self.type = VAR_F
+end
 
 SVAR = class(_VAR)
 function SVAR:__tostring() return "SVAR" end
 function SVAR:__init(name, curv, readonly, alias)
 	assert(type(curv) == "string" or not curv, "Wrong value type provided to SVAR.")
 	self[_VAR].__user_init(self, name, nil, curv, nil, readonly, alias)
+    self.type = VAR_S
 end
 function SVAR:isInReach(v)
 	if type(v) ~= "string" or v then

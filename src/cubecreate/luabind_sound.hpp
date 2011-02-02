@@ -1,5 +1,5 @@
 /*
- * luabinds_sound.hpp, version 1
+ * luabind_sound.hpp, version 1
  * Sound control methods for Lua
  *
  * author: q66 <quaker66@gmail.com>

@@ -1,5 +1,5 @@
 /*
- * luabinds_entity.hpp, version 1
+ * luabind_entity.hpp, version 1
  * Entity Lua API exports
  *
  * author: q66 <quaker66@gmail.com>

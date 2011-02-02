@@ -1,5 +1,5 @@
 /*
- * luabinds_gui.hpp, version 1
+ * luabind_gui.hpp, version 1
  * GUI methods for Lua
  *
  * author: q66 <quaker66@gmail.com>

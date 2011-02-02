@@ -1,5 +1,5 @@
 /*
- * luabinds_parthud.hpp, version 1
+ * luabind_parthud.hpp, version 1
  * Particles, HUD, dynlights
  *
  * author: q66 <quaker66@gmail.com>
