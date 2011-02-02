@@ -5,7 +5,7 @@
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
  *
- * Copyright (c) 2010 q66
+ * Copyright (c) 2011 q66
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,15 @@ void addfilecomplete(char *command, char *dir, char *ext);
 void addlistcomplete(char *command, char *list);
 void history_(int *n);
 void onrelease(char *s);
+void screenshot(char *filename);
+void movie(char *name);
+void glext(char *ext);
+void loadcrosshair_(const char *name, int *i);
+void tabify(const char *str, int *numtabs);
+void resetsound();
+void scorebshow(bool on);
+bool addzip(const char *name, const char *mount = NULL, const char *strip = NULL);
+bool removezip(const char *name);
 
 namespace lua_binds
 {
@@ -60,13 +69,38 @@ namespace lua_binds
 
     LUA_BIND_DEF(echo, conoutf("\f1%s", e.get<const char*>(1));)
 
+    LUA_BIND_DEF(say, {
+        int n = e.gettop();
+        switch (n)
+        {
+            case 0: game::toserver((char*)""); break;
+            case 1: game::toserver(e.get<char*>(1)); break;
+            default:
+            {
+                char *s = e.get<char*>(1);
+                for (int i = 2; i <= n; i++)
+                {
+                    const char *a = e.get<const char*>(i);
+                    s = (char*)realloc(s, strlen(s) + strlen(a) + 1);
+                    assert(s);
+                    strcat(s, a);
+                }
+                game::toserver(s);
+                delete s;
+                break;
+            }
+        }
+    })
+
     /* CAPI Lua namespace */
 
     // Core binds
 
     LUA_BIND_DEF(currtime, e.push(Utility::SystemInfo::currTime());)
+    LUA_BIND_STD(getmillis, e.push, e.get<bool>(1) ? totalmillis : lastmillis)
     LUA_BIND_STD_CLIENT(keymap, keymap, e.get<int*>(1), e.get<char*>(2))
     LUA_BIND_STD_CLIENT(registersound, registersound, e.get<char*>(1), e.get<int*>(2))
+    LUA_BIND_STD_CLIENT(resetsound, resetsound)
     LUA_BIND_STD_CLIENT(font, newfont, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<int*>(4), e.get<int*>(5), e.get<int*>(6), e.get<int*>(7), e.get<int*>(8))
     LUA_BIND_STD_CLIENT(fontoffset, fontoffset, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(fontchar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
@@ -74,7 +108,43 @@ namespace lua_binds
     LUA_BIND_STD_CLIENT(force_quit, force_quit)
     LUA_BIND_STD_CLIENT(screenres, screenres, e.get<int*>(1), e.get<int*>(2))
     LUA_BIND_STD_CLIENT(resetgl, resetgl)
+    LUA_BIND_STD_CLIENT(glext, glext, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(getfps, getfps_, e.get<int*>(1))
+    LUA_BIND_STD_CLIENT(screenshot, screenshot, e.get<char*>(1))
+    LUA_BIND_STD_CLIENT(movie, movie, e.get<char*>(1))
+    LUA_BIND_STD_CLIENT(loadcrosshair, loadcrosshair_, e.get<char*>(1), e.get<int*>(2))
+    LUA_BIND_CLIENT(showscores, {
+        bool on = (addreleaseaction("showscores") != 0);
+        SETV(scoreboard, on);
+        scorebshow(on);
+    })
+    LUA_BIND_STD_CLIENT(tabify, tabify, e.get<char*>(1), e.get<int*>(2))
+    LUA_BIND_STD(execcfg, Utility::config_exec_json, e.get<const char*>(1), e.get<bool>(2))
+    LUA_BIND_STD(writecfg, Utility::writecfg, e.get<const char*>(1))
+    LUA_BIND_STD(getcfg, e.push, Utility::Config::getString(e.get<const char*>(1), e.get<const char*>(2), "?").c_str())
+    LUA_BIND_DEF(readfile, {
+        try
+        {
+            REFLECT_PYTHON( read_file_safely );
+
+            boost::python::object data = read_file_safely(std::string(e.get<const char*>(1)));
+            const char *text = boost::python::extract<const char*>(data);
+
+            e.push(text);
+        }
+        catch(boost::python::error_already_set const &)
+        {
+            printf("Error in Python execution of embedded read_file_safely\r\n");
+            PyErr_Print();
+            assert(0 && "Halting on Python error");
+        }
+    })
+    LUA_BIND_STD(addzip, addzip,
+                 e.get<const char*>(1),
+                 e.get<const char*>(2)[0] ? e.get<const char*>(2) : NULL,
+                 e.get<const char*>(3)[0] ? e.get<const char*>(3) : NULL)
+    LUA_BIND_STD(removezip, removezip, e.get<const char*>(1))
+    
 
     // Bit math
 

@@ -5,7 +5,7 @@
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
  *
- * Copyright (c) 2010 q66
+ * Copyright (c) 2011 q66
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,6 @@ void propagatevslot(VSlot &dst, const VSlot &src, int diff, bool edit = false);
 void propagatevslot(VSlot *root, int changed);
 void reloadtex(char *name);
 void gendds(char *infile, char *outfile);
-void screenshot(char *filename);
 int guessimageformat(const char *filename, int format = IMG_BMP);
 void saveimage(const char *filename, int format, ImageData &image, bool flip = false);
 #endif
@@ -181,7 +180,6 @@ namespace lua_binds
 
     LUA_BIND_STD_CLIENT(reloadtex, reloadtex, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(gendds, gendds, e.get<char*>(1), e.get<char*>(2))
-    LUA_BIND_STD_CLIENT(screenshot, screenshot, e.get<char*>(1))
 
     // TODO: REMOVE
     #define readwritetex(t, s, body) \

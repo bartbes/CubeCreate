@@ -5,7 +5,7 @@
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
  *
- * Copyright (c) 2010 q66
+ * Copyright (c) 2011 q66
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -83,6 +83,20 @@ namespace lua_binds
         vec floor(0);
 
         e.push(rayfloor(o, floor, 0, e.get<double>(4)));
+    })
+
+    LUA_BIND_CLIENT(gettargetpos, {
+        // Force a determination, if needed
+        TargetingControl::determineMouseTarget(true);
+        e.push(TargetingControl::targetPosition);
+    })
+
+    LUA_BIND_CLIENT(gettargetent, {
+        TargetingControl::determineMouseTarget(true);
+        LogicEntityPtr target = TargetingControl::targetLogicEntity;
+        if (target.get() && !target->isNone() && target->luaRef >= 0)
+             e.getref(target->luaRef);
+        else e.push();
     })
 
     /* World */

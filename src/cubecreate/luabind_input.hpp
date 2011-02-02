@@ -5,7 +5,7 @@
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
  *
- * Copyright (c) 2010 q66
+ * Copyright (c) 2011 q66
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -164,5 +164,22 @@ namespace lua_binds
             e.t_getraw("performJump").push_index(-2).push(addreleaseaction("jump") ? true : false).call(2, 0);
             e.pop(2);
         }
+    })
+
+    LUA_BIND_STD_CLIENT(mouse_targeting, TargetingControl::setMouseTargeting, e.get<int>(1))
+
+    LUA_BIND_CLIENT(set_mouse_targeting_ent, {
+        TargetingControl::targetLogicEntity = LogicSystem::getLogicEntity(e.get<int>(1));
+        e.push((int)(TargetingControl::targetLogicEntity.get() != NULL));
+    })
+
+    LUA_BIND_CLIENT(set_mouse_target_client, {
+        dynent *client = FPSClientInterface::getPlayerByNumber(e.get<int>(1));
+        if (client)
+            TargetingControl::targetLogicEntity = LogicSystem::getLogicEntity(client);
+        else
+            TargetingControl::targetLogicEntity.reset();
+
+        e.push((int)(TargetingControl::targetLogicEntity.get() != NULL));
     })
 }

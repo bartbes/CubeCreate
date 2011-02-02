@@ -5,7 +5,7 @@
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
  *
- * Copyright (c) 2010 q66
+ * Copyright (c) 2011 q66
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,6 +56,36 @@ void flip();
 void rotate(int *cw);
 void editmat(char *name, char *filtername);
 void showtexgui(int *n);
+void resetlightmaps(bool fullclean);
+void calclight(int *quality);
+void patchlight(int *quality);
+void clearlightmaps();
+void dumplms();
+void recalc();
+void printcube();
+void remip_();
+void phystest();
+void clearpvs();
+void testpvs(int *vcsize);
+void genpvs(int *viewcellsize);
+void pvsstats();
+
+namespace EditingSystem
+{
+#ifdef CLIENT
+    extern int savedMousePosTime;
+    extern vec savedMousePos;
+#endif
+    extern std::vector<std::string> entityClasses;
+    void newEntity(std::string _class, std::string stateData);
+    void prepareentityclasses();
+}
+void debugoctree();
+void centerent();
+#ifdef CLIENT
+void listtex();
+void massreplacetex(char *filename);
+#endif
 
 namespace lua_binds
 {
@@ -235,4 +265,47 @@ namespace lua_binds
     #else
     LUA_BIND_DUMMY(npcdel)
     #endif
+
+    LUA_BIND_CLIENT(save_mouse_pos, {
+        EditingSystem::savedMousePosTime = Utility::SystemInfo::currTime();
+        EditingSystem::savedMousePos = TargetingControl::worldPosition;
+        Logging::log(Logging::DEBUG,
+                     "Saved mouse pos: %f,%f,%f (%d)\r\n",
+                     EditingSystem::savedMousePos.x,
+                     EditingSystem::savedMousePos.y,
+                     EditingSystem::savedMousePos.z,
+                     EditingSystem::savedMousePosTime);
+    })
+
+    LUA_BIND_CLIENT(getentclass, {
+        std::string ret = EditingSystem::entityClasses[e.get<int>(1)];
+        assert( Utility::validateAlphaNumeric(ret, "_") ); // Prevent injections
+        e.push(ret.c_str());
+    })
+
+    LUA_BIND_STD(prepareentityclasses, EditingSystem::prepareentityclasses)
+    LUA_BIND_STD(numentityclasses, e.push, (int)EditingSystem::entityClasses.size())
+    LUA_BIND_STD(spawnent, EditingSystem::newEntity, e.get<const char*>(1))
+    LUA_BIND_STD_CLIENT(listtex, listtex)
+    LUA_BIND_STD_CLIENT(massreplacetex, massreplacetex, e.get<char*>(1))
+    LUA_BIND_STD(debugoctree, debugoctree)
+    LUA_BIND_STD(centerent, centerent)
+
+    LUA_BIND_STD_CLIENT(requestprivedit, MessageSystem::send_RequestPrivateEditMode)
+    LUA_BIND_STD_CLIENT(hasprivedit, e.push, ClientSystem::editingAlone)
+
+    LUA_BIND_STD_CLIENT(resetlightmaps, resetlightmaps, e.get<bool>(1))
+    LUA_BIND_STD_CLIENT(calclight, calclight, e.get<int*>(1))
+    LUA_BIND_STD_CLIENT(patchlight, patchlight, e.get<int*>(1))
+    LUA_BIND_STD_CLIENT(clearlightmaps, clearlightmaps)
+    LUA_BIND_STD_CLIENT(dumplms, dumplms)
+
+    LUA_BIND_STD_CLIENT(recalc, recalc)
+    LUA_BIND_STD(printcube, printcube)
+    LUA_BIND_STD(remip, remip_)
+    LUA_BIND_STD(phystest, phystest)
+    LUA_BIND_STD(genpvs, genpvs, e.get<int*>(1))
+    LUA_BIND_STD(testpvs, testpvs, e.get<int*>(1))
+    LUA_BIND_STD(clearpvs, clearpvs)
+    LUA_BIND_STD(pvsstats, pvsstats)
 }

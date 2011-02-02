@@ -5,7 +5,7 @@
  * author: q66 <quaker66@gmail.com>
  * license: MIT/X11
  *
- * Copyright (c) 2010 q66
+ * Copyright (c) 2011 q66
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -117,4 +117,19 @@ namespace lua_binds
         e.get<int>(10),
         e.get<int>(11));
     )
+
+    LUA_BIND_DEF(signalcomp, {
+        try
+        {
+            REFLECT_PYTHON( signal_signal_component );
+            boost::python::object data = signal_signal_component(std::string(e.get<const char*>(1)), std::string(e.get<const char*>(2)));
+            e.push(boost::python::extract<const char*>(data));
+        }
+        catch(boost::python::error_already_set const &)
+        {
+            printf("Error in signalling python component initialization\r\n");
+            PyErr_Print();
+            assert(0 && "Halting on Python error");
+        }
+    })
 }
