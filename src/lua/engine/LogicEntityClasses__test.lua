@@ -7,9 +7,9 @@ assert(table.concat(table.keys(_logicEntityClasses)) == "")
 local tc1 = class(LogicEntity)
 function tc1:__tostring () return "tc1" end
 function tc1:__init ()
-	self[RootLogicEntity].__user_init(self)
-	self.var1a = StateVariable()
-	self.var1b = StateVariable()
+    self[RootLogicEntity].__user_init(self)
+    self.var1a = StateVariable()
+    self.var1b = StateVariable()
 end
 
 local tc2 = class(LogicEntity)
@@ -47,15 +47,15 @@ assert(getEntitySauerType("tc2_1_1") == "wak")
 local tc1_1 = class(tc1)
 function tc1_1:__tostring () return "tc1_1" end
 function tc1_1:__init ()
-	self[tc1].__user_init(self)
-	self.var1_1a = StateVariable()
+    self[tc1].__user_init(self)
+    self.var1_1a = StateVariable()
 end
 
 local tc1_1_1 = class(tc1_1)
 function tc1_1_1:__tostring () return "tc1_1_1" end
 function tc1_1_1:__init ()
-	self[tc1_1].__user_init(self)
-	self.var1_1_1a = StateVariable()
+    self[tc1_1].__user_init(self)
+    self.var1_1_1a = StateVariable()
 end
 
 MessageSystem.feedback = {}

@@ -5,9 +5,9 @@ log(DEBUG, "Testing defineGetter / defineSetter first:")
 local _x = class()
 
 function _x:__init()
-	self.value = 0
-	self:__defineGetter("test", function(self) return self.value end)
-	self:__defineSetter("test", function(self, v) self.value = v + 100 end)
+    self.value = 0
+    self:__defineGetter("test", function(self) return self.value end)
+    self:__defineSetter("test", function(self, v) self.value = v + 100 end)
 end
 
 local x = _x()
@@ -41,26 +41,26 @@ function TestVariable:fromData (x) return x + 1 end
 
 local BaseClass = class()
 function BaseClass:__init ()
-	self.initialized = true
-	self.stateVariableValues = {}
-	self.stateVariableValueTimestamps = {}
-	self.var1 = TestVariable()
-	self.var2 = TestVariable()
-	self.int1 = StateInteger()
-	self.float1 = StateFloat()
-	self.bool1 = StateBoolean()
-	self.string1 = StateString()
-	self.arr1 = StateArray()
-	self.arr2 = StateArray()
-	self.farr1 = StateArrayFloat()
+    self.initialized = true
+    self.stateVariableValues = {}
+    self.stateVariableValueTimestamps = {}
+    self.var1 = TestVariable()
+    self.var2 = TestVariable()
+    self.int1 = StateInteger()
+    self.float1 = StateFloat()
+    self.bool1 = StateBoolean()
+    self.string1 = StateString()
+    self.arr1 = StateArray()
+    self.arr2 = StateArray()
+    self.farr1 = StateArrayFloat()
 end
 
 function BaseClass:_getStateDatum (key)
-	return self.stateVariableValues[key]
+    return self.stateVariableValues[key]
 end
 
 function BaseClass:_setStateDatum (key, value, origin)
-	self.stateVariableValues[key] = value
+    self.stateVariableValues[key] = value
 end
 
 function BaseClass:canCallCFuncs () return true end
@@ -124,20 +124,20 @@ log(DEBUG, "Array surrogate:")
 local surrFeedback = {}
 
 local entityWithSurr = {
-	uniqueId = "harrowe",
-	itemBase = 8
+    uniqueId = "harrowe",
+    itemBase = 8
 }
 
 local variableWithSurr = {
-	getLength = function (self, entity)
-		return entity.uniqueId
-	end,
-	getItem = function (self, entity, i)
-		return entity.itemBase + i
-	end,
-	setItem = function (self, entity, i, value)
-		entity.itemBase = entity.itemBase + i + value
-	end
+    getLength = function (self, entity)
+        return entity.uniqueId
+    end,
+    getItem = function (self, entity, i)
+        return entity.itemBase + i
+    end,
+    setItem = function (self, entity, i, value)
+        entity.itemBase = entity.itemBase + i + value
+    end
 }
 
 local surr = ArraySurrogate(entityWithSurr, variableWithSurr)
@@ -196,11 +196,11 @@ log(DEBUG, "Subclass tests:")
 local SubClass = class(BaseClass)
 
 function SubClass:__init ()
-	self.initialized = true
-	self[BaseClass].__user_init(self)
-	self.subint = StateInteger()
-	self.subintalias = VariableAlias("subint")
-	self.int1alias = VariableAlias("int1")
+    self.initialized = true
+    self[BaseClass].__user_init(self)
+    self.subint = StateInteger()
+    self.subintalias = VariableAlias("subint")
+    self.int1alias = VariableAlias("int1")
 end
 
 local sub = SubClass()
@@ -234,42 +234,42 @@ assert(test.int1 == 18)
 log(DEBUG, "Wrapping tests:")
 
 local testGetter = function (entity)
-	return entity.uniqueId + 1
+    return entity.uniqueId + 1
 end
 
 local testGetter2 = function (entity)
-	return entity.uniqueId + 2
+    return entity.uniqueId + 2
 end
 
 local VALS = {}
 
 local testSetter = function (entity, value)
-	VALS[entity.uniqueId] = value + 1
+    VALS[entity.uniqueId] = value + 1
 end
 
 local testSetter2 = function (entity, value)
-	VALS[entity.uniqueId] = value + 2
+    VALS[entity.uniqueId] = value + 2
 end
 
 local testVecGetter = function (entity)
-	return {entity.uniqueId + 1, entity.uniqueId + 3, entity.uniqueId + 2}
+    return {entity.uniqueId + 1, entity.uniqueId + 3, entity.uniqueId + 2}
 end
 
 local testVecSetter = function (entity, value)
-	log(DEBUG, "testVecSetter: " .. tostring(entity.uniqueId) .. "," .. tostring(value))
-	VALS[entity.uniqueId] = value
+    log(DEBUG, "testVecSetter: " .. tostring(entity.uniqueId) .. "," .. tostring(value))
+    VALS[entity.uniqueId] = value
 end
 
 local WrappedClass = class(BaseClass)
 
 function WrappedClass:__init ()
-	self.initialized = true
-	self[BaseClass].__user_init(self)
-	self.wrapint1  = WrappedCInteger({ cGetter = testGetter,     cSetter = testSetter     })
-	self.wrapint2  = WrappedCInteger({ cGetter = testGetter2,    cSetter = testSetter2    })
-	self.wrapfloat = WrappedCFloat  ({ cGetter = testGetter,     cSetter = testSetter     })
-	self.wrapvec3  = WrappedCVector3({ cGetter = testVecGetter,  cSetter = testVecSetter  })
-	self.wrapvec3b = WrappedCVector3({ cGetter = testVecGetter,  cSetter = testVecSetter  })
+    self.initialized = true
+    self[BaseClass].__user_init(self)
+    self.wrapint1  = WrappedCInteger({ cGetter = testGetter,     cSetter = testSetter     })
+    self.wrapint2  = WrappedCInteger({ cGetter = testGetter2,    cSetter = testSetter2    })
+    self.wrapfloat = WrappedCFloat  ({ cGetter = testGetter,     cSetter = testSetter     })
+    self.wrapvec3  = WrappedCVector3({ cGetter = testVecGetter,  cSetter = testVecSetter  })
+    self.wrapvec3b = WrappedCVector3({ cGetter = testVecGetter,  cSetter = testVecSetter  })
 end
 
 local wrap = WrappedClass()

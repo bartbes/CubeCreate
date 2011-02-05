@@ -11,8 +11,8 @@ Signals.addMethods(test2)
 
 local xy = 0
 local fc = function (self, v)
-	log(DEBUG, string.format("Printing value from callback: %f", v))
-	xy = v*2
+    log(DEBUG, string.format("Printing value from callback: %f", v))
+    xy = v*2
 end
 
 test2:connect("meh", fc)

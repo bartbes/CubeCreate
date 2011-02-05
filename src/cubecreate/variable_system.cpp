@@ -272,36 +272,45 @@ namespace var
 
     void cvar::regliv()
     {
-        lua::engine.getg("ivar")
+        lua::engine.getg("cc")
+                   .t_getraw("engine_variables")
+                   .t_getraw("ivar")
                    .push(name)
                    .push(minv.i)
                    .push(curv.i)
                    .push(maxv.i)
                    .push(readonly)
                    .push(alias)
-                   .call(6);
+                   .call(6)
+                   .pop(2);
     }
 
     void cvar::reglfv()
     {
-        lua::engine.getg("fvar")
+        lua::engine.getg("cc")
+                   .t_getraw("engine_variables")
+                   .t_getraw("fvar")
                    .push(name)
                    .push(minv.f)
                    .push(curv.f)
                    .push(maxv.f)
                    .push(readonly)
                    .push(alias)
-                   .call(6);
+                   .call(6)
+                   .pop(2);
     }
 
     void cvar::reglsv()
     {
-        lua::engine.getg("svar")
+        lua::engine.getg("cc")
+                   .t_getraw("engine_variables")
+                   .t_getraw("svar")
                    .push(name)
                    .push(curv.s)
                    .push(readonly)
                    .push(alias)
-                   .call(4);
+                   .call(4)
+                   .pop(2);
     }
 
     /*
@@ -314,7 +323,7 @@ namespace var
         if ((luasync || alias) && lua::engine.hashandle()) \
         { \
             defformatstring(buf)("%s_ns", name); \
-            lua::engine.getg("EV").t_set(buf, v).pop(1); \
+            lua::engine.getg("_G").t_set(buf, v).pop(1); \
         }
 
         switch (type)

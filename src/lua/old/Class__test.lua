@@ -3,8 +3,8 @@ log(DEBUG, "---- CLASS TEST BEGIN ----")
 A = class()
 function A:__tostring() return "A" end
 function A:__init()
-	self.xyz = 156
-	log(DEBUG, "Initializing A class or class inherited from A without its own constructor.")
+    self.xyz = 156
+    log(DEBUG, "Initializing A class or class inherited from A without its own constructor.")
 end
 
 B = class(A)

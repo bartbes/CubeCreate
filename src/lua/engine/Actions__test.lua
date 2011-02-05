@@ -14,8 +14,8 @@ local TestAction = class(Action)
 function TestAction:__tostring () return "TestAction" end
 TestAction.secondsLeft = 6
 function TestAction:doExecute (seconds)
-	feedback = feedback + seconds
-	return self[Action].doExecute(self, seconds)
+    feedback = feedback + seconds
+    return self[Action].doExecute(self, seconds)
 end
 
 local act = TestAction()

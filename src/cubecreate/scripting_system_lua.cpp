@@ -168,16 +168,11 @@ namespace lua
 
         Logging::log(Logging::DEBUG, "Setting up lua engine embedding\n");
 
-        m_runtests = Utility::Config::getInt("Logging", "lua_tests", 1);
+        m_runtests = Utility::Config::getInt("Logging", "scripting_tests", 1);
 
         if (m_rantests) m_runtests = false;
-        if (m_runtests)
-        {
-            defformatstring(f)("%s__TestingEnvironment.lua", m_scriptdir);
-            execf(f);
-        }
 
-        setup_namespace("Logging", LAPI);
+        setup_namespace("logging", LAPI);
         #define PUSHLEVEL(l) t_set(#l, Logging::l);
         PUSHLEVEL(INFO)
         PUSHLEVEL(DEBUG)
@@ -185,43 +180,18 @@ namespace lua
         PUSHLEVEL(ERROR)
         pop(1);
 
-        // general modules for Lua
-        setup_module("LoggingExtras");
-        setup_module("Class");
-        setup_module("JSON");
-        setup_module("Signals");
-
-        // CubeCerate modules
-        // before setting up CC API, set client/server
-        setup_module("engine/Platform");
-        #ifdef CLIENT
-        exec("Global:initAsClient()");
-        #else
-        exec("Global:initAsServer()");
-        #endif
-
-        getg("Global").t_set("version", m_version).pop(1);
-
         setup_namespace("CAPI", CAPI);
         pop(1);
 
-        setup_module("LuaExtensions", true);
-        setup_module("engine/EngineVariables");
-        setup_module("engine/CAPIExtras", true);
-        setup_module("engine/Utilities");
-        setup_module("engine/Actions");
-        setup_module("engine/LogicEntityStore");
-        setup_module("engine/Variables");
-        setup_module("engine/LogicEntity");
-        setup_module("engine/MessageSystem");
-        setup_module("engine/LogicEntityClasses");
-        setup_module("engine/ModelAttachments");
-        setup_module("engine/Animatable");
-        setup_module("engine/Character");
-        setup_module("engine/StaticEntity");
-        setup_module("engine/Sound");
-        setup_module("engine/Application");
-        setup_module("engine/Effects");
+        push("run_tests").push(m_runtests).setg();
+        #ifdef CLIENT
+        push("cc_init_client").push(true).setg();
+        #else
+        push("cc_init_client").push(false).setg();
+        #endif
+        push("cc_version").push(m_version).setg();
+
+        setup_module("init");
 
         if (m_runtests)
         {
