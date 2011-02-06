@@ -90,7 +90,7 @@ function new(b)
         local o = {}
         base.setmetatable(o, c)
         if self.__init then
-            self:__init(...)
+            self.__init(o, ...)
         end
         return o
     end

@@ -31,7 +31,7 @@ local log = require("cc.logging")
 local CAPI = require("CAPI")
 local table = require("table")
 local string = require("string")
-local ls = require("cc.logent")
+--local ls = require("cc.logent")
 
 --- Message system interface for Lua. Used for communication between client and server,
 -- takes care of name compressing and other things.

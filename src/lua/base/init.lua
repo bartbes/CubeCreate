@@ -86,6 +86,11 @@ require("base.base_blend")
 cc.logging.log(cc.logging.DEBUG, ":: Message system.")
 require("base.base_msgsys")
 
+cc.logging.log(cc.logging.DEBUG, ":: Effects.")
+require("base.base_effects")
+
 cc.logging.log(cc.logging.DEBUG, ":: Sound.")
 require("base.base_sound")
 
+cc.logging.log(cc.logging.DEBUG, ":: Action system.")
+require("base.base_actions")

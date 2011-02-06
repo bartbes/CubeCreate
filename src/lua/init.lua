@@ -43,6 +43,3 @@ require("language")
 
 cc.logging.log(cc.logging.DEBUG, "Initializing base.")
 require("base")
-
-cc.logging.log(cc.logging.DEBUG, "Initializing game scripting files.")
-require("game")

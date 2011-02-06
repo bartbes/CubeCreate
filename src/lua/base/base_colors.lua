@@ -33,8 +33,8 @@ local string = require("string")
 --- Color conversions for cC Lua interface (RGB->HSL, HEX->RGB etc.)
 -- HSL/HSV functions taken from http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
 -- @class module
--- @name cc.colors
-module("cc.colors")
+-- @name cc.color
+module("cc.color")
 
 ---
 -- Converts an RGB color value to HSL. Conversion formula
