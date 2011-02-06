@@ -47,16 +47,7 @@ module("cc.json")
 local jregs = {}
 
 -- private functions
-local decode_scanArray
-local decode_scanComment
-local decode_scanConstant
-local decode_scanNumber
-local decode_scanObject
-local decode_scanString
-local decode_scanWhitespace
-local encodeString
-local isArray
-local isEncodable
+local isencodable
 
 --- Encodes an arbitrary Lua object / variable.
 -- @param v The Lua object / variable to be JSON encoded.

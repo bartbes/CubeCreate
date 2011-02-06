@@ -671,6 +671,7 @@ namespace lua
     template<> bool           lua_Engine::get(int i, bool d);
     template<> const char    *lua_Engine::get(int i, const char *d);
     // specializations for pointers; temporary till stuff requiring this is rewritten
+    template<> char          *lua_Engine::get(int i, char *d);
     template<> int           *lua_Engine::get(int i);
     template<> double        *lua_Engine::get(int i);
     template<> float         *lua_Engine::get(int i);

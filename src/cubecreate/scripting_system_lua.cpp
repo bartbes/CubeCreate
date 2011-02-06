@@ -364,6 +364,18 @@ namespace lua
         return d;
     }
 
+    template<>
+    char *lua_Engine::get(int i, char *d)
+    {
+        if (m_hashandle && !lua_isnoneornil(m_handle, i))
+        {
+            char *r = (char*)lua_tolstring(m_handle, i, 0);
+            if (!r) typeerror(i, "string");
+            return r;
+        }
+        return d;
+    }
+
     // specializations for pointers; temporary till stuff requiring this is rewritten
 
     template<>

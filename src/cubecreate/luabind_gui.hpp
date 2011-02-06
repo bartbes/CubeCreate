@@ -28,6 +28,9 @@
  */
 
 /* PROTOTYPES */
+void newfont(char *name, char *tex, int *defaultw, int *defaulth, int *offsetx, int *offsety, int *offsetw, int *offseth);
+void fontoffset(char *c);
+void fontchar(int *x, int *y, int *w, int *h);
 void showgui(const char *name);
 int cleargui(int n);
 void guionclear(char *action);
@@ -59,15 +62,10 @@ namespace lua_binds
 {
     LUA_BIND_STD_CLIENT(showmessage, IntensityGUI::showMessage, "Script message", e.get<const char*>(1))
     LUA_BIND_STD_CLIENT(showinputdialog, IntensityGUI::showInputDialog, "Script input", e.get<const char*>(1))
-    LUA_BIND_CLIENT(setdeftpm, {
-        // Only allow this to be done once
-        if (!lua::engine["setdeftpm"])
-        {
-            lua::engine["setdeftpm"] = "set";
-            SETV(thirdperson, e.get<int>(1));
-        } else
-            Logging::log(Logging::WARNING, "Can only set default thirdperson mode once per map\r\n");
-    })
+
+    LUA_BIND_STD_CLIENT(font, newfont, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<int*>(4), e.get<int*>(5), e.get<int*>(6), e.get<int*>(7), e.get<int*>(8))
+    LUA_BIND_STD_CLIENT(fontoffset, fontoffset, e.get<char*>(1))
+    LUA_BIND_STD_CLIENT(fontchar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
 
     LUA_BIND_STD_CLIENT(newgui, newgui, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
     LUA_BIND_STD_CLIENT(guibutton, guibutton, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))

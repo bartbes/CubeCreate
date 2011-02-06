@@ -3,68 +3,68 @@
 
 echo("CubeCreate defaults")
 
-EV.invmouse = 0
+invmouse = 0
 
-EV.sensitivity = 3      -- similar number to quake
-EV.fov = 100            -- 90 is default in other games
+sensitivity = 3      -- similar number to quake
+fov = 100            -- 90 is default in other games
 
-EV.musicvol = 60       -- set higher if you want (max 255)
-EV.soundvol = 255      -- sounds average volume is actually set per sound, average 100
+musicvol = 60       -- set higher if you want (max 255)
+soundvol = 255      -- sounds average volume is actually set per sound, average 100
 
-EV.gamma = 100          -- set to your liking, 100 = default
+gamma = 100          -- set to your liking, 100 = default
 
-EV.fullbrightmodels = 60 -- make player models a bit easier to see
+fullbrightmodels = 60 -- make player models a bit easier to see
 
-EV.sensitivity = 3      -- similar number to quake
-EV.fov = 100            -- 90 is default in other games
+sensitivity = 3      -- similar number to quake
+fov = 100            -- 90 is default in other games
 
-EV.musicvol = 60       -- set higher if you want (max 255)
-EV.soundvol = 255      -- sounds average volume is actually set per sound, average 100
+musicvol = 60       -- set higher if you want (max 255)
+soundvol = 255      -- sounds average volume is actually set per sound, average 100
 
-EV.gamma = 100          -- set to your liking, 100 = default
+gamma = 100          -- set to your liking, 100 = default
 
-EV.fullbrightmodels = 60 -- make player models a bit easier to see
+fullbrightmodels = 60 -- make player models a bit easier to see
 
 -- console
 
-EV.consize = 5            -- console is 5 lines
-EV.miniconsize = 5        -- mini-console is 5 lines
-EV.miniconwidth = 40      -- mini-console is 40% of screen width
-EV.fullconsize = 75       -- full console is 75% of screen height
-EV.miniconfilter = 0x300  -- display chat and team chat in mini-console
-EV.confilter = math.band(0x2FFF, math.bnot(EV.miniconfilter)) -- don't display other player frags or mini-console stuff in console
-EV.fullconfilter = 0xFFFF -- display all messages in full console
+consize = 5            -- console is 5 lines
+miniconsize = 5        -- mini-console is 5 lines
+miniconwidth = 40      -- mini-console is 40% of screen width
+fullconsize = 75       -- full console is 75% of screen height
+miniconfilter = 0x300  -- display chat and team chat in mini-console
+confilter = math.band(0x2FFF, math.bnot(miniconfilter)) -- don't display other player frags or mini-console stuff in console
+fullconfilter = 0xFFFF -- display all messages in full console
 
 -- WSAD
 
-console.binds.add("W", [[Movement.forward()]])
-console.binds.add("S", [[Movement.backward()]])
-console.binds.add("A", [[Movement.left()]])
-console.binds.add("D", [[Movement.right()]])
+cc.console.binds.add("W", [[Movement.forward()]])
+cc.console.binds.add("S", [[Movement.backward()]])
+cc.console.binds.add("A", [[Movement.left()]])
+cc.console.binds.add("D", [[Movement.right()]])
 
-console.binds.add("UP", [[Movement.forward()]])
-console.binds.add("DOWN", [[Movement.backward()]])
-console.binds.add("LEFT", [[Movement.left()]])
-console.binds.add("RIGHT", [[Movement.right()]])
+cc.console.binds.add("UP", [[Movement.forward()]])
+cc.console.binds.add("DOWN", [[Movement.backward()]])
+cc.console.binds.add("LEFT", [[Movement.left()]])
+cc.console.binds.add("RIGHT", [[Movement.right()]])
 
-console.binds.add("SPACE", [[Movement.jump()]])
-console.binds.add("MOUSE2", [[Movement.jump()]])
-console.binds.add("MOUSE1", [[CV:run("attack")]])
-console.binds.add("MOUSE3", [[CV:run("weapon")]])
+cc.console.binds.add("SPACE", [[Movement.jump()]])
+cc.console.binds.add("MOUSE2", [[Movement.jump()]])
+cc.console.binds.add("MOUSE1", [[CV:run("attack")]])
+cc.console.binds.add("MOUSE3", [[CV:run("weapon")]])
 
-console.binds.addspec("MOUSE1", [[CV:run("nextfollow")]])
-console.binds.addspec("MOUSE2", [[CV:run("nextfollow -1")]])
-console.binds.addspec("MOUSE3", [[CV:run("follow")]])
-console.binds.addspec("SPACE", [[CV:run("follow")]])
+cc.console.binds.addspec("MOUSE1", [[CV:run("nextfollow")]])
+cc.console.binds.addspec("MOUSE2", [[CV:run("nextfollow -1")]])
+cc.console.binds.addspec("MOUSE3", [[CV:run("follow")]])
+cc.console.binds.addspec("SPACE", [[CV:run("follow")]])
 
-console.binds.add("TAB", [[CV:run("showscores")]])
+cc.console.binds.add("TAB", [[CV:run("showscores")]])
 
-console.binds.add("T", [[console.saycommand()]])
---console.binds.add("T", [[console.sayteamcommand()]])
-console.binds.add("BACKQUOTE", [[console.saycommand("/")]])
-console.binds.add("SLASH", [[console.saycommand("/")]])
+cc.console.binds.add("T", [[cc.console.saycommand()]])
+--cc.console.binds.add("T", [[cc.console.sayteamcommand()]])
+cc.console.binds.add("BACKQUOTE", [[cc.console.saycommand("/")]])
+cc.console.binds.add("SLASH", [[cc.console.saycommand("/")]])
 
-console.binds.add("I", [[CV:run("taunt")]])
-console.binds.add("E", [[CV:run([=[ if (< (getmode) 0) [ echo "^f3Please press F1 to enter editmode from a local game" ] [ edittoggle ] ]=])]])
-console.binds.add("F1", [[CV:run("edittoggle")]])
+cc.console.binds.add("I", [[CV:run("taunt")]])
+cc.console.binds.add("E", [[CV:run([=[ if (< (getmode) 0) [ echo "^f3Please press F1 to enter editmode from a local game" ] [ edittoggle ] ]=])]])
+cc.console.binds.add("F1", [[CV:run("edittoggle")]])
 

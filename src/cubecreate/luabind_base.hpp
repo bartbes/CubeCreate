@@ -30,9 +30,6 @@
 /* PROTOTYPES */
 
 void keymap(int *code, char *key);
-void newfont(char *name, char *tex, int *defaultw, int *defaulth, int *offsetx, int *offsety, int *offsetw, int *offseth);
-void fontoffset(char *c);
-void fontchar(int *x, int *y, int *w, int *h);
 void registersound(char *name, int *vol);
 void run_python(char *code);
 void force_quit();
@@ -101,9 +98,6 @@ namespace lua_binds
     LUA_BIND_STD_CLIENT(keymap, keymap, e.get<int*>(1), e.get<char*>(2))
     LUA_BIND_STD_CLIENT(registersound, registersound, e.get<char*>(1), e.get<int*>(2))
     LUA_BIND_STD_CLIENT(resetsound, resetsound)
-    LUA_BIND_STD_CLIENT(font, newfont, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3), e.get<int*>(4), e.get<int*>(5), e.get<int*>(6), e.get<int*>(7), e.get<int*>(8))
-    LUA_BIND_STD_CLIENT(fontoffset, fontoffset, e.get<char*>(1))
-    LUA_BIND_STD_CLIENT(fontchar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
     LUA_BIND_STD_CLIENT(quit, quit)
     LUA_BIND_STD_CLIENT(force_quit, force_quit)
     LUA_BIND_STD_CLIENT(screenres, screenres, e.get<int*>(1), e.get<int*>(2))
@@ -251,4 +245,14 @@ namespace lua_binds
     LUA_BIND_STD_CLIENT(onrelease, onrelease, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(complete, addfilecomplete, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
     LUA_BIND_STD_CLIENT(listcomplete, addlistcomplete, e.get<char*>(1), e.get<char*>(2))
+
+    LUA_BIND_CLIENT(setdeftpm, {
+        // Only allow this to be done once
+        if (!lua::engine["setdeftpm"])
+        {
+            lua::engine["setdeftpm"] = "set";
+            SETV(thirdperson, e.get<int>(1));
+        } else
+            Logging::log(Logging::WARNING, "Can only set default thirdperson mode once per map\r\n");
+    })
 }

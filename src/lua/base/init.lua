@@ -64,3 +64,28 @@ setmetatable(_G, {
 
 cc.logging.log(cc.logging.DEBUG, ":: Utilities.")
 require("base.base_utils")
+
+cc.logging.log(cc.logging.DEBUG, ":: Color conversion.")
+require("base.base_colors")
+
+cc.logging.log(cc.logging.DEBUG, ":: Console.")
+require("base.base_console")
+
+cc.logging.log(cc.logging.DEBUG, ":: GUI.")
+require("base.base_gui")
+
+cc.logging.log(cc.logging.DEBUG, ":: Shaders.")
+require("base.base_shaders")
+
+cc.logging.log(cc.logging.DEBUG, ":: Models.")
+require("base.base_models")
+
+cc.logging.log(cc.logging.DEBUG, ":: Texture blending.")
+require("base.base_blend")
+
+cc.logging.log(cc.logging.DEBUG, ":: Message system.")
+require("base.base_msgsys")
+
+cc.logging.log(cc.logging.DEBUG, ":: Sound.")
+require("base.base_sound")
+

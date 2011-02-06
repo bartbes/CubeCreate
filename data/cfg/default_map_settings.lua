@@ -2,10 +2,10 @@
 
 -- on every map load, this file will be executed, followed by mapscript.
 
-map.mapmodelreset()
+cc.model.reset()
 
-if not EV.skybox then
-    EV.skybox = "textures/sky/remus/sky01"
+if not skybox then
+    skybox = "textures/sky/remus/sky01"
 end
 
 map.materialreset()
@@ -22,7 +22,7 @@ map.texture("1",    "textures/core/lava.png", 0, 0, 0, 2) -- falling lava
 
 map.texturereset() -- let's start at texture slot 0
 
-shader.set("stdworld") -- default world shader
+cc.shader.set("stdworld") -- default world shader
 
 map.texture("0", "textures/core/defsky.png") -- fallback sky
 map.texture("0", "textures/core/256.png") -- fallback geometry
@@ -41,4 +41,4 @@ map.texture("0", "textures/core/32i.png")
 map.texture("0", "textures/core/16i.png")
 map.texture("0", "textures/core/8i.png")
 
-shader.set("stdworld")
+cc.shader.set("stdworld")

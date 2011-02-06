@@ -118,61 +118,61 @@ def show_gui(sender, **kwargs):
     if has_server():
         if check_server_ready():
             CModule.run_script('''
-                gui.text("Local server: Running")
-                gui.stayopen([[ gui.button("  stop", [=[ engine.ssls() ]=]) ]])
-                gui.button("  show output", [[ gui.show("local_server_output") ]])
-                gui.stayopen([[ gui.button("  save map", [=[ CV:run("do_upload") ]=]) ]])
-                gui.button("  restart map", [[ gui.show("restart_map") ]])
-                gui.button("  editing commands", [[ gui.show("editing") ]])
+                cc.gui.text("Local server: Running")
+                cc.gui.stayopen([[ cc.gui.button("  stop", [=[ engine.ssls() ]=]) ]])
+                cc.gui.button("  show output", [[ cc.gui.show("local_server_output") ]])
+                cc.gui.stayopen([[ cc.gui.button("  save map", [=[ CV:run("do_upload") ]=]) ]])
+                cc.gui.button("  restart map", [[ cc.gui.show("restart_map") ]])
+                cc.gui.button("  editing commands", [[ cc.gui.show("editing") ]])
             ''')
         elif check_server_terminated():
             Module.server_proc = None
             log(logging.ERROR, "Local server terminated due to an error")
         else:
             CModule.run_script('''
-                gui.text("Local server: ...preparing...")
-                gui.stayopen([[ gui.button("  stop", [=[ engine.ssls() ]=]) ]])
+                cc.gui.text("Local server: ...preparing...")
+                cc.gui.stayopen([[ cc.gui.button("  stop", [=[ engine.ssls() ]=]) ]])
             ''')
     else:
         CModule.run_script('''
-            gui.text("Local server: (not active)")
-            if EV.logged_into_master == 0 then
-				gui.text("   << not logged into master >>")
+            cc.gui.text("Local server: (not active)")
+            if logged_into_master == 0 then
+				cc.gui.text("   << not logged into master >>")
 			end
 
-            gui.list([[
-                gui.text("Map location to run: base/")
-                gui.field("local_server_location", 30, "")
-                gui.text(".tar.gz")
+            cc.gui.list([[
+                cc.gui.text("Map location to run: base/")
+                cc.gui.field("local_server_location", 30, "")
+                cc.gui.text(".tar.gz")
             ]])
-            gui.stayopen([[
-			    gui.button("  start", [=[
-					engine.ssls(EV.local_server_location)
+            cc.gui.stayopen([[
+			    cc.gui.button("  start", [=[
+					engine.ssls(local_server_location)
 			    ]=])
             ]])
-            gui.button("  show output", [[ gui.show("local_server_output") ]])
+            cc.gui.button("  show output", [[ cc.gui.show("local_server_output") ]])
         ''')
-    CModule.run_script('gui.bar()')
+    CModule.run_script('cc.gui.bar()')
 
 show_components.connect(show_gui, weak=False)
 
 # Always enter private edit mode if masterless
 def request_private_edit(sender, **kwargs):
-    if not CModule.run_script_int("EV.logged_into_master"):
+    if not CModule.run_script_int("logged_into_master"):
         MessageSystem.send(CModule.RequestPrivateEditMode)
 map_load_finish.connect(request_private_edit, weak=False)
 
 CModule.run_script('''
-    gui.new("local_server_output", [[
-        gui.noAutotab([=[
-            gui.bar()
-            gui.editor("%(name)s", -80, 20)
-            gui.bar()
-            gui.stayopen([==[
-                gui.button("refresh", [===[
-                    gui.textfocus("%(name)s")
-                    gui.textload("%(name)s")
-                    gui.show("-1")
+    cc.gui.new("local_server_output", [[
+        cc.gui.noautotab([=[
+            cc.gui.bar()
+            cc.gui.editor("%(name)s", -80, 20)
+            cc.gui.bar()
+            cc.gui.stayopen([==[
+                cc.gui.button("refresh", [===[
+                    cc.gui.textfocus("%(name)s")
+                    cc.gui.textload("%(name)s")
+                    cc.gui.show("-1")
                 ]===])
             ]==])
         ]=])

@@ -1,11 +1,11 @@
 ---
--- init.lua, version 1
--- Loader for core Lua library.
---
--- @author q66 (quaker66@gmail.com)
--- license: MIT/X11
---
--- @copyright 2011 CubeCreate project
+-- init.lua, version 1<br/>
+-- Loader for all game files.<br/>
+-- <br/>
+-- @author q66 (quaker66@gmail.com)<br/>
+-- license: MIT/X11<br/>
+-- <br/>
+-- @copyright 2011 CubeCreate project<br/>
 -- <br/>
 -- Permission is hereby granted, free of charge, to any person obtaining a copy<br/>
 -- of this software and associated documentation files (the "Software"), to deal<br/>
@@ -26,23 +26,5 @@
 -- THE SOFTWARE.
 --
 
-package.path = package.path .. ";./src/lua/?.lua;./src/lua/?/init.lua;./?/init.lua"
-
--- Logging comes first.
-require("base.base_logging")
--- Globally wrap some logging stuff because it's often used.
-log = cc.logging.log
-INFO = cc.logging.INFO
-DEBUG = cc.logging.DEBUG
-WARNING = cc.logging.WARNING
-ERROR = cc.logging.ERROR
-echo = cc.logging.echo
-
-cc.logging.log(cc.logging.DEBUG, "Initializing language extensions.")
-require("language")
-
-cc.logging.log(cc.logging.DEBUG, "Initializing base.")
-require("base")
-
-cc.logging.log(cc.logging.DEBUG, "Initializing game scripting files.")
-require("game")
+--cc.logging.log(cc.logging.DEBUG, ":: GUI.")
+--require("game.game_ui")
