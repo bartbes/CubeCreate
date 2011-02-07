@@ -1886,17 +1886,16 @@ bool moveplayer(physent *pl, int moveres, bool local, int curtime)
     if (pl->o.z < 0)
     {
         using namespace lua;
-        engine.getg("ApplicationManager");
-        engine.t_getraw("instance");
+        engine.getg("cc").t_getraw("appman").t_getraw("inst");
 #ifdef CLIENT
-        engine.t_getraw("clientOnEntityOffMap");
+        engine.t_getraw("client_on_entoffmap");
 #else
-        engine.t_getraw("onEntityOffMap");
+        engine.t_getraw("on_entoffmap");
 #endif
         engine.push_index(-2);
         engine.getref(LogicSystem::getLogicEntity((dynent*)pl).get()->luaRef);
         engine.call(2, 0);
-        engine.pop(2);
+        engine.pop(3);
     }
 #endif
 

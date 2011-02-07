@@ -74,9 +74,9 @@ void WorldSystem::triggerCollide(LogicEntityPtr mapmodel, physent* d, bool ellip
 
     engine.getref(mapmodel.get()->luaRef);
     #ifdef SERVER
-    engine.t_getraw("onCollision");
+    engine.t_getraw("on_collision");
     #else
-    engine.t_getraw("clientOnCollision");
+    engine.t_getraw("client_on_collision");
     #endif
     engine.push_index(-2).getref(colliderEntity.get()->luaRef).call(2, 0).pop(1);
 }

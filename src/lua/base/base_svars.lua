@@ -1,0 +1,705 @@
+---
+-- base_svars.lua, version 1<br/>
+-- State variable system for Lua<br/>
+-- <br/>
+-- @author q66 (quaker66@gmail.com)<br/>
+-- license: MIT/X11<br/>
+-- <br/>
+-- @copyright 2011 CubeCreate project<br/>
+-- <br/>
+-- Permission is hereby granted, free of charge, to any person obtaining a copy<br/>
+-- of this software and associated documentation files (the "Software"), to deal<br/>
+-- in the Software without restriction, including without limitation the rights<br/>
+-- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell<br/>
+-- copies of the Software, and to permit persons to whom the Software is<br/>
+-- furnished to do so, subject to the following conditions:<br/>
+-- <br/>
+-- The above copyright notice and this permission notice shall be included in<br/>
+-- all copies or substantial portions of the Software.<br/>
+-- <br/>
+-- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br/>
+-- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,<br/>
+-- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE<br/>
+-- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER<br/>
+-- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,<br/>
+-- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN<br/>
+-- THE SOFTWARE.
+--
+
+local base = _G
+local table = require("table")
+local string = require("string")
+local CAPI = require("CAPI")
+local class = require("cc.class")
+local log = require("cc.logging")
+local glob = require("cc.global")
+local lent = require("cc.logent")
+local conv = require("cc.typeconv")
+local json = require("cc.json")
+local vector = require("cc.vector")
+
+--- State variable system for cC Lua interface.
+-- @class module
+-- @name cc.state_variables
+module("cc.state_variables")
+
+function get_onmodify_prefix()
+    if glob.CLIENT then
+        return "client_on_modify_"
+    else
+        return "on_modify_"
+    end
+end
+
+variable = class.new()
+function variable:__tostring() return "variable" end
+
+function is(c)
+    return c.is_a and c:is_a(variable) or false
+end
+
+_SV_PREFIX = "__SV_"
+
+function __get(uid, vn)
+    return lent.store.get(uid)[_SV_PREFIX .. vn]
+end
+
+function __getguin(uid, vn)
+    local ent = lent.store.get(uid)
+    local var = ent[_SV_PREFIX .. vn]
+    return var.guiname and var.guiname or vn
+end
+
+state_variable = class.new(variable)
+function state_variable:__tostring() return "state_variable" end
+function state_variable:__init(kwargs)
+    log.log(log.INFO, "state_variable: constructor ..")
+
+    if not kwargs then kwargs = {} end
+
+    self.clientread = kwargs.clientread or true
+    self.clientwrite = kwargs.clientwrite or true
+    self.customsynch = kwargs.customsynch or false
+    self.clientset = kwargs.clientset or false
+    self.guiname = kwargs.guiname
+    self.altname = kwargs.altname
+    self.reliable = kwargs.reliable or true
+    self.hashistory = kwargs.hashistory or true
+    self.clientpriv = kwargs.clientpriv or false
+end
+
+function state_variable:_register(_name, parent)
+    self._name = _name
+    parent[_SV_PREFIX .. _name] = self
+    parent[_name] = nil
+
+    assert(self.getter)
+    assert(self.setter)
+    parent:define_getter(_name, self.getter, self)
+    parent:define_setter(_name, self.setter, self)
+
+    if self.altname then
+        parent[_SV_PREFIX .. self.altname] = self
+        parent:define_getter(self.altname, self.getter, self)
+        parent:define_setter(self.altname, self.setter, self)
+    end
+end
+
+function state_variable:read_tests(ent)
+    if not glob.SERVER or not self.clientread then
+        base.assert(false)
+    end
+end
+
+function state_variable:write_tests(ent)
+    if ent.deactivated then
+        log.log(log.ERROR, "Trying to write a field " .. self._name .. " of " .. ent.uid .. ", " .. base.tostring(ent))
+        base.assert(false)
+    end
+    if not glob.SERVER or not self.clientwrite then
+        base.assert(glob.SERVER or self.clientwrite)
+    end
+    if not ent.initialized then
+        base.assert(ent.initialized)
+    end
+end
+
+function state_variable:getter(var)
+    var:read_tests(self)
+    return self.state_var_vals[var._name]
+end
+
+function state_variable:setter(var, val)
+    var:write_tests(self)
+    self:set_statedata(var._name, val, nil)
+end
+
+function state_variable:validate(val)
+    return true
+end
+
+function state_variable:should_send(ent, tcn)
+    return not self.clientpriv or ent.cn == tcn
+end
+
+state_integer = class.new(state_variable)
+function state_integer:__tostring() return "state_integer" end
+state_integer.to_wire = conv.tostring
+state_integer.from_wire = conv.tointeger
+state_integer.to_data = conv.tostring
+state_integer.from_data = conv.tointeger
+
+state_float = class.new(state_variable)
+function state_float:__tostring() return "state_float" end
+state_float.to_wire = conv.todec2str
+state_float.from_wire = conv.tonumber
+state_float.to_data = conv.todec2str
+state_float.from_data = conv.tonumber
+
+state_enum = class.new(state_integer)
+function state_enum:__tostring() return "state_enum" end
+
+state_bool = class.new(state_variable)
+function state_bool:__tostring() return "state_bool" end
+state_bool.to_wire = conv.tostring
+state_bool.from_wire = conv.toboolean
+state_bool.to_data = conv.tostring
+state_bool.from_data = conv.toboolean
+
+state_string = class.new(state_variable)
+function state_string:__tostring() return "state_string" end
+state_string.to_wire = conv.tostring
+state_string.from_wire = conv.tostring
+state_string.to_data = conv.tostring
+state_string.from_data = conv.tostring
+
+array_surrogate = class.new()
+function array_surrogate:__tostring() return "array_surrogate" end
+
+function array_surrogate:__init(ent, var)
+    log.log(log.INFO, "setting up array_surrogate ..")
+
+    self.entity = ent
+    self.variable = var
+end
+
+function array_surrogate:__user_get(n)
+    if n == "length" then
+        return self.variable:get_length(self.entity)
+    end
+    return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
+end
+
+function array_surrogate:__user_set(n, v)
+    if base.tonumber(n) then
+        self.variable:set_item(self.entity, base.tonumber(n), v)
+    else
+        base.rawset(self, n, v)
+    end
+end
+
+function array_surrogate:push(v)
+    self[self.length + 1] = v
+end
+
+function array_surrogate:as_array()
+    log.log(log.INFO, "as_array: " .. base.tostring(self))
+
+    local r = {}
+    for i = 1, self.length do
+        log.log(log.INFO, "as_array(" .. base.tostring(i) .. ")")
+        table.insert(r, self[i])
+    end
+    return r
+end
+
+state_array = class.new(state_variable)
+function state_array:__tostring() return "state_array" end
+state_array.separator = "|"
+state_array.surrogate_class = array_surrogate
+
+function state_array:empty_value() return {} end
+
+function state_array:getter(var)
+    var:read_tests(self)
+
+    if not var:get_raw(self) then return nil end
+
+    log.log(log.INFO, "state_array getter: " .. var._name .. ", " .. base.tostring(var) .. ": creating surrogate ..")
+
+    local cache_name = "__arraysurrogate_" .. var._name
+    if not self[cache_name] then
+        self[cache_name] = var.surrogate_class(self, var)
+    end
+
+    return self[cache_name]
+end
+
+function state_array:setter(var, val)
+    log.log(log.INFO, "state_array setter: " .. json.encode(val))
+    if val.x then
+        log.log(log.INFO, "state_array setter: " .. base.tostring(val.x) .. ", " .. base.tostring(val.y) .. ", " .. base.tostring(val.z))
+    end
+    if val[1] then
+        log.log(log.INFO, "state_array setter: " .. base.tostring(val[1]) .. ", " .. base.tostring(val[2]) .. ", " .. base.tostring(val[3]))
+    end
+
+    local data
+
+    if val.as_array then data = val:as_array()
+    else
+        data = {}
+        local i
+
+        local sz = (val.is_a and val:is_a(array_surrogate)) and val.length or #val
+
+        for i = 1, sz do
+            data[i] = val[i]
+        end
+    end
+
+    self:set_statedata(var._name, data, nil)
+end
+
+state_array.to_wire_item = conv.tostring
+
+function state_array:to_wire(v)
+    log.log(log.INFO, "to_wire of state_array: " .. json.encode(v))
+    if v.as_array then
+        -- array surrogate
+        v = v:as_array()
+    end
+
+    return "[" .. table.concat(table.map(v, self.to_wire_item), self.separator) .. "]"
+end
+
+state_array.from_wire_item = conv.tostring
+
+function state_array:from_wire(v)
+    log.log(log.DEBUG, "from_wire of state_array: " .. base.tostring(self._name) .. "::" .. base.tostring(v))
+    if v == "[]" then
+        return {}
+    else
+        return table.map(string.split(string.sub(v, 2, #v - 1), self.separator), self.from_wire_item)
+    end
+end
+
+state_array.to_data_item = conv.tostring
+
+function state_array:to_data(v)
+    log.log(log.INFO, "(1) to_data of state_array: " .. base.tostring(v) .. ", " .. base.type(v) .. ", " .. json.encode(v))
+    if v.as_array then
+        log.log(log.INFO, "(1.5) to_data of state_array: using as_array ..")
+        v = v:as_array()
+    end
+
+    log.log(log.INFO, "(2) to_data of state_array: " .. base.tostring(v) .. ", " .. base.type(v) .. ", " .. json.encode(v))
+
+    return "[" .. table.concat(table.map(v, self.to_data_item), self.separator) .. "]"
+end
+
+state_array.from_data_item = conv.tostring
+
+function state_array:from_data(v)
+    log.log(log.DEBUG, "from_data of state_array: " .. base.tostring(self._name) .. "::" .. base.tostring(v))
+    if v == "[]" then
+        return {}
+    else
+        return table.map(string.split(string.sub(v, 2, #v - 1), self.separator), self.from_data_item)
+    end
+end
+
+function state_array:get_raw(ent)
+    log.log(log.INFO, "get_raw: " .. base.tostring(self))
+    log.log(log.INFO, json.encode(ent.state_var_vals))
+    local val = entity.state_var_vals[self._name]
+    return val and val or {}
+end
+
+function state_array:set_item(ent, i, v)
+    log.log(log.INFO, "set_item: " .. base.tostring(i) .. " : " .. json.encode(v))
+    local arr = self:get_raw(ent)
+    log.log(log.INFO, "got_raw: " .. json.encode(arr))
+    if base.type(v) == "string" then
+        base.assert(not string.find(v, "%" .. self.separator))
+    end
+    arr[i] = v
+    ent:set_statedata(self._name, arr, nil)
+end
+
+function state_array:get_item(ent, i)
+    log.log(log.INFO, "state_array:get_item for " .. base.tostring(i))
+    local arr = self:get_raw(ent)
+    log.log(log.INFO, "state_array:get_item " .. json.encode(arr) .. " ==> " .. base.tostring(arr[i]))
+    return arr[i] -- TODO: optimize
+end
+
+function state_array:get_length(ent)
+    local arr = self:get_raw(ent)
+    if not arr then
+        base.assert(false)
+    end
+    return #arr
+end
+
+state_array_string = class.new(state_array)
+function state_array_string:__tostring() return "state_array_string" end
+
+state_array_string_comma = class.new(state_array_string)
+function state_array_string_comma:__tostring() return "state_array_string_comma" end
+state_array_string_comma.separator = ","
+
+state_array_float = class.new(state_array)
+function state_array_float:__tostring() return "state_array_float" end
+state_array_float.to_wire_item = conv.todec2str
+state_array_float.from_wire_item = conv.tonumber
+state_array_float.to_data_item = conv.todec2str
+state_array_float.from_data_item = conv.tonumber
+
+state_array_integer = class.new(state_array)
+function state_array_integer:__tostring() return "state_array_integer" end
+state_array_integer.to_wire_item = conv.todec2str
+state_array_integer.from_wire_item = conv.tointeger
+state_array_integer.to_data_item = conv.todec2str
+state_array_integer.from_data_item = conv.tointeger
+
+variable_alias = class.new(variable)
+function variable_alias:__tostring() return "variable_alias" end
+
+function variable_alias:__init(tn)
+    self.targetname = tn
+end
+
+function variable_alias:_register(_name, parent)
+    self._name = _name
+
+    parent[_name] = nil
+    local tg = parent[_SV_PREFIX .. self.targetname]
+    parent[_SV_PREFIX .. _name] = tg -- point to the true variable
+
+    parent:define_getter(_name, tg.getter, tg)
+    parent:define_setter(_name, tg.setter, tg)
+
+    base.assert(not self.altname)
+end
+
+-- not actual class. meant just for constructing other classes.
+wrapped_cvariable = {}
+function wrapped_cvariable:__init(kwargs)
+    log.log(log.INFO, "wrapped_cvariable:__init()")
+
+    self.cgetter_raw = kwargs.cgetter_raw
+    self.csetter_raw = kwargs.csetter_raw
+    kwargs.cgetter = nil
+    kwargs.csetter = nil
+
+    self.__base.__init(self, kwargs)
+end
+
+function wrapped_cvariable:_register(_name, parent)
+    self.__base._register(self, _name, parent)
+
+    -- allow use of string names, for late binding at this stagem we copy raw walues, then eval
+    self.cgetter = self.cgetter_raw
+    self.csetter = self.csetter_raw
+
+    if base.type(self.cgetter) == "string" then
+        self.cgetter = base.loadstring("return " .. self.cgetter)()
+    end
+    if base.type(self.csetter) == "string" then
+        self.csetter = base.loadstring("return " .. self.csetter)()
+    end
+
+    if self.csetter then
+        -- subscribe to modify event, so we always call csetter
+        local prefix = get_onmodify_prefix()
+        local variable = self
+        parent:connect(prefix .. _name, function (self, v)
+            if glob.CLIENT or parent:can_call_cfuncs() then
+                log.log(log.INFO, string.format("Calling csetter for %s, with %s (%s)", base.tostring(variable._name), base.tostring(v), base.type(v)))
+                -- we've been set up, apply the change
+                variable.csetter(parent, v)
+
+                -- caching reads from script into C++ (search for -- caching)
+                parent.state_var_vals[base.tostring(variable._name)] = v
+                parent.state_var_val_timestamps[base.tostring(variable._name)] = glob.curr_timestamp
+            else
+                -- not yet set up, queue change
+                parent:queue_statevar_change(base.tostring(variable._name), v)
+            end
+        end)
+    else
+        log.log(log.DEBUG, "No csetter for " .. base.tostring(_name) .. ": not connecting to signal.")
+    end
+end
+
+function wrapped_cvariable:getter(var)
+    var:read_tests(self)
+
+    -- caching
+    local cached_timestamp = self.state_var_val_timestamps[base.tostring(var._name)]
+    if cached_timestamp == glob.curr_timestamp then
+        return self.state_var_vals[base.tostring(var._name)]
+    end
+
+    log.log(log.INFO, "WCV getter " .. base.tostring(var._name))
+    if var.cgetter and (glob.CLIENT or self:can_call_cfuncs()) then
+        log.log(log.INFO, "WCV getter: call C")
+        local val = var.cgetter(self)
+
+        -- caching
+        if glob.CLIENT or self._queued_sv_changes_complete then
+            self.state_var_vals[base.tostring(var._name)] = val
+            self.state_var_val_timestamps[base.tostring(var._name)] = glob.curr_timestamp
+        end
+
+        return val
+    else
+        log.log(log.INFO, "WCV getter: fallback to state_data since " .. base.tostring(var.cgetter))
+        return var.__base.getter(self, var)
+    end
+end
+
+-- wrapped_c versions of state variables
+
+wrapped_cinteger = class.new(state_integer)
+function wrapped_cinteger:__tostring() return "wrapped_cinteger" end
+wrapped_cinteger.__init    = wrapped_cvariable.__init
+wrapped_cinteger._register = wrapped_cvariable._register
+wrapped_cinteger.getter    = wrapped_cvariable.getter
+
+wrapped_cfloat = class.new(state_float)
+function wrapped_cfloat:__tostring() return "wrapped_cfloat" end
+wrapped_cfloat.__init    = wrapped_cvariable.__init
+wrapped_cfloat._register = wrapped_cvariable._register
+wrapped_cfloat.getter    = wrapped_cvariable.getter
+
+wrapped_cenum = class.new(state_enum)
+function wrapped_cenum:__tostring() return "wrapped_cenum" end
+wrapped_cenum.__init    = wrapped_cvariable.__init
+wrapped_cenum._register = wrapped_cvariable._register
+wrapped_cenum.getter    = wrapped_cvariable.getter
+
+wrapped_cbool = class.new(state_bool)
+function wrapped_cbool:__tostring() return "wrapped_cbool" end
+wrapped_cbool.__init    = wrapped_cvariable.__init
+wrapped_cbool._register = wrapped_cvariable._register
+wrapped_cbool.getter    = wrapped_cvariable.getter
+
+wrapped_cstring = class.new(state_string)
+function wrapped_cstring:__tostring() return "wrapped_cstring" end
+wrapped_cstring.__init    = wrapped_cvariable.__init
+wrapped_cstring._register = wrapped_cvariable._register
+wrapped_cstring.getter    = wrapped_cvariable.getter
+
+-- wrapped vectors
+
+wrapped_carray = class.new(state_array)
+function wrapped_carray:__tostring() return "wrapped_carray" end
+wrapped_carray.__init    = wrapped_cvariable.__init
+wrapped_carray._register = wrapped_cvariable._register
+
+function wrapped_carray:get_raw(ent)
+    log.log(log.INFO, "WCA:get_raw " .. base.tostring(self._name) .. base.tostring(self.cgetter))
+    if self.cgetter and (glob.CLIENT or self:can_call_cfuncs()) then
+        -- caching
+        local cached_timestamp = ent.state_var_val_timestamps[base.tostring(self._name)]
+        if cached_timestamp == glob.curr_timestamp then
+            return ent.state_var_vals[base.tostring(self._name)]
+        end
+
+        log.log(log.INFO, "WCA:get_raw: call C")
+        -- caching
+        local val = self.cgetter(ent)
+        if glob.CLIENT or ent._queued_sv_changes_complete then
+            ent.state_var_vals[base.tostring(self._name)] = val
+            ent.state_var_val_timestamps[base.tostring(self._name)] = glob.curr_timestamp
+        end
+        return val
+    else
+        log.log(log.INFO, "WCA:get_raw: fallback to state_data")
+        local r = ent.state_var_vals[base.tostring(self._name)]
+        log.log(log.INFO, "WCA:get_raw .." .. base.tostring(r))
+        return r
+    end
+end
+
+vec3_surrogate = class.new(array_surrogate)
+function vec3_surrogate:__tostring() return "vec3_surrogate" end
+
+function vec3_surrogate:__init(ent, var)
+    self.__base.__init(self, ent, var)
+
+    self.entity = ent
+    self.variable = var
+end
+
+function vec3_surrogate:push(v)
+    base.assert(false)
+end
+
+function vec3_surrogate:__user_get(n)
+    if n == "length" then
+        return 3
+    elseif n == "x" then
+        return self.variable:get_item(self.entity, 1)
+    elseif n == "y" then
+        return self.variable:get_item(self.entity, 2)
+    elseif n == "z" then
+        return self.variable:get_item(self.entity, 3)
+    end
+    return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
+end
+
+function vec3_surrogate:__user_set(n, v)
+    if base.tonumber(n) then
+        self.variable:set_item(self.entity, base.tonumber(n), v)
+    else
+        if n == "x" then
+            self.variable:set_item(self.entity, 1, v)
+        elseif n == "y" then
+            self.variable:set_item(self.entity, 2, v)
+        elseif n == "z" then
+            self.variable:set_item(self.entity, 3, v)
+        else
+            base.rawset(self, n, v)
+        end
+    end
+end
+
+vec3_surrogate.magnitude = vector.vec3.magnitude
+vec3_surrogate.normalize = vector.vec3.normalize
+vec3_surrogate.cap = vector.vec3.cap
+vec3_surrogate.subnew = vector.vec3.subnew
+vec3_surrogate.addnew = vector.vec3.addnew
+vec3_surrogate.mulnew = vector.vec3.mulnew
+vec3_surrogate.sub = vector.vec3.sub
+vec3_surrogate.add = vector.vec3.add
+vec3_surrogate.mul = vector.vec3.mul
+vec3_surrogate.copy = vector.vec3.copy
+vec3_surrogate.getarr = vector.vec3.getarr
+vec3_surrogate.fromyawpitch = vector.vec3.fromyawpitch
+vec3_surrogate.toyawpitch = vector.vec3.toyawpitch
+vec3_surrogate.iscloseto = vector.vec3.iscloseto
+vec3_surrogate.dotproduct = vector.vec3.dotproduct
+
+
+wrapped_cvec3 = class.new(wrapped_carray)
+function wrapped_cvec3:__tostring() return "wrapped_cvec3" end
+
+wrapped_cvec3.surrogate_class = vec3_surrogate
+function wrapped_cvec3:empty_value() return { 0, 0, 0 } end
+
+wrapped_cvec3.from_wire_item = conv.tonumber
+wrapped_cvec3.to_wire_item = conv.todec2str
+wrapped_cvec3.from_data_item = conv.tonumber
+wrapped_cvec3.to_data_item = conv.todec2str
+
+state_vec3 = class.new(state_array)
+function state_vec3:__tostring() return "state_vec3" end
+
+state_vec3.surrogate_class = vec3_surrogate
+function state_vec3:empty_value() return { 0, 0, 0 } end
+
+state_vec3.from_wire_item = conv.tonumber
+state_vec3.to_wire_item = conv.todec2str
+state_vec3.from_data_item = conv.tonumber
+state_vec3.to_data_item = conv.todec2str
+
+
+vec4_surrogate = class.new(array_surrogate)
+function vec4_surrogate:__tostring() return "vec4_surrogate" end
+
+function vec4_surrogate:__init(ent, var)
+    self.__base.__init(self, ent, var)
+
+    self.entity = ent
+    self.variable = var
+end
+
+function vec4_surrogate:push(v)
+    base.assert(false)
+end
+
+function vec4_surrogate:__user_get(n)
+    if n == "length" then
+        return 4
+    elseif n == "x" then
+        return self.variable:get_item(self.entity, 1)
+    elseif n == "y" then
+        return self.variable:get_item(self.entity, 2)
+    elseif n == "z" then
+        return self.variable:get_item(self.entity, 3)
+    elseif n == "w" then
+        return self.variable:get_item(self.entity, 4)
+    end
+    return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
+end
+
+function vec4_surrogate:__user_set(n, v)
+    if base.tonumber(n) then
+        self.variable:set_item(self.entity, base.tonumber(n), v)
+    else
+        if n == "x" then
+            self.variable:set_item(self.entity, 1, v)
+        elseif n == "y" then
+            self.variable:set_item(self.entity, 2, v)
+        elseif n == "z" then
+            self.variable:set_item(self.entity, 3, v)
+        elseif n == "w" then
+            self.variable:set_item(self.entity, 4, v)
+        else
+            base.rawset(self, n, v)
+        end
+    end
+end
+
+vec4_surrogate.magnitude = vector.vec4.magnitude
+vec4_surrogate.subnew = vector.vec4.subnew
+vec4_surrogate.addnew = vector.vec4.addnew
+vec4_surrogate.mulnew = vector.vec4.mulnew
+vec4_surrogate.sub = vector.vec4.sub
+vec4_surrogate.add = vector.vec4.add
+vec4_surrogate.mul = vector.vec4.mul
+vec4_surrogate.copy = vector.vec4.copy
+vec4_surrogate.getarr = vector.vec4.getarr
+vec4_surrogate.quatfromaxiangle = vector.vec4.quatfromaxiangle
+vec4_surrogate.toyawpitchroll = vector.vec4.toyawpitchroll
+vec4_surrogate.normalize = vector.vec4.normalize
+vec4_surrogate.cap = vector.vec4.cap
+vec4_surrogate.fromyawpitch = vector.vec4.fromyawpitch
+vec4_surrogate.toyawpitch = vector.vec4.toyawpitch
+vec4_surrogate.iscloseto = vector.vec4.iscloseto
+vec4_surrogate.dotproduct = vector.vec4.dotproduct
+
+wrapped_cvec4 = class.new(wrapped_carray)
+function wrapped_cvec4:__tostring() return "wrapped_cvec4" end
+
+wrapped_cvec4.surrogate_class = vec4_surrogate
+function wrapped_cvec4:empty_value() return { 0, 0, 0, 0 } end
+
+wrapped_cvec4.from_wire_item = conv.tonumber
+wrapped_cvec4.to_wire_item = conv.todec2str
+wrapped_cvec4.from_data_item = conv.tonumber
+wrapped_cvec4.to_data_item = conv.todec2str
+
+state_vec4 = class.new(state_array)
+function state_vec4:__tostring() return "state_vec4" end
+
+state_vec4.surrogate_class = vec4_surrogate
+function state_vec4:empty_value() return { 0, 0, 0, 0 } end
+
+state_vec4.from_wire_item = conv.tonumber
+state_vec4.to_wire_item = conv.todec2str
+state_vec4.from_data_item = conv.tonumber
+state_vec4.to_data_item = conv.todec2str
+
+-- no surrogate, won't notice changes to internals
+state_json = class.new(state_variable)
+function state_json:__tostring() return "state_json" end
+state_json.to_wire = json.encode
+state_json.from_wire = json.decode
+state_json.to_data = json.encode
+state_json.from_data = json.decode
+
+json.register("logent", function(v) return (v.uid ~= nil) end, function(v) return v.uid end)

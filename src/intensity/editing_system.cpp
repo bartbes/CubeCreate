@@ -67,11 +67,11 @@ void prepareentityclasses()
 {
     entityClasses.clear();
 
-    lua::engine.getg("listEntityClasses").call(0, 1);
+    lua::engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("list").call(0, 1);
     LUA_TABLE_FOREACH(lua::engine, {
-        entityClasses.push_back(std::string(lua::engine.get<const char*>(-1)));
+        entityClasses.push_back(lua::engine.get<const char*>(-1));
     });
-    lua::engine.pop(1);
+    lua::engine.pop(4);
 }
 
 bool validateEntityClass(std::string _class)

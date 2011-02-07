@@ -25,7 +25,7 @@ void CameraControl::incrementCameraDist(int inc_dir)
 
     SETV(cam_dist, GETIV(cam_dist) + (inc_dir * GETIV(cameraMoveDist)));
 
-    if (engine.hashandle()) engine.getg("Global").t_set("cameraDistance", GETIV(cam_dist)).pop(1);
+    if (engine.hashandle()) engine.getg("cc").t_getraw("global").t_set("cam_dist", GETIV(cam_dist)).pop(2);
 }
 
 int saved_cam_dist; // Saved from before characterviewing, restored right after
@@ -152,7 +152,7 @@ void CameraControl::positionCamera(physent* camera1)
     if (engine.hashandle() && lastCameraHeight != GETFV(cameraheight))
     {
         lastCameraHeight = GETFV(cameraheight);
-        engine.getg("Global").t_set("cameraHeight", GETFV(cameraheight)).pop(1);
+        engine.getg("cc").t_getraw("global").t_set("cameraheight", GETFV(cameraheight)).pop(2);
     }
 
     // If we just left forced camera mode, restore thirdperson state
@@ -324,7 +324,7 @@ void PlayerControl::handleExtraPlayerMovements(int millis)
     fpsent* fpsPlayer = dynamic_cast<fpsent*>(player);
 
     engine.getref(ClientSystem::playerLogicEntity.get()->luaRef);
-    float _facingSpeed = engine.t_get<double>("facingSpeed");
+    float _facingSpeed = engine.t_get<double>("facing_speed");
 
     if (fpsPlayer->turn_move || fabs(x - 0.5) > 0.45)
         mover->yaw += _facingSpeed * (
@@ -357,7 +357,7 @@ bool PlayerControl::handleClick(int button, bool up)
 void PlayerControl::flushActions()
 {
     engine.getref(ClientSystem::playerLogicEntity.get()->luaRef);
-    engine.t_getraw("actionSystem");
+    engine.t_getraw("action_system");
     engine.t_getraw("clear").push_index(-2).call(1, 0).pop(2);
 }
 

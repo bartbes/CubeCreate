@@ -810,7 +810,7 @@ void mousemove(int dx, int dy)
     using namespace lua;
     if (engine.hashandle())
     {
-        engine.getg("ApplicationManager").t_getraw("instance").t_getraw("performMousemove");
+        engine.getg("cc").t_getraw("appman").t_getraw("inst").t_getraw("do_mousemove");
         engine.push_index(-2).push(dx * cursens).push(-dy * cursens * (GETIV(invmouse) ? -1 : 1)).call(3, 1);
 
         engine.t_getraw("yaw");
@@ -827,7 +827,7 @@ void mousemove(int dx, int dy)
                 player->pitch = camera1->pitch;
             }
         }
-        engine.pop(4);
+        engine.pop(5);
     }
 }
 
@@ -2013,10 +2013,10 @@ void drawcrosshair(int w, int h)
         using namespace lua;
         if (engine.hashandle())
         {
-            engine.getg("ApplicationManager").t_getraw("instance").t_getraw("getCrosshair");
+            engine.getg("cc").t_getraw("appman").t_getraw("inst").t_getraw("get_crosshair");
             engine.push_index(-2).call(1, 1);
             crosshairName = engine.get(-1, "data/textures/hud/crosshair.png");
-            engine.pop(3);
+            engine.pop(4);
         }
         crosshair = textureload(crosshairName.c_str(), 3, true, false);
         if (crosshair == notexture) return;

@@ -249,10 +249,10 @@ namespace game
 #if (SERVER_DRIVEN_PLAYERS == 1)
             // Enable this to let server drive client movement
             engine.exec(
-                "getEntity(" + Utility::toString(d->uniqueId) + ").position = {" +
-                "getEntity(" + Utility::toString(d->uniqueId) + ").position.x," +
-                "getEntity(" + Utility::toString(d->uniqueId) + ").position.y," +
-                "getEntity(" + Utility::toString(d->uniqueId) + ").position.z}"
+                "cc.logent.store.get(" + Utility::toString(d->uniqueId) + ").position = {" +
+                "cc.logent.store.get(" + Utility::toString(d->uniqueId) + ").position.x," +
+                "cc.logent.store.get(" + Utility::toString(d->uniqueId) + ").position.y," +
+                "cc.logent.store.get(" + Utility::toString(d->uniqueId) + ").position.z}"
             );
 #endif
         }
@@ -371,7 +371,10 @@ namespace game
 
                 // If triggering collisions can be done by the lua library code, use that
 
-                engine.getg("manageTriggeringCollisions");
+                engine.getg("cc")
+                      .t_getraw("logent")
+                      .t_getraw("store")
+                      .t_getraw("manage_triggering_collisions");
                 if (!engine.is<void>(-1)) engine.call(0, 0);
                 else
                 {
@@ -388,6 +391,7 @@ namespace game
                         }
                     }
                 }
+                engine.pop(3);
             }
 
         physicsBenchmarker.stop();
@@ -401,7 +405,11 @@ namespace game
         actionsBenchmarker.start();
             if (runWorld)
             {
-                engine.getg("startFrame").call(0, 0);
+                engine.getg("cc")
+                      .t_getraw("logent")
+                      .t_getraw("store")
+                      .t_getraw("start_frame")
+                      .call(0, 0).pop(3);
                 LogicSystem::manageActions(curtime);
             }
         actionsBenchmarker.stop();
@@ -615,10 +623,13 @@ namespace game
 
     std::string scriptname(fpsent *d)
     {
-        engine.getg("getEntity").push(LogicSystem::getUniqueId(d)).call(1, 1);
+        engine.getg("cc")
+              .t_getraw("logent")
+              .t_getraw("get")
+              .push(LogicSystem::getUniqueId(d)).call(1, 1);
         // got class here
         std::string ret(engine.t_get<const char*>("_name"));
-        engine.pop(1);
+        engine.pop(3);
         return ret;
     }
 

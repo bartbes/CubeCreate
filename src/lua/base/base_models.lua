@@ -26,6 +26,8 @@
 -- THE SOFTWARE.
 --
 
+local base = _G
+local string = require("string")
 local CAPI = require("CAPI")
 
 --- Model control for cC's Lua interface.
@@ -57,6 +59,13 @@ reload = CAPI.reloadmodel
 -- @class function
 -- @name render
 render = CAPI.rendermodel
+
+---
+function attachment(t, n)
+    base.assert(not string.find(t, ","))
+    base.assert(not string.find(n, ","))
+    return t .. "," .. n
+end
 
 --- This table contains various generic
 -- methods relating a single model.

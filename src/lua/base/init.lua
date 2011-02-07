@@ -48,14 +48,14 @@ require("base.base_evars")
 -- @field __newindex Called when a value is set.
 setmetatable(_G, {
     __index = function(self, n)
-        return (cc.engine_variables.instance.stor[n] and
-            cc.engine_variables.instance[n] or
+        return (cc.engine_variables.inst.stor[n] and
+            cc.engine_variables.inst[n] or
             rawget(self, n)
         )
     end,
     __newindex = function(self, n, v)
-        if cc.engine_variables.instance.stor[n] then
-            cc.engine_variables.instance[n] = v
+        if cc.engine_variables.inst.stor[n] then
+            cc.engine_variables.inst[n] = v
         else
             rawset(self, n, v)
         end
@@ -83,6 +83,9 @@ require("base.base_models")
 cc.logging.log(cc.logging.DEBUG, ":: Texture blending.")
 require("base.base_blend")
 
+cc.logging.log(cc.logging.DEBUG, ":: Logic entities.")
+require("base.base_logent")
+
 cc.logging.log(cc.logging.DEBUG, ":: Message system.")
 require("base.base_msgsys")
 
@@ -94,3 +97,6 @@ require("base.base_sound")
 
 cc.logging.log(cc.logging.DEBUG, ":: Action system.")
 require("base.base_actions")
+
+cc.logging.log(cc.logging.DEBUG, ":: State variables.")
+require("base.base_svars")

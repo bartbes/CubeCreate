@@ -176,7 +176,7 @@ bool Utility::config_exec_json(const char *cfgfile, bool msg)
                 JSONObject als = root[L"aliases"]->AsObject();
                 for (JSONObject::const_iterator aiter = als.begin(); aiter != als.end(); ++aiter)
                 {
-                    defformatstring(aliasc)("EV.%s = \"%s\"", fromwstring(aiter->first).c_str(), fromwstring(aiter->second->AsString()).c_str());
+                    defformatstring(aliasc)("%s = \"%s\"", fromwstring(aiter->first).c_str(), fromwstring(aiter->second->AsString()).c_str());
                     lua::engine.exec(aliasc);
                 }
             }

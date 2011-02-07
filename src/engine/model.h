@@ -107,8 +107,8 @@ struct model
                         // Sauer C++ variables that are managed in C++. Here, the *true* values are in lua
         {
             lua::engine.getref(entity->luaRef);
-            width = lua::engine.t_get<double>("collisionRadiusWidth");
-            height = lua::engine.t_get<double>("collisionRadiusHeight");
+            width = lua::engine.t_get<double>("collision_radius_width");
+            height = lua::engine.t_get<double>("collision_radius_height");
             lua::engine.pop(1);
         }
 

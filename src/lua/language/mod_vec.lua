@@ -52,23 +52,13 @@ function vec3:__tostring()
                          tostring(self.z))
 end
 
---- Index access / set conditional.
--- @return true if the index is good, false otherwise.
-function vec3:__indexcond(n)
-    return ((n == "x"
-          or n == "y"
-          or n == "z"
-          or n == "length") and true or false
-           )
-end
-
 --- vec3 constructor.
 -- @param x X value of vector.
 -- @param y Y value of vector.
 -- @param z Z value of vector.
 -- @return A vector of those values.
 function vec3:__init(x, y, z)
-    if base.type(x) == "table" and x:is_a(vec3) then
+    if base.type(x) == "table" and x.is_a and x:is_a(vec3) then
         self.x = base.tonumber(x.x)
         self.y = base.tonumber(x.y)
         self.z = base.tonumber(x.z)
@@ -262,17 +252,6 @@ function vec4:__tostring()
                          tostring(self.w))
 end
 
---- Index access / set conditional.
--- @return true if the index is good, false otherwise.
-function vec4:__indexcond(n)
-    return ((n == "x"
-          or n == "y"
-          or n == "z"
-          or n == "w"
-          or n == "length") and true or false
-           )
-end
-
 --- vec4 constructor.
 -- @param x X value of vector.
 -- @param y Y value of vector.
@@ -280,7 +259,7 @@ end
 -- @param w W value of vector.
 -- @return A vector of those values.
 function vec4:__init(x, y, z, w)
-    if base.type(x) == "table" and x:is_a(vec4) then
+    if base.type(x) == "table" and x.is_a and x:is_a(vec4) then
         self.x = base.tonumber(x.x)
         self.y = base.tonumber(x.y)
         self.z = base.tonumber(x.z)

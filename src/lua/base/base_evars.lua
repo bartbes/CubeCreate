@@ -36,9 +36,9 @@ local CAPI = require("CAPI")
 -- editing variables and many others. Besides Lua representation, there
 -- is also C++ representation. Lua is there just to minimize number
 -- of stack changes - values are sync only when needed.<br/><br/>
--- The "storage" is a class, which has an instance called "intstance".
--- From that you can get a variable (cc.engine_variables.instance.foo)
--- or set (cc.engine_variables.instance.foo = 5). VAR_I, VAR_F and VAR_S
+-- The "storage" is a class, which has an instance called "inst".
+-- From that you can get a variable (cc.engine_variables.inst.foo)
+-- or set (cc.engine_variables.inst.foo = 5). VAR_I, VAR_F and VAR_S
 -- are simple integers reflecting C++ enumeration. _VAR is the skeleton
 -- for variable, IVAR, FVAR and SVAR inherit it in proper way.
 -- To make things shorter, you don't have to get variables specifying
@@ -99,8 +99,8 @@ end
 
 --- The storage class instance for variables.
 -- @class table
--- @name instance
-instance = storage()
+-- @name inst
+inst = storage()
 
 -- Variable classes
 
@@ -247,6 +247,6 @@ function SVAR:check_bounds(v)
 end
 
 -- Some wrappers mainly for C++ to simplify registering.
-function ivar(name, ...) instance:reg(IVAR(name, ...)) end
-function fvar(name, ...) instance:reg(FVAR(name, ...)) end
-function svar(name, ...) instance:reg(SVAR(name, ...)) end
+function ivar(name, ...) inst:reg(IVAR(name, ...)) end
+function fvar(name, ...) inst:reg(FVAR(name, ...)) end
+function svar(name, ...) inst:reg(SVAR(name, ...)) end

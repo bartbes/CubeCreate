@@ -935,18 +935,18 @@ void entpaste()
         std::string _class = entity->getClass();
 
         using namespace lua;
-        engine.getref(entity->luaRef).t_getraw("createStateDataDict");
+        engine.getref(entity->luaRef).t_getraw("create_statedatadict");
         engine.push_index(-2).call(1, 1);
-        engine.push("__intensityentcopy__TEMP").shift();
+        engine.push("__ccentcopy__TEMP").shift();
         engine.setg().pop(1);
 
-        defformatstring(s)("__intensityentcopy__TEMP.position = '[%f|%f|%f]'", o.x, o.y, o.z);
+        defformatstring(s)("__ccentcopy__TEMP.position = '[%f|%f|%f]'", o.x, o.y, o.z);
         engine.exec(s);
 
-        engine.getg("encodeJSON");
-        engine.getg("__intensityentcopy__TEMP").call(1, 1);
+        engine.getg("cc").t_getraw("json").t_getraw("encode");
+        engine.getg("__ccentcopy__TEMP").call(1, 1);
         std::string stateData = engine.get(-1, "{}");
-        engine.pop(1);
+        engine.pop(3);
 
         EditingSystem::newEntity(_class, stateData);
         // INTENSITY: end Create entity using new system
@@ -1023,19 +1023,19 @@ void intensityentcopy() // INTENSITY
     intensityCopiedClass = entity->getClass();
 
     using namespace lua;
-    engine.getref(entity->luaRef).t_getraw("createStateDataDict");
+    engine.getref(entity->luaRef).t_getraw("create_statedatadict");
     engine.push_index(-2).call(1, 1);
-    engine.push("__intensityentcopy__TEMP").shift().setg();
+    engine.push("__ccentcopy__TEMP").shift().setg();
     engine.pop(1);
 
-    engine.exec("__intensityentcopy__TEMP.position = nil"); // Position is determined at paste time
+    engine.exec("__ccentcopy__TEMP.position = nil"); // Position is determined at paste time
 
-    engine.getg("encodeJSON");
-    engine.getg("__intensityentcopy__TEMP").call(1, 1);
+    engine.getg("cc").t_getraw("json").t_getraw("encode");
+    engine.getg("__ccentcopy__TEMP").call(1, 1);
     intensityCopiedStateData = engine.get(-1, "{}");
-    engine.pop(1);
+    engine.pop(3);
 
-    engine.exec("__intensityentcopy__TEMP = nil");
+    engine.exec("__ccentcopy__TEMP = nil");
 }
 
 void intensitypasteent() // INTENSITY

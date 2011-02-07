@@ -126,7 +126,7 @@ float CLogicEntity::getRadius()
 
 void CLogicEntity::setOrigin(vec &newOrigin)
 {
-    defformatstring(c)("getEntity(%i).position = {%f,%f,%f}", getUniqueId(), newOrigin.x, newOrigin.y, newOrigin.z);
+    defformatstring(c)("cc.logent.store.get(%i).position = {%f,%f,%f}", getUniqueId(), newOrigin.x, newOrigin.y, newOrigin.z);
     engine.exec(c);
 }
 
@@ -370,7 +370,7 @@ void LogicSystem::clear()
 
     if (engine.hashandle())
     {
-        //engine.getg("removeAllEntities").call(0, 0);
+        //engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("delall").call(0, 0).pop(3);
         //assert(logicEntities.size() == 0);
 
         // For client, remove player logic entity
@@ -401,8 +401,9 @@ void LogicSystem::registerLogicEntity(LogicEntityPtr newEntity)
     assert(logicEntities.find(uniqueId) == logicEntities.end());
     logicEntities.insert( LogicEntityMap::value_type( uniqueId, newEntity ) );
 
-    engine.getg("getEntity").push(uniqueId).call(1, 1);
+    engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("get").push(uniqueId).call(1, 1);
     newEntity.get()->luaRef = engine.ref();
+    engine.pop(3);
 
     assert(newEntity.get()->luaRef >= 0);
 
@@ -481,7 +482,12 @@ void LogicSystem::manageActions(long millis)
     INDENT_LOG(Logging::INFO);
 
     if (engine.hashandle())
-        engine.getg("manageActions").push(double(millis) / 1000.0f).push(lastmillis).call(2, 0);
+        engine.getg("cc")
+              .t_getraw("logent")
+              .t_getraw("store")
+              .t_getraw("actions_manage")
+              .push(double(millis) / 1000.0f)
+              .push(lastmillis).call(2, 0).pop(3);
 
     Logging::log(Logging::INFO, "manageActions complete\r\n");
 }
@@ -554,7 +560,7 @@ void LogicSystem::setUniqueId(physent* dynamicEntity, int uniqueId)
 void LogicSystem::setupExtent(int ref, int type, float x, float y, float z, int attr1, int attr2, int attr3, int attr4)
 {
     engine.getref(ref);
-    int uniqueId = engine.t_get("uniqueId", -1);
+    int uniqueId = engine.t_get("uid", -1);
     engine.pop(1);
 
     Logging::log(Logging::DEBUG, "setupExtent: %d,  %d : %f,%f,%f : %d,%d,%d,%d\r\n", uniqueId, type, x, y, z, attr1, attr2, attr3, attr4);
@@ -594,26 +600,26 @@ void LogicSystem::setupCharacter(int ref)
 //    #endif
 
     engine.getref(ref);
-    int uniqueId = engine.t_get("uniqueId", -1);
+    int uniqueId = engine.t_get("uid", -1);
 
     Logging::log(Logging::DEBUG, "setupCharacter: %d\r\n", uniqueId);
     INDENT_LOG(Logging::DEBUG);
 
     fpsent* fpsEntity;
 
-    int clientNumber = engine.t_get("clientNumber", -1);
-    Logging::log(Logging::DEBUG, "(a) clientNumber: %d\r\n", clientNumber);
+    int clientNumber = engine.t_get("cn", -1);
+    Logging::log(Logging::DEBUG, "(a) cn: %d\r\n", clientNumber);
 
     #ifdef CLIENT
         Logging::log(Logging::DEBUG, "client numbers: %d, %d\r\n", ClientSystem::playerNumber, clientNumber);
 
-        if (uniqueId == ClientSystem::uniqueId) engine.t_set("clientNumber", ClientSystem::playerNumber);
+        if (uniqueId == ClientSystem::uniqueId) engine.t_set("cn", ClientSystem::playerNumber);
     #endif
 
     // nothing else will happen with lua table got from ref, so let's pop it out
     engine.pop(1);
 
-    Logging::log(Logging::DEBUG, "(b) clientNumber: %d\r\n", clientNumber);
+    Logging::log(Logging::DEBUG, "(b) cn: %d\r\n", clientNumber);
 
     assert(clientNumber >= 0);
 
@@ -649,7 +655,7 @@ void LogicSystem::setupCharacter(int ref)
 void LogicSystem::setupNonSauer(int ref)
 {
     engine.getref(ref);
-    int uniqueId = engine.t_get("uniqueId", -1);
+    int uniqueId = engine.t_get("uid", -1);
     engine.pop(1);
 
     Logging::log(Logging::DEBUG, "setupNonSauer: %d\r\n", uniqueId);
@@ -661,7 +667,7 @@ void LogicSystem::setupNonSauer(int ref)
 void LogicSystem::dismantleExtent(int ref)
 {
     engine.getref(ref);
-    int uniqueId = engine.t_get("uniqueId", -1);
+    int uniqueId = engine.t_get("uid", -1);
     engine.pop(1);
 
     Logging::log(Logging::DEBUG, "Dismantle extent: %d\r\n", uniqueId);
@@ -680,7 +686,7 @@ void LogicSystem::dismantleExtent(int ref)
 void LogicSystem::dismantleCharacter(int ref)
 {
     engine.getref(ref);
-    int clientNumber = engine.t_get("clientNumber", -1);
+    int clientNumber = engine.t_get("cn", -1);
     engine.pop(1);
     #ifdef CLIENT
     if (clientNumber == ClientSystem::playerNumber)

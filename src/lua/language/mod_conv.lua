@@ -28,6 +28,7 @@
 
 local base = _G
 local math = require("math")
+local string = require("string")
 local vector = require("cc.vector")
 
 --- Type conversion module for CubeCreate. Contains several basic type conversion
@@ -55,6 +56,19 @@ end
 -- @return A number with integral value.
 function tointeger(v)
     return math.floor(base.tonumber(v))
+end
+
+--- Convert a floating point number to
+-- string representing the number with
+-- max two decimal positions. Returns "0"
+-- if the number is lower than 0.01.
+-- @param v Value to convert.
+-- @return A converted value.
+function todec2str(v)
+    if math.abs(v) < 0.01 then return "0" end
+    local r = base.tostring(v)
+    local p = string.find(r, "%.")
+    return not p and r or string.sub(r, 1, p + 2)
 end
 
 -- Convert types into number.

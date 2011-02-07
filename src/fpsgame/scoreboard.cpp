@@ -20,8 +20,8 @@ namespace game
             g.background(0x808080, 5);
 
             using namespace lua;
-            engine.getg("ApplicationManager").t_getraw("instance");
-            engine.t_getraw("getScoreboardText").push_index(-2).call(1, 1);
+            engine.getg("cc").t_getraw("appman").t_getraw("inst");
+            engine.t_getraw("get_sbtext").push_index(-2).call(1, 1);
             // we get a table here
             LUA_TABLE_FOREACH(engine, {
                 int lineUniqueId = engine.t_get<int>(1);
@@ -49,7 +49,7 @@ namespace game
                 }
                 g.text(lineText.c_str(), 0xFFFFDD, NULL);
             });
-            engine.pop(3);
+            engine.pop(4);
 
         g.poplist();
         g.poplist();

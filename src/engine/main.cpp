@@ -161,7 +161,7 @@ bool execinitcfg(const char *cfgfile, bool msg)
             root = value->AsObject();
             for (JSONObject::const_iterator iter = root.begin(); iter != root.end(); ++iter)
             {
-                defformatstring(cmd)("EV.%s = %i", fromwstring(iter->first).c_str(), (int)iter->second->AsNumber());
+                defformatstring(cmd)("%s = %i", fromwstring(iter->first).c_str(), (int)iter->second->AsNumber());
                 lua::engine.exec(cmd);
             }
         }
@@ -574,14 +574,14 @@ void setScreenScriptValues() // INTENSITY: New function
     using namespace lua;
     if (engine.hashandle())
     {
-        engine.getg("Global");
-        engine.t_set("aspectRatio", float(GETIV(scr_w))/float(GETIV(scr_h)));
-        engine.t_set("screenWidth", GETIV(scr_w));
-        engine.t_set("screenHeight", GETIV(scr_h));
-        engine.t_set("fontHeight", FONTH);
-        engine.t_set("cameraDistance", GETIV(cam_dist));
-        engine.t_set("cameraHeight", GETFV(cameraheight));
-        engine.pop(1);
+        engine.getg("cc").t_getraw("global");
+        engine.t_set("aspect_ratio", float(GETIV(scr_w))/float(GETIV(scr_h)));
+        engine.t_set("scr_w", GETIV(scr_w));
+        engine.t_set("scr_h", GETIV(scr_h));
+        engine.t_set("fonth", FONTH);
+        engine.t_set("cam_dist", GETIV(cam_dist));
+        engine.t_set("cameraheight", GETFV(cameraheight));
+        engine.pop(2);
     }
 }
 

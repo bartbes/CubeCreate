@@ -27,6 +27,7 @@
 --
 
 local base = _G
+local string = require("string")
 
 --- Class library for Lua. Allows instances, parent calling and simple inheritance.
 -- Multiple inheritance isn't and won't be supported. Code using multiple inheritance
@@ -74,6 +75,11 @@ function new(b)
     -- called when new index gets created in table
     function c:__newindex(n, v)
         if not self:__indexcond(n) then return nil end
+
+        if self.__user_set then
+            return self.__user_set(self, n, v)
+        end
+
         if self.__setters[n] then
             if self.__setselfs[n] then
                 self.__setters[n](self, self.__setselfs[n], v)
@@ -99,6 +105,11 @@ function new(b)
     function mt:__index(n)
         if not self:__indexcond(n) then return nil end
 
+        -- allow for user methods only, no metamethods or internals
+        if string.sub(n, 1, 2) ~= "__" and self.__user_get then
+            return self.__user_get(self, n)
+        end
+
         if self.__getters[n] then
             if self.__getselfs[n] then
                 return self.__getters[n](self, self.__getselfs[n])
@@ -106,8 +117,8 @@ function new(b)
                 return self.__getters[n](self)
             end
         else
-        return self.__base[n]
-    end
+            return self.__base[n]
+        end
     end
 
     -- returns true if table is instance of class c
