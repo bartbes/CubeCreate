@@ -1076,7 +1076,7 @@ namespace MessageSystem
                 // Note in C++
                 ClientSystem::playerLogicEntity = LogicSystem::getLogicEntity(ClientSystem::uniqueId);
                 // Note in lua
-                engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("setplayeruid").push(ClientSystem::uniqueId).call(1, 0).pop(3);
+                engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("set_player_uid").push(ClientSystem::uniqueId).call(1, 0).pop(3);
             }
         #endif
         // Events post-reception

@@ -1,6 +1,6 @@
 ---
--- base_logent.lua, version 1<br/>
--- Logic entity system for Lua<br/>
+-- base_logent_classes.lua, version 1<br/>
+-- Logic entity classes management for Lua<br/>
 -- <br/>
 -- @author q66 (quaker66@gmail.com)<br/>
 -- license: MIT/X11<br/>
@@ -26,7 +26,7 @@
 -- THE SOFTWARE.
 --
 
---- This module takes care of logic entities.
+--- This module takes care of logic entity classes.
 -- @class module
--- @name cc.logent
-module("cc.logent")
+-- @name cc.logent.classes
+module("cc.logent.classes")

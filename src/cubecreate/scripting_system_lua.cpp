@@ -308,7 +308,7 @@ namespace lua
         int id = 0;
 
         push_index(i);
-        id = t_get<int>("uniqueId");
+        id = t_get<int>("uid");
         pop(1);
 
         ret = LogicSystem::getLogicEntity(id);
