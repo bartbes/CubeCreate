@@ -53,7 +53,7 @@ namespace lua_binds
         TargetingControl::determineMouseTarget(true); \
         vec pos = TargetingControl::targetPosition; \
         \
-        e.getg("ApplicationManager").t_getraw("instance").t_getraw("performClick"); \
+        engine.getg("cc").t_getraw("appman").t_getraw("inst").t_getraw("do_click"); \
         e.push_index(-2).push(num).push(down).push(pos); \
         if (TargetingControl::targetLogicEntity.get() && !TargetingControl::targetLogicEntity->isNone()) \
             e.getref(TargetingControl::targetLogicEntity->luaRef); \
@@ -61,7 +61,7 @@ namespace lua_binds
         float x; \
         float y; \
         g3d_cursorpos(x, y); \
-        e.push(x).push(y).call(7, 0).pop(2); \
+        e.push(x).push(y).call(7, 0).pop(3); \
     })
     MOUSECLICK(1)
     MOUSECLICK(2)
@@ -73,13 +73,13 @@ namespace lua_binds
     LUA_BIND_CLIENT(actionkey##num, { \
         if (e.hashandle()) \
         { \
-            e.getg("ApplicationManager").t_getraw("instance"); \
-            e.t_getraw("actionKey") \
+            engine.getg("cc").t_getraw("appman").t_getraw("inst"); \
+            e.t_getraw("action_key") \
                 .push_index(-2) \
                 .push(num) \
                 .push(addreleaseaction(QUOT(actionkey##num)) != 0) \
                 .call(3, 0); \
-                e.pop(2); \
+                e.pop(3); \
         } \
     })
 
@@ -138,31 +138,31 @@ namespace lua_binds
         { \
             PlayerControl::flushActions(); /* stop current actions */ \
             s = addreleaseaction(#name)!=0; \
-            e.getg("ApplicationManager").t_getraw("instance"); \
+            engine.getg("cc").t_getraw("appman").t_getraw("inst"); \
             e.t_getraw(#v).push_index(-2).push(s ? d : (os ? -(d) : 0)).push(s).call(3, 0); \
-            e.pop(2); \
+            e.pop(3); \
         } \
     })
 
-    //SCRIPT_DIR(turn_left,  performYaw, -1, k_turn_left,  k_turn_right); // New turning motion
-    //SCRIPT_DIR(turn_right, performYaw, +1, k_turn_right, k_turn_left);  // New pitching motion
+    //SCRIPT_DIR(turn_left,  do_yaw, -1, k_turn_left,  k_turn_right); // New turning motion
+    //SCRIPT_DIR(turn_right, do_yaw, +1, k_turn_right, k_turn_left);  // New pitching motion
     // TODO: Enable these. But they do change the protocol (see Character.lua), so forces everyone and everything to upgrade
-    //SCRIPT_DIR(look_down, performPitch, -1, k_look_down, k_look_up);
-    //SCRIPT_DIR(look_up,   performPitch, +1, k_look_up,   k_look_down);
+    //SCRIPT_DIR(look_down, do_pitch, -1, k_look_down, k_look_up);
+    //SCRIPT_DIR(look_up,   do_pitch, +1, k_look_up,   k_look_down);
 
     // Old player movements
-    SCRIPT_DIR(backward, performMovement, -1, player->k_down,  player->k_up);
-    SCRIPT_DIR(forward,  performMovement,  1, player->k_up,    player->k_down);
-    SCRIPT_DIR(left,     performStrafe,    1, player->k_left,  player->k_right);
-    SCRIPT_DIR(right,    performStrafe,   -1, player->k_right, player->k_left);
+    SCRIPT_DIR(backward, do_movement, -1, player->k_down,  player->k_up);
+    SCRIPT_DIR(forward,  do_movement,  1, player->k_up,    player->k_down);
+    SCRIPT_DIR(left,     do_strafe,    1, player->k_left,  player->k_right);
+    SCRIPT_DIR(right,    do_strafe,   -1, player->k_right, player->k_left);
 
     LUA_BIND_CLIENT(jump, {
         if (ClientSystem::scenarioStarted())
         {
             PlayerControl::flushActions(); /* stop current actions */
-            e.getg("ApplicationManager").t_getraw("instance");
-            e.t_getraw("performJump").push_index(-2).push(addreleaseaction("jump") ? true : false).call(2, 0);
-            e.pop(2);
+            engine.getg("cc").t_getraw("appman").t_getraw("inst");
+            e.t_getraw("do_jump").push_index(-2).push(addreleaseaction("jump") ? true : false).call(2, 0);
+            e.pop(3);
         }
     })
 

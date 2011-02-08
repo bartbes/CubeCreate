@@ -519,7 +519,7 @@ namespace MessageSystem
         // Add entity
         Logging::log(Logging::DEBUG, "Creating new entity, %s   %f,%f,%f   %s\r\n", _class.c_str(), x, y, z, stateData.c_str());
         if ( !server::isRunningCurrentScenario(sender) ) return; // Silently ignore info from previous scenario
-        engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("getEntitySauerType").push(_class.c_str()).call(1, 1);
+        engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("get_sauertype").push(_class.c_str()).call(1, 1);
         std::string sauerType = engine.get(-1, "extent");
         engine.pop(4);
         Logging::log(Logging::DEBUG, "Sauer type: %s\r\n", sauerType.c_str());
@@ -946,7 +946,7 @@ namespace MessageSystem
             send_LogicEntityCompleteNotification( sender,
                                                   sender,
                                                   9999, // TODO: this same constant appears in multiple places
-                                                  "Player",
+                                                  "player",
                                                   "{}" );
             MessageSystem::send_AllActiveEntitiesSent(sender);
         #endif

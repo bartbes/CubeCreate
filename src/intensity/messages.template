@@ -211,7 +211,7 @@ NewEntityRequest(client->server)
 
         if ( !server::isRunningCurrentScenario(sender) ) return; // Silently ignore info from previous scenario
 
-        engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("getEntitySauerType").push(_class.c_str()).call(1, 1);
+        engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("get_sauertype").push(_class.c_str()).call(1, 1);
         std::string sauerType = engine.get(-1, "extent");
         engine.pop(4);
 
@@ -389,7 +389,7 @@ ActiveEntitiesRequest(client->server)
             send_LogicEntityCompleteNotification( sender,
                                                   sender,
                                                   9999, // TODO: this same constant appears in multiple places
-                                                  "Player",
+                                                  "player",
                                                   "{}" );
 
             MessageSystem::send_AllActiveEntitiesSent(sender);
