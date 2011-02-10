@@ -388,8 +388,8 @@ wrapped_cvariable = {}
 function wrapped_cvariable:__init(kwargs)
     log.log(log.INFO, "wrapped_cvariable:__init()")
 
-    self.cgetter_raw = kwargs.cgetter_raw
-    self.csetter_raw = kwargs.csetter_raw
+    self.cgetter_raw = kwargs.cgetter
+    self.csetter_raw = kwargs.csetter
     kwargs.cgetter = nil
     kwargs.csetter = nil
 

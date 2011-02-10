@@ -519,12 +519,12 @@ namespace MessageSystem
         // Add entity
         Logging::log(Logging::DEBUG, "Creating new entity, %s   %f,%f,%f   %s\r\n", _class.c_str(), x, y, z, stateData.c_str());
         if ( !server::isRunningCurrentScenario(sender) ) return; // Silently ignore info from previous scenario
-        engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("get_sauertype").push(_class.c_str()).call(1, 1);
+        engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("get_sauertype").push(_class.c_str()).call(1, 2);
         std::string sauerType = engine.get(-1, "extent");
-        engine.pop(4);
+        engine.pop(5);
         Logging::log(Logging::DEBUG, "Sauer type: %s\r\n", sauerType.c_str());
         python::list params;
-        if (sauerType != "dynent")
+        if (sauerType != "fpsent")
             params.append(findtype((char*)sauerType.c_str()));
         params.append(x);
         params.append(y);
@@ -1267,9 +1267,9 @@ namespace MessageSystem
         if (entity.get() == NULL)
         {
             Logging::log(Logging::DEBUG, "Creating new active LogicEntity\r\n");
-            engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("get_sauertype").push(otherClass.c_str()).call(1, 1);
+            engine.getg("cc").t_getraw("logent").t_getraw("classes").t_getraw("get_sauertype").push(otherClass.c_str()).call(1, 2);
             std::string sauerType = engine.get(-1, "extent");
-            engine.pop(4);
+            engine.pop(5);
             engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("add")
                 .push(otherClass.c_str())
                 .push(otherUniqueId)

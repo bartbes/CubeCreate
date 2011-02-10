@@ -28,12 +28,25 @@
 
 local base = _G
 local string = require("string")
+local math = require("math")
 local CAPI = require("CAPI")
 
 --- Model control for cC's Lua interface.
 -- @class module
 -- @name cc.model
 module("cc.model")
+
+-- in sync with iengine.h
+CULL_VFC = math.lsh(1, 0)
+CULL_DIST = math.lsh(1, 1)
+CULL_OCCLUDED = math.lsh(1, 2)
+CULL_QUERY = math.lsh(1, 3)
+SHADOW = math.lsh(1, 4)
+DYNSHADOW = math.lsh(1, 5)
+LIGHT = math.lsh(1, 6)
+DYNLIGHT = math.lsh(1, 7)
+FULLBRIGHT = math.lsh(1, 8)
+NORENDER = math.lsh(1, 9)
 
 ---
 -- @class function

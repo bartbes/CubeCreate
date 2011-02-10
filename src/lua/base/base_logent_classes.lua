@@ -26,7 +26,84 @@
 -- THE SOFTWARE.
 --
 
+local base = _G
+local table = require("table")
+local log = require("cc.logging")
+local svar = require("cc.state_variables")
+local msgsys = require("cc.msgsys")
+
 --- This module takes care of logic entity classes.
 -- @class module
 -- @name cc.logent.classes
 module("cc.logent.classes")
+
+_logent_classes = {}
+
+function reg(_cl, st)
+    local _cln = _cl._class
+
+    log.log(log.DEBUG, "registering LE class: " .. base.tostring(_cln))
+
+    if not st then
+        local _base = self.__base
+        while _base do
+            local _pn = _base._class
+            log.log(log.DEBUG, "finding sauertype in parent: " .. base.tostring(_pn))
+            local found, stype = get_sauertype(_pn)
+            if found then
+                st = stype
+                break
+            else
+                _base = _base.__base._class and _base.__base or nil
+            end
+        end
+    end
+    st = st or ""
+
+    -- store in registry
+    base.assert(not _logent_classes[base.tostring(_cln)], "must not exist already, ensure each class has a different _class.")
+    _logent_classes[base.tostring(_cln)] = { _cl, st }
+
+    -- generate protocol data
+    local sv_names = {}
+
+    local inst = _cl()
+    local _keys = table.keys(inst)
+    for i = 1, #keys do
+        local var = inst[_keys[i]]
+        log.log(log.INFO, "considering " .. base.tostring(_keys[i]) .. " -- " .. base.tostring(var))
+        if svar.is(var) then
+            log.log(log.INFO, "setting up " .. base.tostring(_keys[i]))
+            table.insert(sv_names, base.tostring(_keys[i]))
+        end
+    end
+
+    log.log(log.DEBUG, "generating protocol data for { " .. table.concat(sv_names) .. " }")
+    msgsys.genprod(base.tostring(_cln), sv_names)
+
+    return _cl
+end
+
+function get_class(_cn)
+    if _logent_classes[base.tostring(_cn)] then
+        return true, _logent_classes[base.tostring(_cn)][1]
+    else
+        log.log(log.ERROR, "invalid class: " .. base.tostring(_cn))
+        return false, nil
+    end
+end
+
+function get_sauertype(_cn)
+    if _logent_classes[base.tostring(_cn)] then
+        return true, _logent_classes[base.tostring(_cn)][2]
+    else
+        log.log(log.ERROR, "invalid class: " .. base.tostring(_cn))
+        return false, nil
+    end
+end
+
+function list()
+    local r = table.filter(table.keys(_logent_classes), function(k, v) local f, c = get_class(v); return f and c._sauertype ~= "fpsent" end)
+    table.sort(r)
+    return r
+end

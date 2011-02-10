@@ -50,7 +50,7 @@ base.assert(not (glob.CLIENT and glob.SERVER))
 log.log(log.DEBUG, "Generating logent system with CLIENT = " .. base.tostring(glob.CLIENT))
 
 root_logent = class.new()
-root_logent._class = "logic_entity"
+root_logent._class = "logent"
 root_logent.should_act = true
 
 function root_logent:__tostring() return self._class end

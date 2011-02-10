@@ -51,18 +51,6 @@ function CAPI.getdynentfalling(self)
              CAPI.getdynentfalling_raw(self, 2) }
 end
 
-function CAPI.setattachments(self, attachments)
-    CAPI.setattachments_raw(self, table.concat(attachments, '|')) -- give python the format it wants
-end
-
--- DEBUG stuff
-
-local osetmodeln = CAPI.setmodelname;
-function CAPI.setmodelname(self, model)
-    log(DEBUG, "CAPI.setmodelname: " .. model .. "(" .. type(model) .. "), self=" .. tostring(self))
-    osetmodeln(self, model)
-end
-
 -- Mapping
 
 map = {

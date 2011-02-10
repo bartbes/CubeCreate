@@ -324,7 +324,7 @@ namespace lua_binds
             if (fp->ragdoll || !GETIV(ragdoll) || !PhysicsManager::getEngine()->prepareRagdoll(self))
             {
                 anim &= ~ANIM_RAGDOLL;
-                engine.getref(self.get()->luaRef).t_getraw("setLocalAnimation").push_index(-2).push(anim).call(2, 0);
+                engine.getref(self.get()->luaRef).t_getraw("set_localanim").push_index(-2).push(anim).call(2, 0);
                 engine.pop(1);
             }
         }
@@ -345,7 +345,7 @@ namespace lua_binds
 
     fpsent *getproxyfpsent(LogicEntityPtr self)
     {
-        engine.getref(self.get()->luaRef).t_getraw("renderingHashHint");
+        engine.getref(self.get()->luaRef).t_getraw("rendering_hash_hint");
         if (!engine.is<void>(-1))
         {
             static bool initialized = false;

@@ -64,7 +64,7 @@ namespace lua_binds
     LUA_BIND_LE(getstarttime, e.push(self.get()->getStartTime());)
 
     LUA_BIND_LE(setmodelname, {
-        Logging::log(Logging::DEBUG, "setmodelname(%s)\n", e.get<const char*>(2));
+        Logging::log(Logging::DEBUG, "setmodelname(%s, %s)\n", self.get()->getClass().c_str(), e.get<const char*>(2));
 
         self.get()->setModel(e.get<const char*>(2));
     })
@@ -89,7 +89,11 @@ namespace lua_binds
         self.get()->setSound(self.get()->soundName.c_str());
     })
 
-    LUA_BIND_LE(setattachments_raw, self.get()->setAttachments(e.get<const char*>(2));)
+    LUA_BIND_LE(setattachments, {
+        e.getg("table").t_getraw("concat").push_index(2).push("|").call(2, 1);
+        self.get()->setAttachments(e.get<const char*>(-1));
+        e.pop(2);
+    })
 
     LUA_BIND_LE(getattachmentpos, {
         vec& vp = self->getAttachmentPosition(e.get<const char*>(2));

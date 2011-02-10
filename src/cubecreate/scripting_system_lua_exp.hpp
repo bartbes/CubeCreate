@@ -92,7 +92,7 @@ const LE_reg CAPI[] = {
     LUAREG(setmodelname),
     LUAREG(setsoundname),
     LUAREG(setsoundvol),
-    LUAREG(setattachments_raw),
+    LUAREG(setattachments),
     LUAREG(getattachmentpos),
     LUAREG(setCanMove),
     LUAREG(geta1),

@@ -62,6 +62,9 @@ setmetatable(_G, {
     end
 })
 
+require("base.stub_logent")
+require("base.stub_logent_classes")
+
 cc.logging.log(cc.logging.DEBUG, ":: Utilities.")
 require("base.base_utils")
 
@@ -89,14 +92,14 @@ require("base.base_actions")
 cc.logging.log(cc.logging.DEBUG, ":: Message system.")
 require("base.base_msgsys")
 
-cc.logging.log(cc.logging.DEBUG, ":: Logic entity classes.")
-require("base.base_logent_classes")
-
 cc.logging.log(cc.logging.DEBUG, ":: Logic entity storage.")
 require("base.base_logent_store")
 
 cc.logging.log(cc.logging.DEBUG, ":: State variables.")
 require("base.base_svars")
+
+cc.logging.log(cc.logging.DEBUG, ":: Logic entity classes.")
+require("base.base_logent_classes")
 
 cc.logging.log(cc.logging.DEBUG, ":: Logic entities.")
 require("base.base_logent")
@@ -109,3 +112,6 @@ require("base.base_effects")
 
 cc.logging.log(cc.logging.DEBUG, ":: Sound.")
 require("base.base_sound")
+
+cc.logging.log(cc.logging.DEBUG, ":: Animatables.")
+require("base.base_animatable")

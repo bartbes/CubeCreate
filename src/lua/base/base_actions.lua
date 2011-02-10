@@ -90,7 +90,7 @@ ANIM_RAGDOLL = math.lsh(1, 27)
 
 -- Default action from which every other inherits
 action = class.new()
-function action:__tostring() return "OVERRIDETHIS" end
+function action:__tostring() return "action" end
 
 function action:__init(kwargs)
     kwargs = kwargs or {}
