@@ -153,25 +153,23 @@ namespace lua_binds
 
     // Add 'FAST' versions of accessors - no addentity/removeentity. Good to change e.g. particle parameters
 
-    LUA_BIND_LE(getextent0_raw, {
-        int arg2 = e.get<int>(2);
+    LUA_BIND_LE(getextent0, {
         extentity *ext = self.get()->staticEntity;
         assert(ext);
-        assert(arg2 >= 0 && arg2 <= 2);
-
-        Logging::log(Logging::INFO, "getextent0_raw(%d): %f\n", arg2, ext->o[arg2]);
-
-        e.push(ext->o[arg2]);
+        Logging::log(Logging::INFO, "getextent0(%s): x: %f, y: %f, z: %f\n", self.get()->getClass().c_str(), ext->o.x, ext->o.y, ext->o.z);
+        e.push(ext->o);
     })
 
-    LUA_BIND_LE(setextent0_raw, {
+    LUA_BIND_LE(setextent0, {
         extentity *ext = self.get()->staticEntity;
         assert(ext);
 
         removeentity(ext); /* Need to remove, then add, to the octa world on each change. */
-        ext->o.x = e.get<double>(2);
-        ext->o.y = e.get<double>(3);
-        ext->o.z = e.get<double>(4);
+        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
+        ext->o.x = e.t_get<double>(1);
+        ext->o.y = e.t_get<double>(2);
+        ext->o.z = e.t_get<double>(3);
+        e.pop(1);
         addentity(ext);
     })
 
@@ -211,23 +209,21 @@ namespace lua_binds
     // For dynents, 'o' is at their head, not their feet like static entities. We make this uniform by
     // letting lua specify a feet position, and we work relative to their height - add to
     // assignments, subtract from readings
-    LUA_BIND_LE(getdynent0_raw, {
-        int arg2 = e.get<int>(2);
+    LUA_BIND_LE(getdynent0, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
-        assert(arg2 >= 0 && arg2 <= 2);
-
-        if (arg2 != 2) e.push(d->o[arg2]);
-        else e.push(d->o.z - d->eyeheight);// - d->aboveeye);
+        e.push(vec(d->o.x, d->o.y, d->o.z - d->eyeheight/* - d->aboveeye*/));
     })
 
-    LUA_BIND_LE(setdynent0_raw, {
+    LUA_BIND_LE(setdynent0, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
 
-        d->o.x = e.get<double>(2);
-        d->o.y = e.get<double>(3);
-        d->o.z = e.get<double>(4) + d->eyeheight;// + d->aboveeye;
+        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
+        d->o.x = e.t_get<double>(1);
+        d->o.y = e.t_get<double>(2);
+        d->o.z = e.t_get<double>(3) + d->eyeheight;// + d->aboveeye;
+        e.pop(1);
 
         // Also set 'newpos', otherwise this change may get overwritten
         d->newpos = d->o;
@@ -237,39 +233,37 @@ namespace lua_binds
         Logging::log(Logging::INFO, "(%d).setdynent0(%f, %f, %f)\n", d->uniqueId, d->o.x, d->o.y, d->o.z);
     })
 
-    LUA_BIND_LE(getdynentvel_raw, {
-        int arg2 = e.get<int>(2);
+    LUA_BIND_LE(getdynentvel, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
-        assert(arg2 >= 0 && arg2 <= 2);
-
-        e.push(d->vel[arg2]);
+        e.push(d->vel);
     })
 
-    LUA_BIND_LE(setdynentvel_raw, {
+    LUA_BIND_LE(setdynentvel, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
 
-        d->vel.x = e.get<double>(2);
-        d->vel.y = e.get<double>(3);
-        d->vel.z = e.get<double>(4);
+        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
+        d->vel.x = e.t_get<double>(1);
+        d->vel.y = e.t_get<double>(2);
+        d->vel.z = e.t_get<double>(3);
+        e.pop(1);
     })
 
-    LUA_BIND_LE(getdynentfalling_raw, {
-        int arg2 = e.get<int>(2);
+    LUA_BIND_LE(getdynentfalling, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
-        assert(arg2 >= 0 && arg2 <= 2);
-
-        e.push(d->falling[arg2]);
+        e.push(d->falling);
     })
 
-    LUA_BIND_LE(setdynentfalling_raw, {
+    LUA_BIND_LE(setdynentfalling, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
 
-        d->falling.x = e.get<double>(2);
-        d->falling.y = e.get<double>(3);
-        d->falling.z = e.get<double>(4);
+        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
+        d->falling.x = e.t_get<double>(1);
+        d->falling.y = e.t_get<double>(2);
+        d->falling.z = e.t_get<double>(3);
+        e.pop(1);
     })
 }

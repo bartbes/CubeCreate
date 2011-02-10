@@ -172,7 +172,7 @@ end
 
 --- Get array of vector components.
 -- @return Array of vector components.
-function vec3:getarr()
+function vec3:as_array()
     return { self.x, self.y, self.z }
 end
 
@@ -364,7 +364,7 @@ end
 
 --- Get array of vector components.
 -- @return Array of vector components.
-function vec4:getarr()
+function vec4:as_array()
     return { self.x, self.y, self.z, self.w }
 end
 
