@@ -33,7 +33,7 @@ local CAPI = require("CAPI")
 local class = require("cc.class")
 local log = require("cc.logging")
 local glob = require("cc.global")
-local lent = require("cc.logent")
+local lstor = require("cc.logent.store")
 local conv = require("cc.typeconv")
 local json = require("cc.json")
 local vector = require("cc.vector")
@@ -61,11 +61,11 @@ end
 _SV_PREFIX = "__SV_"
 
 function __get(uid, vn)
-    return lent.store.get(uid)[_SV_PREFIX .. vn]
+    return lstor.get(uid)[_SV_PREFIX .. vn]
 end
 
 function __getguin(uid, vn)
-    local ent = lent.store.get(uid)
+    local ent = lstor.get(uid)
     local var = ent[_SV_PREFIX .. vn]
     return var.guiname and var.guiname or vn
 end

@@ -83,8 +83,8 @@ require("base.base_models")
 cc.logging.log(cc.logging.DEBUG, ":: Texture blending.")
 require("base.base_blend")
 
-cc.logging.log(cc.logging.DEBUG, ":: Logic entities.")
-require("base.base_logent")
+cc.logging.log(cc.logging.DEBUG, ":: Action system.")
+require("base.base_actions")
 
 cc.logging.log(cc.logging.DEBUG, ":: Message system.")
 require("base.base_msgsys")
@@ -95,6 +95,12 @@ require("base.base_logent_classes")
 cc.logging.log(cc.logging.DEBUG, ":: Logic entity storage.")
 require("base.base_logent_store")
 
+cc.logging.log(cc.logging.DEBUG, ":: State variables.")
+require("base.base_svars")
+
+cc.logging.log(cc.logging.DEBUG, ":: Logic entities.")
+require("base.base_logent")
+
 cc.logging.log(cc.logging.DEBUG, ":: Application manager.")
 require("base.base_appman")
 
@@ -103,9 +109,3 @@ require("base.base_effects")
 
 cc.logging.log(cc.logging.DEBUG, ":: Sound.")
 require("base.base_sound")
-
-cc.logging.log(cc.logging.DEBUG, ":: Action system.")
-require("base.base_actions")
-
-cc.logging.log(cc.logging.DEBUG, ":: State variables.")
-require("base.base_svars")

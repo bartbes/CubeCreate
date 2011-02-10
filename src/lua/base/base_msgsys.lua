@@ -31,7 +31,6 @@ local log = require("cc.logging")
 local CAPI = require("CAPI")
 local table = require("table")
 local string = require("string")
-local lent = require("cc.logent")
 
 --- Message system interface for Lua. Used for communication between client and server,
 -- takes care of name compressing and other things.
@@ -51,7 +50,7 @@ function send(...)
     local cn
 
     local args = { ... }
-    if args[1].is_a and args[1]:is_a(lent.logic_entity) then
+    if args[1].is_a and args[1]:is_a(lent.logent) then
         -- server->client message, get clientnumber from entity
         server = true
         cn = args[1].cn
@@ -105,7 +104,7 @@ function delci(cln)
 end
 
 function showcm(cn, ti, tx)
-    if cn.is_a and cn:is_a(lent.logic_entity) then
+    if cn.is_a and cn:is_a(lent.logent) then
         cn = cn.cn
     end
     send(cn, CAPI.personal_servmsg, -1, ti, tx)
