@@ -53,12 +53,10 @@ root_logent = class.new()
 root_logent._class = "logent"
 root_logent.should_act = true
 
-function root_logent:__tostring() return self._class end
+root_logent.tags = svar.state_array()
+root_logent._persistent = svar.state_bool()
 
-function root_logent:__init()
-    self.tags = svar.state_array()
-    self._persistent = svar.state_bool()
-end
+function root_logent:__tostring() return self._class end
 
 function root_logent:_general_setup()
     log.log(log.DEBUG, "root_logent:_general_setup")
@@ -115,7 +113,7 @@ function root_logent:has_tag(t)
 end
 
 function root_logent:_setup_vars()
-    local _names = table.keys(self)
+    local _names = table.keys(base.getmetatable(self))
     for i = 1, #_names do
         local var = self[_names[i]]
         if svar.is(var) then
@@ -131,7 +129,7 @@ function root_logent:create_statedatadict(tcn, kwargs)
     log.log(log.DEBUG, "create_statedatadict(): " .. base.tostring(self) .. base.tostring(self.uid) .. ", " .. base.tostring(tcn))
 
     local r = {}
-    local _names = table.keys(self)
+    local _names = table.keys(base.getmetatable(self))
     for i = 1, #_names do
         local var = self[_names[i]]
         if svar.is(var) and var.hashistory then

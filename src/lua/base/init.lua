@@ -115,3 +115,6 @@ require("base.base_sound")
 
 cc.logging.log(cc.logging.DEBUG, ":: Animatables.")
 require("base.base_animatable")
+
+cc.logging.log(cc.logging.DEBUG, ":: Character.")
+require("base.base_character")

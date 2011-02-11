@@ -66,9 +66,6 @@ local World_meta = {
 }
 
 World = setmetatable({
-    isColliding = function (position, radius, ignore)
-        return CAPI.isColliding(position.x, position.y, position.z, radius, ignore and ignore.uniqueId or -1)
-    end
 }, World_meta)
 
 World.gravity = 200.0

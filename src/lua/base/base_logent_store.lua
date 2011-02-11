@@ -115,7 +115,7 @@ function is_player_editing(ply)
     if glob.CLIENT then
         ply = ply or get_plyent()
     end
-    return ply and ply.cs == 4 -- cc.character.CLIENTSTATE.EDITING
+    return ply and ply.cs == 4 -- cc.character.CSTATE.EDITING
 end
 
 function get_all_close(origin, maxdist, cl, wtag, unsorted)
@@ -293,7 +293,7 @@ end
 
 function render_hud_models()
     local ply = get_plyent()
-    if ply.hud_modelname and ply.cs ~= 4 then -- 4 = cc.character.CLIENTSTATE.EDITING
+    if ply.hud_modelname and ply.cs ~= 4 then -- 4 = cc.character.CSTATE.EDITING
         ply:render_dynamic(true, true)
     end
 end

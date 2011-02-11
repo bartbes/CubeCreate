@@ -100,7 +100,7 @@ namespace lua_binds
         e.push(vp);
     })
 
-    LUA_BIND_LE(setCanMove, self.get()->setCanMove(e.get<bool>(2));)
+    LUA_BIND_LE(setcanmove, self.get()->setCanMove(e.get<bool>(2));)
 
     /* Extents */
 

@@ -55,7 +55,7 @@ variable = class.new()
 function variable:__tostring() return "variable" end
 
 function is(c)
-    return c.is_a and c:is_a(variable) or false
+    return base.type(c) == "table" and c.is_a and c:is_a(variable) or false
 end
 
 _SV_PREFIX = "__SV_"
@@ -217,8 +217,6 @@ state_array = class.new(state_variable)
 function state_array:__tostring() return "state_array" end
 state_array.separator = "|"
 state_array.surrogate_class = array_surrogate
-
-function state_array:empty_value() return {} end
 
 function state_array:getter(var)
     var:read_tests(self)
@@ -583,28 +581,26 @@ vec3_surrogate.toyawpitch = vector.vec3.toyawpitch
 vec3_surrogate.iscloseto = vector.vec3.iscloseto
 vec3_surrogate.dotproduct = vector.vec3.dotproduct
 
-
-wrapped_cvec3 = class.new(wrapped_carray)
+wrapped_cvec3 = class.new(state_array)
 function wrapped_cvec3:__tostring() return "wrapped_cvec3" end
 
 wrapped_cvec3.surrogate_class = vec3_surrogate
-function wrapped_cvec3:empty_value() return { 0, 0, 0 } end
-
-wrapped_cvec3.from_wire_item = conv.tonumber
-wrapped_cvec3.to_wire_item = conv.todec2str
-wrapped_cvec3.from_data_item = conv.tonumber
-wrapped_cvec3.to_data_item = conv.todec2str
+wrapped_cvec3.__init          = wrapped_cvariable.__init
+wrapped_cvec3._register       = wrapped_cvariable._register
+wrapped_cvec3.from_wire_item  = conv.tonumber
+wrapped_cvec3.to_wire_item    = conv.todec2str
+wrapped_cvec3.from_data_item  = conv.tonumber
+wrapped_cvec3.to_data_item    = conv.todec2str
+wrapped_cvec3.get_raw         = wrapped_carray.get_raw
 
 state_vec3 = class.new(state_array)
 function state_vec3:__tostring() return "state_vec3" end
 
 state_vec3.surrogate_class = vec3_surrogate
-function state_vec3:empty_value() return { 0, 0, 0 } end
-
-state_vec3.from_wire_item = conv.tonumber
-state_vec3.to_wire_item = conv.todec2str
-state_vec3.from_data_item = conv.tonumber
-state_vec3.to_data_item = conv.todec2str
+state_vec3.from_wire_item  = conv.tonumber
+state_vec3.to_wire_item    = conv.todec2str
+state_vec3.from_data_item  = conv.tonumber
+state_vec3.to_data_item    = conv.todec2str
 
 
 vec4_surrogate = class.new(array_surrogate)
@@ -672,34 +668,35 @@ vec4_surrogate.toyawpitch = vector.vec4.toyawpitch
 vec4_surrogate.iscloseto = vector.vec4.iscloseto
 vec4_surrogate.dotproduct = vector.vec4.dotproduct
 
-wrapped_cvec4 = class.new(wrapped_carray)
+
+wrapped_cvec4 = class.new(state_array)
 function wrapped_cvec4:__tostring() return "wrapped_cvec4" end
 
 wrapped_cvec4.surrogate_class = vec4_surrogate
-function wrapped_cvec4:empty_value() return { 0, 0, 0, 0 } end
+wrapped_cvec4.__init          = wrapped_cvariable.__init
+wrapped_cvec4._register       = wrapped_cvariable._register
+wrapped_cvec4.from_wire_item  = conv.tonumber
+wrapped_cvec4.to_wire_item    = conv.todec2str
+wrapped_cvec4.from_data_item  = conv.tonumber
+wrapped_cvec4.to_data_item    = conv.todec2str
+wrapped_cvec4.get_raw         = wrapped_carray.get_raw
 
-wrapped_cvec4.from_wire_item = conv.tonumber
-wrapped_cvec4.to_wire_item = conv.todec2str
-wrapped_cvec4.from_data_item = conv.tonumber
-wrapped_cvec4.to_data_item = conv.todec2str
 
 state_vec4 = class.new(state_array)
 function state_vec4:__tostring() return "state_vec4" end
 
 state_vec4.surrogate_class = vec4_surrogate
-function state_vec4:empty_value() return { 0, 0, 0, 0 } end
-
-state_vec4.from_wire_item = conv.tonumber
-state_vec4.to_wire_item = conv.todec2str
-state_vec4.from_data_item = conv.tonumber
-state_vec4.to_data_item = conv.todec2str
+state_vec4.from_wire_item  = conv.tonumber
+state_vec4.to_wire_item    = conv.todec2str
+state_vec4.from_data_item  = conv.tonumber
+state_vec4.to_data_item    = conv.todec2str
 
 -- no surrogate, won't notice changes to internals
 state_json = class.new(state_variable)
 function state_json:__tostring() return "state_json" end
-state_json.to_wire = json.encode
+state_json.to_wire   = json.encode
 state_json.from_wire = json.decode
-state_json.to_data = json.encode
+state_json.to_data   = json.encode
 state_json.from_data = json.decode
 
 json.register("logent", function(v) return (v.uid ~= nil) end, function(v) return v.uid end)

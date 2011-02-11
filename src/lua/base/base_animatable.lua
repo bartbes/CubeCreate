@@ -43,14 +43,10 @@ module("cc.animatable")
 animatable_logent = class.new(lent.logent)
 animatable_logent._class = "animatable_logent"
 
-function animatable_logent:__init()
-    self.__base.__init(self)
-
-    self.animation = svar.wrapped_cinteger({ csetter = "CAPI.setanim", clientset = true })
-    self.starttime = svar.wrapped_cinteger({ cgetter = "CAPI.getstarttime" })
-    self.modelname = svar.wrapped_cstring ({ csetter = "CAPI.setmodelname" })
-    self.attachments = svar.wrapped_carray({ csetter = "CAPI.setattachments"})
-end
+animatable_logent.animation = svar.wrapped_cinteger({ csetter = "CAPI.setanim", clientset = true })
+animatable_logent.starttime = svar.wrapped_cinteger({ cgetter = "CAPI.getstarttime" })
+animatable_logent.modelname = svar.wrapped_cstring ({ csetter = "CAPI.setmodelname" })
+animatable_logent.attachments = svar.wrapped_carray({ csetter = "CAPI.setattachments" })
 
 function animatable_logent:init(uid, kwargs)
     if self.__base.init then self.__base.init(self, uid, kwargs) end

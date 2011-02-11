@@ -229,3 +229,10 @@ function floor_lowestdist(o, d, r)
     return rt
 end
 
+--- Finds whether position is colliding.
+-- @param p The position.
+-- @param r Radius it applies for.
+-- @param i Entity to ignore. (optional)
+function iscolliding(p, r, i)
+    return CAPI.iscolliding(p.x, p.y, p.z, r, i and i.uid or -1)
+end

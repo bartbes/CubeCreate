@@ -68,8 +68,8 @@ function reg(_cl, st)
     local sv_names = {}
 
     local inst = _cl()
-    local _keys = table.keys(inst)
-    for i = 1, #keys do
+    local _keys = table.keys(base.getmetatable(inst))
+    for i = 1, #_keys do
         local var = inst[_keys[i]]
         log.log(log.INFO, "considering " .. base.tostring(_keys[i]) .. " -- " .. base.tostring(var))
         if svar.is(var) then
@@ -78,7 +78,7 @@ function reg(_cl, st)
         end
     end
 
-    log.log(log.DEBUG, "generating protocol data for { " .. table.concat(sv_names) .. " }")
+    log.log(log.DEBUG, "generating protocol data for { " .. table.concat(sv_names, ", ") .. " }")
     msgsys.genprod(base.tostring(_cln), sv_names)
 
     return _cl

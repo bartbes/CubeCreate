@@ -13,7 +13,7 @@ VER="$(cat $IN|grep 'scripting_system_lua_def.hpp, version'|sed 's/ \* scripting
 # the preprocessor to use to get rid of additional macros
 CPP="cpp -DCLIENT -DSERVER"
 
-$CPP $IN | grep LUA_BIND > $TMP
+$CPP $IN | grep LUA_BIND | sed -e 's/ LUA_BIND/\nLUA_BIND/g' -e 's/^   \n//' > $TMP
 
 cat << EOF > $OUT
 /*
