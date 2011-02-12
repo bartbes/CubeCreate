@@ -104,12 +104,12 @@ namespace lua_binds
 
     /* Extents */
 
-    #define EXTENT_ACCESSORS(n, an) \
+    #define EXTENT_ACCESSORS(n) \
     LUA_BIND_LE(get##n, { \
         extentity *ext = self.get()->staticEntity; \
         assert(ext); \
         \
-        e.push(ext->an); \
+        e.push(ext->n); \
     }) \
     \
     LUA_BIND_LE(set##n, { \
@@ -118,7 +118,7 @@ namespace lua_binds
         \
         /* Need to remove, then add, to the world on each change, if not during load. */ \
         if (!WorldSystem::loadingWorld) removeentity(ext); \
-        ext->an = e.get<int>(2); \
+        ext->n = e.get<int>(2); \
         if (!WorldSystem::loadingWorld) addentity(ext); \
     }) \
     \
@@ -127,13 +127,13 @@ namespace lua_binds
         extentity *ext = self.get()->staticEntity; \
         assert(ext); \
     \
-        ext->an = e.get<int>(2); \
+        ext->n = e.get<int>(2); \
     })
 
-    EXTENT_ACCESSORS(a1, attr1)
-    EXTENT_ACCESSORS(a2, attr2)
-    EXTENT_ACCESSORS(a3, attr3)
-    EXTENT_ACCESSORS(a4, attr4)
+    EXTENT_ACCESSORS(attr1)
+    EXTENT_ACCESSORS(attr2)
+    EXTENT_ACCESSORS(attr3)
+    EXTENT_ACCESSORS(attr4)
 
     #define EXTENT_LE_ACCESSORS(n, an) \
     LUA_BIND_LE(get##n, e.push(self->an);) \

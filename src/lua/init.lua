@@ -43,3 +43,5 @@ require("language")
 
 cc.logging.log(cc.logging.DEBUG, "Initializing base.")
 require("base")
+
+cc.logging.log(cc.logging.DEBUG, "Core scripting initialization complete.")

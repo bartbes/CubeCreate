@@ -37,6 +37,7 @@ local lcl = require("cc.logent.classes")
 local mdl = require("cc.model")
 local act = require("cc.action")
 local util = require("cc.utils")
+local CAPI = require("CAPI")
 
 --- This module takes care of character entity, states and player entity.
 -- @class module
@@ -251,14 +252,14 @@ function character:is_onfloor()
     return util.iscolliding(self.position, self.radius + 2, self)
 end
 
-player = class.new(anim.animatable_logent)
+player = class.new(character)
 player._class = "player"
 player._can_edit = svar.state_bool()
 player.hud_modelname = svar.state_string()
 
 function player:init(uid, kwargs)
     log.log(log.DEBUG, "player:init")
-    self.__base.init(uid, kwargs)
+    self.__base.init(self, uid, kwargs)
 
     self._can_edit = false
     self.hud_modelname = ""

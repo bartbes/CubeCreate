@@ -118,3 +118,6 @@ require("base.base_animatable")
 
 cc.logging.log(cc.logging.DEBUG, ":: Character.")
 require("base.base_character")
+
+cc.logging.log(cc.logging.DEBUG, ":: Static entities.")
+require("base.base_statent")
