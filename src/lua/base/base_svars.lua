@@ -181,21 +181,20 @@ function array_surrogate:__init(ent, var)
 
     self.entity = ent
     self.variable = var
-end
 
-function array_surrogate:__user_get(n)
-    if n == "length" then
-        return self.variable:get_length(self.entity)
-    end
-    return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
-end
-
-function array_surrogate:__user_set(n, v)
-    if base.tonumber(n) then
-        self.variable:set_item(self.entity, base.tonumber(n), v)
-    else
-        base.rawset(self, n, v)
-    end
+    self:define_userget(function(self, n)
+        if n == "length" then
+            return self.variable.get_length(self.variable, self.entity)
+        end
+        return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
+    end)
+    self:define_userset(function(self, n, v)
+        if base.tonumber(n) then
+            self.variable.set_item(self.variable, self.entity, base.tonumber(n), v)
+        else
+            base.rawset(self, n, v)
+        end
+    end)
 end
 
 function array_surrogate:push(v)
@@ -531,40 +530,38 @@ function vec3_surrogate:__init(ent, var)
 
     self.entity = ent
     self.variable = var
+
+    self:define_userget(function(self, n)
+        if n == "length" then
+            return 3
+        elseif n == "x" then
+            return self.variable.get_item(self.variable, self.entity, 1)
+        elseif n == "y" then
+            return self.variable.get_item(self.variable, self.entity, 2)
+        elseif n == "z" then
+            return self.variable.get_item(self.variable, self.entity, 3)
+        end
+        return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
+    end)
+    self:define_userset(function(self, n, v)
+        if base.tonumber(n) then
+            self.variable.set_item(self.variable, self.entity, base.tonumber(n), v)
+        else
+            if n == "x" then
+                self.variable.set_item(self.variable, self.entity, 1, v)
+            elseif n == "y" then
+                self.variable.set_item(self.variable, self.entity, 2, v)
+            elseif n == "z" then
+                self.variable.set_item(self.variable, self.entity, 3, v)
+            else
+                base.rawset(self, n, v)
+            end
+        end
+    end)
 end
 
 function vec3_surrogate:push(v)
     base.assert(false)
-end
-
-function vec3_surrogate:__user_get(n)
-    if n == "length" then
-        return 3
-    elseif n == "x" then
-        return self.variable:get_item(self.entity, 1)
-    elseif n == "y" then
-        return self.variable:get_item(self.entity, 2)
-    elseif n == "z" then
-        return self.variable:get_item(self.entity, 3)
-    end
-    return nil
-    --return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
-end
-
-function vec3_surrogate:__user_set(n, v)
-    if base.tonumber(n) then
-        self.variable:set_item(self.entity, base.tonumber(n), v)
-    else
-        if n == "x" then
-            self.variable:set_item(self.entity, 1, v)
-        elseif n == "y" then
-            self.variable:set_item(self.entity, 2, v)
-        elseif n == "z" then
-            self.variable:set_item(self.entity, 3, v)
-        else
-            base.rawset(self, n, v)
-        end
-    end
 end
 
 vec3_surrogate.magnitude = vector.vec3.magnitude
@@ -613,43 +610,42 @@ function vec4_surrogate:__init(ent, var)
 
     self.entity = ent
     self.variable = var
+
+    self:define_userget(function(self, n)
+        if n == "length" then
+            return 4
+        elseif n == "x" then
+            return self.variable.get_item(self.variable, self.entity, 1)
+        elseif n == "y" then
+            return self.variable.get_item(self.variable, self.entity, 2)
+        elseif n == "z" then
+            return self.variable.get_item(self.variable, self.entity, 3)
+        elseif n == "w" then
+            return self.variable.get_item(self.variable, self.entity, 4)
+        end
+        return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
+    end)
+    self:define_userset(function(self, n, v)
+        if base.tonumber(n) then
+            self.variable.set_item(self.variable, self.entity, base.tonumber(n), v)
+        else
+            if n == "x" then
+                self.variable.set_item(self.variable, self.entity, 1, v)
+            elseif n == "y" then
+                self.variable.set_item(self.variable, self.entity, 2, v)
+            elseif n == "z" then
+                self.variable.set_item(self.variable, self.entity, 3, v)
+            elseif n == "w" then
+                self.variable.set_item(self.variable, self.entity, 4, v)
+            else
+                base.rawset(self, n, v)
+            end
+        end
+    end)
 end
 
 function vec4_surrogate:push(v)
     base.assert(false)
-end
-
-function vec4_surrogate:__user_get(n)
-    if n == "length" then
-        return 4
-    elseif n == "x" then
-        return self.variable:get_item(self.entity, 1)
-    elseif n == "y" then
-        return self.variable:get_item(self.entity, 2)
-    elseif n == "z" then
-        return self.variable:get_item(self.entity, 3)
-    elseif n == "w" then
-        return self.variable:get_item(self.entity, 4)
-    end
-    return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
-end
-
-function vec4_surrogate:__user_set(n, v)
-    if base.tonumber(n) then
-        self.variable:set_item(self.entity, base.tonumber(n), v)
-    else
-        if n == "x" then
-            self.variable:set_item(self.entity, 1, v)
-        elseif n == "y" then
-            self.variable:set_item(self.entity, 2, v)
-        elseif n == "z" then
-            self.variable:set_item(self.entity, 3, v)
-        elseif n == "w" then
-            self.variable:set_item(self.entity, 4, v)
-        else
-            base.rawset(self, n, v)
-        end
-    end
 end
 
 vec4_surrogate.magnitude = vector.vec4.magnitude

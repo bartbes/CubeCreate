@@ -78,17 +78,17 @@ function new(b)
     function c:__newindex(n, v)
         if not self:__indexcond(n) then return nil end
 
-        if self.__user_set then
-            return self.__user_set(self, n, v)
+        if self.__setters["*"] then
+            self.__setters["*"](self.__setselfs["*"], n, v)
+        else
+            if self.__setters[n] then
+                if self.__setaddargs[n] then
+                    self.__setters[n](self.__setselfs[n], self.__setaddargs[n], v)
+                else
+                    self.__setters[n](self.__setselfs[n], v)
+                end
+            else base.rawset(self, n, v) end
         end
-
-        if self.__setters[n] then
-            if self.__setaddargs[n] then
-                self.__setters[n](self.__setselfs[n], self.__setaddargs[n], v)
-            else
-                self.__setters[n](self.__setselfs[n], v)
-            end
-        else base.rawset(self, n, v) end
     end
 
     -- the metatable for class
@@ -108,8 +108,9 @@ function new(b)
         if not self:__indexcond(n) then return nil end
 
         -- allow for user methods only, no metamethods or internals
-        if string.sub(n, 1, 2) ~= "__" and self.__user_get then
-            return self.__user_get(self, n)
+        if string.sub(n, 1, 2) ~= "__" and self.__getters["*"] then
+            local rv = self.__getters["*"](self.__getselfs["*"], n)
+            if rv then return rv end
         end
 
         if self.__getters[n] then
@@ -149,6 +150,18 @@ function new(b)
         self.__setters[k] = v
         self.__setselfs[k] = self -- a little hack to get right self
         if o then self.__setaddargs[k] = o end
+    end
+
+    -- define userget (callback on anything)
+    function c:define_userget(f)
+        self.__getters["*"] = f
+        self.__getselfs["*"] = self
+    end
+
+    -- define userset (callback on anything)
+    function c:define_userset(f)
+        self.__setters["*"] = f
+        self.__setselfs["*"] = self
     end
 
     -- set the metatable and return the class

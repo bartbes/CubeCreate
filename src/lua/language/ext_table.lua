@@ -41,6 +41,7 @@ function table.map(t, f)
     for i = 1, #t do
         r[i] = f(t[i])
     end
+    return r
 end
 
 --- Merge two dictionaries together.

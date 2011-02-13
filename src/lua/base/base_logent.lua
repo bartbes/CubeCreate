@@ -135,13 +135,7 @@ function root_logent:create_statedatadict(tcn, kwargs)
     log.log(log.DEBUG, "create_statedatadict(): " .. base.tostring(self) .. base.tostring(self.uid) .. ", " .. base.tostring(tcn))
 
     local r = {}
-    local _meta = base.getmetatable(self) -- TODO: efficiency
-    local _names = table.keys(_meta)
-    while _meta do
-        _meta = _meta.__base
-        if not _meta then break end
-        table.mergearrays(_names, table.keys(_meta))
-    end
+    local _names = table.keys(self)
     for i = 1, #_names do
         local var = self[_names[i]]
         if svar.is(var) and var.hashistory then
@@ -151,10 +145,10 @@ function root_logent:create_statedatadict(tcn, kwargs)
             if not skip then
                 local val = self[var._name]
                 if val then
-                    log.log(log.INFO, "create_statedatadict() adding " .. base.tostring(var._name) .. ": " .. json.encode(val.as_array and val:as_array() or val))
+                    log.log(log.DEBUG, "create_statedatadict() adding " .. base.tostring(var._name) .. ": " .. json.encode(val.as_array and val:as_array() or val))
                     r[not kwargs.compressed and var._name or msgsys.toproid(base.tostring(self), var._name)] = var:is_a(svar.state_array) and var:to_data(val) or var.to_data(val)
-                    log.log(log.INFO, "create_statedatadict() currently ..")
-                    log.log(log.INFO, "create_statedatadict() currently: " .. json.encode(r))
+                    log.log(log.DEBUG, "create_statedatadict() currently ..")
+                    log.log(log.DEBUG, "create_statedatadict() currently: " .. json.encode(r))
                 end
             end
         end
