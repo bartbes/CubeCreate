@@ -49,7 +49,7 @@ namespace lua_binds
         defformatstring(str)("preloading sound '%s'...", e.get<const char*>(1));
         renderprogress(0, str);
 
-        e.push(preload_sound((char*)e.get<const char*>(1), min(e.get<int>(2), 100)));
+        e.push(preload_sound((char*)e.get<const char*>(1), min(e.get(2, 100), 100)));
     })
 
     #ifdef CLIENT

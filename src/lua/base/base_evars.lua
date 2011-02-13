@@ -250,3 +250,9 @@ end
 function ivar(name, ...) inst:reg(IVAR(name, ...)) end
 function fvar(name, ...) inst:reg(FVAR(name, ...)) end
 function svar(name, ...) inst:reg(SVAR(name, ...)) end
+
+--- Reset an engine variable.
+-- @param n Name of the variable.
+-- @class function
+-- @name reset
+reset = CAPI.resetvar

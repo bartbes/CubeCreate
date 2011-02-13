@@ -80,7 +80,7 @@ namespace lua_binds
                         e.get<int>(3),
                         e.get<int>(4),
                         e.get<int>(5),
-                        (float)e.get<double>(6),
+                        (float)e.get(6, 1.0),
                         e.get<int>(7))
 
     LUA_BIND_CLIENT(materialreset, {

@@ -262,6 +262,7 @@ namespace var
             default: break;
         }
         overriden = false;
+        callcb(true);
     }
 
     bool cvar::ispersistent()  { return persistent; }

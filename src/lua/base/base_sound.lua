@@ -88,3 +88,4 @@ end
 
 register = CAPI.registersound
 reset = CAPI.resetsound
+preload = CAPI.preloadsound

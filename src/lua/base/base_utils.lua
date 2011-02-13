@@ -236,3 +236,13 @@ end
 function iscolliding(p, r, i)
     return CAPI.iscolliding(p.x, p.y, p.z, r, i and i.uid or -1)
 end
+
+currtime = CAPI.currtime
+getmillis = CAPI.getmillis
+tabify = CAPI.tabify
+execcfg = CAPI.execcfg
+writecfg = CAPI.writecfg
+getcfg = CAPI.getcfg
+readfile = CAPI.readfile
+addzip = CAPI.addzip
+removezip = CAPI.removezip

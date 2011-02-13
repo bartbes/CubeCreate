@@ -121,3 +121,6 @@ require("base.base_character")
 
 cc.logging.log(cc.logging.DEBUG, ":: Static entities.")
 require("base.base_statent")
+
+cc.logging.log(cc.logging.DEBUG, ":: Textures.")
+require("base.base_textures")
