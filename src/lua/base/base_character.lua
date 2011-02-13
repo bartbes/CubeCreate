@@ -99,7 +99,7 @@ end
 
 function character:init(uid, kwargs)
     log.log(log.DEBUG, "character:init")
-    self.__base.init(self, uid, kwargs)
+    anim.animatable_logent.init(self, uid, kwargs)
 
     self._name = "-?-" -- set by the server later
     self.cn = kwargs and kwargs.cn or -1
@@ -116,17 +116,17 @@ end
 function character:activate(kwargs)
     log.log(log.DEBUG, "character:activate")
     self.cn = kwargs and kwargs.cn or -1
-    assert(self.cn >= 0)
+    base.assert(self.cn >= 0)
 
     CAPI.setupcharacter(self)
-    self.__base.activate(self, kwargs)
+    anim.animatable_logent.activate(self, kwargs)
     self:_flush_queued_sv_changes()
 
     log.log(log.DEBUG, "character:activate complete.")
 end
 
 function character:client_activate(kwargs)
-    self.__base.client_activate(self, kwargs)
+    anim.animatable_logent.client_activate(self, kwargs)
     self.cn = kwargs and kwargs.cn or -1
     CAPI.setupcharacter(self)
 
@@ -135,19 +135,19 @@ end
 
 function character:deactivate()
     CAPI.dismantlecharacter(self)
-    self.__base.deactivate(self)
+    anim.animatable_logent.deactivate(self)
 end
 
 function character:client_deactivate()
     CAPI.dismantlecharacter(self)
-    self.__base.client_deactivate(self)
+    anim.animatable_logent.client_deactivate(self)
 end
 
 function character:act(sec)
     if self.action_system:isempty() then
         self:default_action(sec)
     else
-        self.__base.act(self, sec)
+        anim.animatable_logent.act(self, sec)
     end
 end
 
@@ -259,7 +259,7 @@ player.hud_modelname = svar.state_string()
 
 function player:init(uid, kwargs)
     log.log(log.DEBUG, "player:init")
-    self.__base.init(self, uid, kwargs)
+    character.init(self, uid, kwargs)
 
     self._can_edit = false
     self.hud_modelname = ""

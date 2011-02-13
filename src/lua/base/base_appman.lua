@@ -151,7 +151,7 @@ function __dummy_application:__tostring() return "__dummy_application" end
 
 function __dummy_application:init()
     log.log(log.WARNING, "(init) appman.set_appclass was not called, this is __dummy_application running.")
-    self.__base.init(self)
+    application.init(self)
 end
 
 function __dummy_application:get_pcclass()
@@ -161,37 +161,37 @@ end
 
 function __dummy_application:client_on_disconnect()
     log.log(log.WARNING, "(client_on_disconnect) appman.set_appclass was not called, this is __dummy_application running.")
-    self.__base.client_on_disconnect(self)
+    application.client_on_disconnect(self)
 end
 
 function __dummy_application:on_entoffmap(ent)
     log.log(log.WARNING, "(on_entoffmap) appman.set_appclass was not called, this is __dummy_application running.")
-    self.__base.on_entoffmap(self, ent)
+    application.on_entoffmap(self, ent)
 end
 
 function __dummy_application:client_on_entoffmap(ent)
     log.log(log.WARNING, "(client_on_entoffmap) appman.set_appclass was not called, this is __dummy_application running.")
-    self.__base.client_on_entoffmap(self, ent)
+    application.client_on_entoffmap(self, ent)
 end
 
 function __dummy_application:on_player_login(ply)
     log.log(log.WARNING, "(on_player_login) appman.set_appclass was not called, this is __dummy_application running.")
-    self.__base.on_player_login(self, ply)
+    application.on_player_login(self, ply)
 end
 
 function __dummy_application:do_click(...)
      log.log(log.WARNING, "(do_click) appman.set_appclass was not called, this is __dummy_application running.")
-     self.__base.do_click(self, ...)
+     application.do_click(self, ...)
 end
 
 function __dummy_application:client_click(...)
      log.log(log.WARNING, "(client_click) appman.set_appclass was not called, this is __dummy_application running.")
-     self.__base.client_click(self, ...)
+     application.client_click(self, ...)
 end
 
 function __dummy_application:click(...)
      log.log(log.WARNING, "(click) appman.set_appclass was not called, this is __dummy_application running.")
-     self.__base.click(self, ...)
+     application.click(self, ...)
 end
 
 function __dummy_application:action_key(index, down)

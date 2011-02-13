@@ -67,7 +67,7 @@ function statent:init(uid, kwargs)
     kwargs = kwargs or {}
     kwargs._persistent = true -- static entities are persistent by default
 
-    self.__base.init(self, uid, kwargs)
+    anim.animatable_logent.init(self, uid, kwargs)
 
     if not kwargs or not kwargs.position then
         self.position = { 511, 512, 513 }
@@ -83,7 +83,7 @@ function statent:activate(kwargs)
     kwargs = kwargs or {}
 
     log.log(log.DEBUG, base.tostring(self.uid) .. " statent: __base.activate() " .. json.encode(kwargs))
-    self.__base.activate(self, kwargs)
+    anim.animatable_logent.activate(self, kwargs)
 
     if not kwargs._type then
         kwargs._type = self._sauertype_index
@@ -118,7 +118,7 @@ end
 
 function statent:deactivate()
     CAPI.dismantleextent(self)
-    self.__base.deactivate(self)
+    anim.animatable_logent.deactivate(self)
 end
 
 function statent:client_activate(kwargs)
@@ -134,12 +134,12 @@ function statent:client_activate(kwargs)
     end
 
     CAPI.setupextent(self, kwargs._type, kwargs.x, kwargs.y, kwargs.z, kwargs.attr1, kwargs.attr2, kwargs.attr3, kwargs.attr4)
-    self.__base.client_activate(self, kwargs)
+    anim.animatable_logent.client_activate(self, kwargs)
 end
 
 function statent:client_deactivate()
     CAPI.dismantleextent(self)
-    self.__base.client_deactivate(self)
+    anim.animatable_logent.client_deactivate(self)
 end
 
 function statent:send_notification_complete(cn)
@@ -184,7 +184,7 @@ light.green = svar.variable_alias("attr3")
 light.blue = svar.variable_alias("attr4")
 
 function light:init(uid, kwargs)
-    self.__base.init(self, uid, kwargs)
+    statent.init(self, uid, kwargs)
 
     -- default values
     self.radius = 100
@@ -201,7 +201,7 @@ spotlight.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "
 spotlight.radius = svar.variable_alias("attr1")
 
 function spotlight:init(uid, kwargs)
-    self.__base.init(self, uid, kwargs)
+    statent.init(self, uid, kwargs)
     self.radius = 90
 end
 
@@ -213,7 +213,7 @@ envmap.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAP
 envmap.radius = svar.variable_alias("attr1")
 
 function envmap:init(uid, kwargs)
-    self.__base.init(self, uid, kwargs)
+    statent.init(self, uid, kwargs)
     self.radius = 128
 end
 
@@ -231,7 +231,7 @@ ambient_sound.size = svar.variable_alias("attr3")
 ambient_sound.volume = svar.variable_alias("attr4")
 
 function ambient_sound:init(uid, kwargs)
-    self.__base.init(self, uid, kwargs)
+    statent.init(self, uid, kwargs)
     -- attr1 is the slot index - replaced
     self.attr1 = -1
     self.radius = 100
@@ -255,7 +255,7 @@ particle_effect.value2 = svar.variable_alias("attr3")
 particle_effect.value3 = svar.variable_alias("attr4")
 
 function particle_effect:init(uid, kwargs)
-    self.__base.init(self, uid, kwargs)
+    statent.init(self, uid, kwargs)
 
     self.particle_type = 0
     self.value1 = 0
@@ -282,7 +282,7 @@ mapmodel.collision_radius_height = svar.wrapped_cinteger({
 
 function mapmodel:init(uid, kwargs)
     log.log(log.DEBUG, "mapmodel:init")
-    self.__base.init(self, uid, kwargs)
+    statent.init(self, uid, kwargs)
 
     self.attr2 = -1 -- sauer mapmodel index - put as -1 to use out model names as default
     self.yaw = 0
@@ -294,7 +294,7 @@ function mapmodel:init(uid, kwargs)
 end
 
 function mapmodel:client_activate(kwargs)
-    self.__base.client_activate(self, kwargs)
+    statent.client_activate(self, kwargs)
 end
 
 function mapmodel:on_collision(collider)
@@ -309,7 +309,7 @@ function mapmodel:get_center()
         r.z = r.z + base.tonumber(self.collision_radius_height)
         return r
     else
-        return self.__base.get_center(self)
+        return statent.get_center(self)
     end
 end
 
@@ -319,7 +319,7 @@ area_trigger._class = "area_trigger"
 area_trigger.script_to_run = svar.state_string()
 
 function area_trigger:init(uid, kwargs)
-    self.__base.init(self, uid, kwargs)
+    mapmodel.init(self, uid, kwargs)
 
     self.script_to_run = ""
     self.collision_radius_width = 10
@@ -338,12 +338,12 @@ resettable_area_trigger = class.new(area_trigger)
 resettable_area_trigger._class = "resettable_area_trigger"
 
 function resettable_area_trigger:activate(kwargs)
-    self.__base.activate(self, kwargs)
+    area_trigger.activate(self, kwargs)
     self:reset()
 end
 
 function resettable_area_trigger:client_activate(kwargs)
-    self.__base.client_activate(self, kwargs)
+    area_trigger.client_activate(self, kwargs)
     self:reset()
 end
 
@@ -356,7 +356,7 @@ function resettable_area_trigger:on_collision(collider)
     end
 
     if base.tostring(self.script_to_run) ~= "" then
-        self.__base.on_collision(self, collider)
+        area_trigger.on_collision(self, collider)
     else
         self:on_trigger(collider)
     end
@@ -371,7 +371,7 @@ function resettable_area_trigger:client_on_collision(collider)
     end
 
     if base.tostring(self.script_to_run) ~= "" then
-        self.__base.client_on_collision(self, collider)
+        area_trigger.client_on_collision(self, collider)
     else
         self:client_on_trigger(collider)
     end

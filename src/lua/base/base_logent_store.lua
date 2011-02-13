@@ -60,7 +60,7 @@ local __entities_store_by_class = {}
 function get(uid)
     log.log(log.INFO, "get: entity " .. base.tostring(uid))
     local r = __entities_store[base.tonumber(uid)]
-    if ret then
+    if r then
         log.log(log.INFO, "get: entity " .. base.tostring(uid) .. " found (" .. r.uid .. ")")
         return r
     else
@@ -244,7 +244,7 @@ function manage_actions(sec, lastmillis)
     local curr_actions = table.copy(glob.queued_actions) -- work on copy as these may add more
     glob.queued_actions = {}
 
-    for k,v in pairs(curr_actions) do v() end
+    for k,v in base.pairs(curr_actions) do v() end
 
     glob.time = glob.time + sec
     glob.curr_timedelta = sec
@@ -379,7 +379,7 @@ function send_entities(cn)
 
     local numents = 0
     local ids = {}
-    for k, v in pairs(__entities_store) do
+    for k, v in base.pairs(__entities_store) do
         numents = numents + 1
         table.insert(ids, k) -- create the keys table immediately to not iterate twice later
     end

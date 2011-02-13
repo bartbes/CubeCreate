@@ -66,11 +66,13 @@ function new(b)
     if b then c.__tostring = b.__tostring end
 
     c.__index = c
-    -- getters, setters, selfs
+    -- getters, setters, selfs, addargs
     c.__getters = {}
     c.__setters = {}
     c.__getselfs = {}
     c.__setselfs = {}
+    c.__getaddargs = {}
+    c.__setaddargs = {}
 
     -- called when new index gets created in table
     function c:__newindex(n, v)
@@ -81,10 +83,10 @@ function new(b)
         end
 
         if self.__setters[n] then
-            if self.__setselfs[n] then
-                self.__setters[n](self, self.__setselfs[n], v)
+            if self.__setaddargs[n] then
+                self.__setters[n](self.__setselfs[n], self.__setaddargs[n], v)
             else
-                self.__setters[n](self, v)
+                self.__setters[n](self.__setselfs[n], v)
             end
         else base.rawset(self, n, v) end
     end
@@ -111,10 +113,10 @@ function new(b)
         end
 
         if self.__getters[n] then
-            if self.__getselfs[n] then
-                return self.__getters[n](self, self.__getselfs[n])
+            if self.__getaddargs[n] then
+                return self.__getters[n](self.__getselfs[n], self.__getaddargs[n])
             else
-                return self.__getters[n](self)
+                return self.__getters[n](self.__getselfs[n])
             end
         else
             return self.__base[n]
@@ -138,13 +140,15 @@ function new(b)
     -- define getter (callback when virtual element gets accessed)
     function c:define_getter(k, v, o)
         self.__getters[k] = v
-        if o then self.__getselfs[k] = o end
+        self.__getselfs[k] = self -- a little hack to get right self
+        if o then self.__getaddargs[k] = o end
     end
 
     -- define setter (callback when virtual element is set)
     function c:define_setter(k, v, o)
         self.__setters[k] = v
-        if o then self.__setselfs[k] = o end
+        self.__setselfs[k] = self -- a little hack to get right self
+        if o then self.__setaddargs[k] = o end
     end
 
     -- set the metatable and return the class

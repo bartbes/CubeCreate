@@ -49,7 +49,7 @@ animatable_logent.modelname = svar.wrapped_cstring ({ csetter = "CAPI.setmodelna
 animatable_logent.attachments = svar.wrapped_carray({ csetter = "CAPI.setattachments" })
 
 function animatable_logent:init(uid, kwargs)
-    if self.__base.init then self.__base.init(self, uid, kwargs) end
+    if lent.logent.init then lent.logent.init(self, uid, kwargs) end
 
     self._attachments_dict = {}
 
@@ -60,7 +60,7 @@ end
 
 function animatable_logent:activate(kwargs)
     log.log(log.DEBUG, "animatable_logent:activate")
-    self.__base.activate(self, kwargs)
+    lent.logent.activate(self, kwargs)
 
     log.log(log.DEBUG, "animatable_logent:activate (2)")
     self.modelname = self.modelname
@@ -95,7 +95,7 @@ function animatable_logent:set_localmodelname(mdlname)
 end
 
 function animatable_logent:_general_setup(...)
-    self.__base._general_setup(self)
+    lent.logent._general_setup(self)
     self:define_getter("center", self.get_center)
 end
 

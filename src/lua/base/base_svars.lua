@@ -93,8 +93,8 @@ function state_variable:_register(_name, parent)
     parent[_SV_PREFIX .. _name] = self
     parent[_name] = nil
 
-    assert(self.getter)
-    assert(self.setter)
+    base.assert(self.getter)
+    base.assert(self.setter)
     parent:define_getter(_name, self.getter, self)
     parent:define_setter(_name, self.setter, self)
 
@@ -131,7 +131,7 @@ end
 
 function state_variable:setter(var, val)
     var:write_tests(self)
-    self:set_statedata(var._name, val, nil)
+    self:_set_statedata(var._name, val, nil)
 end
 
 function state_variable:validate(val)
@@ -256,7 +256,7 @@ function state_array:setter(var, val)
         end
     end
 
-    self:set_statedata(var._name, data, nil)
+    self:_set_statedata(var._name, data, nil)
 end
 
 state_array.to_wire_item = conv.tostring
@@ -310,7 +310,7 @@ end
 function state_array:get_raw(ent)
     log.log(log.INFO, "get_raw: " .. base.tostring(self))
     log.log(log.INFO, json.encode(ent.state_var_vals))
-    local val = entity.state_var_vals[self._name]
+    local val = ent.state_var_vals[self._name]
     return val and val or {}
 end
 
@@ -423,7 +423,7 @@ function wrapped_cvariable:_register(_name, parent)
                 parent.state_var_val_timestamps[base.tostring(variable._name)] = glob.curr_timestamp
             else
                 -- not yet set up, queue change
-                parent:queue_statevar_change(base.tostring(variable._name), v)
+                parent:_queue_sv_change(base.tostring(variable._name), v)
             end
         end)
     else
@@ -499,7 +499,8 @@ wrapped_carray._register = wrapped_cvariable._register
 
 function wrapped_carray:get_raw(ent)
     log.log(log.INFO, "WCA:get_raw " .. base.tostring(self._name) .. base.tostring(self.cgetter))
-    if self.cgetter and (glob.CLIENT or self:can_call_cfuncs()) then
+
+    if self.cgetter and (glob.CLIENT or ent:can_call_cfuncs()) then
         -- caching
         local cached_timestamp = ent.state_var_val_timestamps[base.tostring(self._name)]
         if cached_timestamp == glob.curr_timestamp then
@@ -546,7 +547,8 @@ function vec3_surrogate:__user_get(n)
     elseif n == "z" then
         return self.variable:get_item(self.entity, 3)
     end
-    return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
+    return nil
+    --return self.variable:get_item(self.entity, base.tonumber(n)) or self.__base[n]
 end
 
 function vec3_surrogate:__user_set(n, v)

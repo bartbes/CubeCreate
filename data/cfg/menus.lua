@@ -15,7 +15,7 @@ function setup_main_menu()
         cc.gui.text("Welcome to CubeCreate development release. (1)")
         cc.gui.bar()
         cc.gui.show_plugins()
-        cc.gui.text("Credits: Cube 2, Syntensity, love2d, Lua, SDL, python, zlib.")
+        cc.gui.text("Credits: Cube 2, Syntensity, Love, Lua, SDL, Python, zlib.")
         cc.gui.text("Licensed under MIT/X11.")
         cc.gui.bar()
         cc.gui.list([=[

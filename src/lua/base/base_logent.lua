@@ -266,7 +266,7 @@ server_logent.sent_notification_complete = false
 function server_logent:init(uid, kwargs)
     log.log(log.DEBUG, "server_logent:init(" .. base.tostring(uid) .. ", " .. base.tostring(kwargs) .. ")")
     base.assert(uid ~= nil)
-    base.assert(type(uid) == "number")
+    base.assert(base.type(uid) == "number")
 
     self.uid = uid
     self:_logent_setup()
