@@ -268,3 +268,9 @@ stayopen = CAPI.guistayopen
 -- @class function
 -- @name noautotab
 noautotab = CAPI.guinoautotab
+--- Show a progress bar.
+-- @name p Percentage as float number from 0.0 to 1.0.
+-- @name t Text to show.
+-- @class function
+-- @name renderprogress
+renderprogress = CAPI.renderprogress

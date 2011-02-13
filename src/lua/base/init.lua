@@ -124,3 +124,9 @@ require("base.base_statent")
 
 cc.logging.log(cc.logging.DEBUG, ":: Textures.")
 require("base.base_textures")
+
+cc.logging.log(cc.logging.DEBUG, ":: World interface.")
+require("base.base_world")
+
+cc.logging.log(cc.logging.DEBUG, ":: Network interface.")
+require("base.base_network")

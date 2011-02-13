@@ -306,3 +306,15 @@ right = CAPI.right
 -- @class function
 -- @name jump
 jump = CAPI.jump
+---
+-- @class function
+-- @name mouse_targeting
+mouse_targeting = CAPI.mouse_targeting
+---
+-- @class function
+-- @name set_mouse_targeting_ent
+set_mouse_targeting_ent = CAPI.set_mouse_targeting_ent
+---
+-- @class function
+-- @name set_mouse_target_client
+set_mouse_target_client = CAPI.set_mouse_target_client

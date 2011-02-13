@@ -237,12 +237,57 @@ function iscolliding(p, r, i)
     return CAPI.iscolliding(p.x, p.y, p.z, r, i and i.uid or -1)
 end
 
+--- Get current time.
+-- @class function
+-- @name currtime
 currtime = CAPI.currtime
+
+--- Get current millis.
+-- @class function
+-- @name getmillis
 getmillis = CAPI.getmillis
+
+--- Tabify a string.
+-- @class function
+-- @name tabify
 tabify = CAPI.tabify
+
+--- Execute a CubeCreate cfg.
+-- @class function
+-- @name execcfg
 execcfg = CAPI.execcfg
+
+--- Write a CubeCreate cfg.
+-- @class function
+-- @name writecfg
 writecfg = CAPI.writecfg
+
+--- Get a CubeCreate cfg.
+-- @class function
+-- @name getcfg
 getcfg = CAPI.getcfg
+
+--- Read a file from disk.
+-- @class function
+-- @name readfile
 readfile = CAPI.readfile
+
+--- Add a zip.
+-- @class function
+-- @name addzip
 addzip = CAPI.addzip
+
+--- Remove a zip.
+-- @class function
+-- @name removezip
 removezip = CAPI.removezip
+
+--- Get target position.
+-- @class function
+-- @name gettargetpos
+gettargetpos = CAPI.gettargetpos
+
+--- Get target entity.
+-- @class function
+-- @name gettargetent
+gettargetent = CAPI.gettargetent
