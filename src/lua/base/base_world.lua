@@ -401,3 +401,39 @@ clearpvs = CAPI.clearpvs
 -- @class function
 -- @name pvsstats
 pvsstats = CAPI.pvsstats
+---
+-- @class function
+-- @name editing_getworldsize
+editing_getworldsize = CAPI.editing_getworldsize
+---
+-- @class function
+-- @name editing_getgridsize
+editing_getgridsize = CAPI.editing_getgridsize
+---
+-- @class function
+-- @name editing_erasegeometry
+editing_erasegeometry = CAPI.editing_erasegeometry
+---
+-- @class function
+-- @name editing_createcube
+editing_createcube = CAPI.editing_createcube
+---
+-- @class function
+-- @name editing_deletecube
+editing_deletecube = CAPI.editing_deletecube
+---
+-- @class function
+-- @name editing_setcubetex
+editing_setcubetex = CAPI.editing_setcubetex
+---
+-- @class function
+-- @name editing_setcubemat
+editing_setcubemat = CAPI.editing_setcubemat
+---
+-- @class function
+-- @name editing_pushcubecorner
+editing_pushcubecorner = CAPI.editing_pushcubecorner
+---
+-- @class function
+-- @name editing_getselent
+editing_getselent = CAPI.editing_getselent

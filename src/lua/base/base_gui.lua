@@ -274,3 +274,64 @@ noautotab = CAPI.guinoautotab
 -- @class function
 -- @name renderprogress
 renderprogress = CAPI.renderprogress
+--- Show a HUD rectangle.
+-- @param x1 X1 position.
+-- @param x2 X2 position.
+-- @param y1 Y1 position.
+-- @param y2 Y2 position.
+-- @param c Color of the rectangle as hex number.
+-- @param a Alpha of rectangle from 0.0 to 1.0.
+-- @class function
+-- @name showhudrect
+showhudrect = CAPI.showhudrect
+--- Show a HUD image.
+-- @param cx X center.
+-- @param cy Y center.
+-- @param w Width.
+-- @param h Height.
+-- @param c Color of the image as hex number.
+-- @param a Alpha of the image from 0.0 to 1.0.
+-- @class function
+-- @name showhudimage
+showhudimage = CAPI.showhudimage
+--- Show a HUD text.
+-- @param t Text to show.
+-- @param x X position.
+-- @param y Y position.
+-- @param s Text scale.
+-- @param c Text color.
+-- @class function
+-- @name showhudtext
+showhudtext = CAPI.showhudtext
+---
+-- @class function
+-- @name menukeyclicktrig
+menukeyclicktrig = CAPI.menukeyclicktrig
+---
+-- @class function
+-- @name prepentgui
+prepentgui = CAPI.prepentgui
+---
+-- @class function
+-- @name getentguilabel
+getentguilabel = CAPI.getentguilabel
+---
+-- @class function
+-- @name getentguival
+getentguival = CAPI.getentguival
+---
+-- @class function
+-- @name setentguival
+setentguival = CAPI.setentguival
+---
+-- @class function
+-- @name show_plugins
+show_plugins = CAPI.show_plugins
+---
+-- @class function
+-- @name loadcrosshair
+loadcrosshair = CAPI.loadcrosshair
+---
+-- @class function
+-- @name showscores
+showscores = CAPI.showscores

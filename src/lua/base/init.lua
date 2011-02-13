@@ -26,6 +26,9 @@
 -- THE SOFTWARE.
 --
 
+-- see cc.world metatable below
+local gravity
+
 cc.logging.log(cc.logging.DEBUG, ":: JSON.")
 require("base.base_json")
 
@@ -128,5 +131,30 @@ require("base.base_textures")
 cc.logging.log(cc.logging.DEBUG, ":: World interface.")
 require("base.base_world")
 
+--- Metatable for world for setting gravity.
+-- @class table
+-- @name world_metatable
+-- @field __index Called when a value is got.
+-- @field __newindex Called when a value is set.
+setmetatable(cc.world, {
+    __index = function(self, n)
+        return (n == "gravity" and gravity or rawget(self, n))
+    end,
+    __newindex = function(self, n, v)
+        if n == "gravity" then
+            CAPI.setgravity(v)
+            gravity = v
+        else
+            rawset(self, n, v)
+        end
+    end
+})
+
 cc.logging.log(cc.logging.DEBUG, ":: Network interface.")
 require("base.base_network")
+
+cc.logging.log(cc.logging.DEBUG, ":: Text editor.")
+require("base.base_textedit")
+
+cc.logging.log(cc.logging.DEBUG, ":: Camera.")
+require("base.base_camera")

@@ -1,6 +1,6 @@
 ---
--- base_textures.lua, version 1<br/>
--- Texture interface for Lua<br/>
+-- base_textedit.lua, version 1<br/>
+-- Text editor interface for Lua<br/>
 -- <br/>
 -- @author q66 (quaker66@gmail.com)<br/>
 -- license: MIT/X11<br/>
@@ -27,118 +27,69 @@
 --
 
 local CAPI = require("CAPI")
-local string = require("string")
 
---- Textures for cC's Lua interface.
+--- Text editor for cC's Lua interface.
 -- @class module
--- @name cc.texture
-module("cc.texture")
+-- @name cc.textedit
+module("cc.textedit")
 
 ---
-function convpngtodds(src, dest)
-    CAPI.convpngtodds(src, dest or string.gsub(src, '.png', '.dds'))
-end
+-- @class function
+-- @name textlist
+textlist = CAPI.textlist
 ---
 -- @class function
--- @name combineimages
-combineimages = CAPI.combineimages
+-- @name textshow
+textshow = CAPI.textshow
 ---
 -- @class function
--- @name reset
-reset = CAPI.texturereset
+-- @name textfocus
+textfocus = CAPI.textfocus
 ---
 -- @class function
--- @name add
-add = CAPI.texture
+-- @name textprev
+textprev = CAPI.textprev
 ---
 -- @class function
--- @name resetmat
-resetmat = CAPI.materialreset
+-- @name textmode
+textmode = CAPI.textmode
 ---
 -- @class function
--- @name autograss
-autograss = CAPI.autograss
+-- @name textsave
+textsave = CAPI.textsave
 ---
 -- @class function
--- @name scroll
-scroll = CAPI.texscroll
+-- @name textload
+textload = CAPI.textload
 ---
 -- @class function
--- @name offset
-offset = CAPI.texoffset
+-- @name textinit
+textinit = CAPI.textinit
 ---
 -- @class function
--- @name rotate
-rotate = CAPI.texrotate
+-- @name textcopy
+textcopy = CAPI.textcopy
 ---
 -- @class function
--- @name scale
-scale = CAPI.texscale
+-- @name textpaste
+textpaste = CAPI.textpaste
 ---
 -- @class function
--- @name layer
-layer = CAPI.texlayer
+-- @name textmark
+textmark = CAPI.textmark
 ---
 -- @class function
--- @name alpha
-alpha = CAPI.texalpha
+-- @name textselectall
+textselectall = CAPI.textselectall
 ---
 -- @class function
--- @name color
-color = CAPI.texcolor
+-- @name textclear
+textclear = CAPI.textclear
 ---
 -- @class function
--- @name ffenv
-ffenv = CAPI.texffenv
+-- @name textcurrentline
+textcurrentline = CAPI.textcurrentline
 ---
 -- @class function
--- @name reload
-reload = CAPI.reloadtex
----
--- @class function
--- @name gendds
-gendds = CAPI.gendds
----
--- @class function
--- @name flipnormalmapy
-flipnormalmapy = CAPI.flipnormalmapy
----
--- @class function
--- @name mergenormalmaps
-mergenormalmaps = CAPI.mergenormalmaps
----
--- @class function
--- @name showgui
-showgui = CAPI.showtexgui
----
--- @class function
--- @name list
-list = CAPI.listtex
----
--- @class function
--- @name massreplace
-massreplace = CAPI.massreplacetex
----
--- @class function
--- @name edit
-edit = CAPI.edittex
----
--- @class function
--- @name get
-get = CAPI.gettex
----
--- @class function
--- @name getcur
-getcur = CAPI.getcurtex
----
--- @class function
--- @name getsel
-getsel = CAPI.getseltex
----
--- @class function
--- @name getrep
-getrep = CAPI.getreptex
----
--- @class function
--- @name getname
-getname = CAPI.gettexname
+-- @name textexec
+textexec = CAPI.textexec

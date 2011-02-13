@@ -1,6 +1,6 @@
 ---
--- base_textures.lua, version 1<br/>
--- Texture interface for Lua<br/>
+-- base_camera.lua, version 1<br/>
+-- Camera interface for Lua<br/>
 -- <br/>
 -- @author q66 (quaker66@gmail.com)<br/>
 -- license: MIT/X11<br/>
@@ -27,118 +27,65 @@
 --
 
 local CAPI = require("CAPI")
-local string = require("string")
 
---- Textures for cC's Lua interface.
+--- Camera for cC's Lua interface.
 -- @class module
--- @name cc.texture
-module("cc.texture")
+-- @name cc.camera
+module("cc.camera")
 
 ---
-function convpngtodds(src, dest)
-    CAPI.convpngtodds(src, dest or string.gsub(src, '.png', '.dds'))
-end
+-- @class function
+-- @name forcecam
+forcecam = CAPI.forcecam
 ---
 -- @class function
--- @name combineimages
-combineimages = CAPI.combineimages
+-- @name forcepos
+forcepos = CAPI.forcepos
 ---
 -- @class function
--- @name reset
-reset = CAPI.texturereset
+-- @name forceyaw
+forceyaw = CAPI.forceyaw
 ---
 -- @class function
--- @name add
-add = CAPI.texture
+-- @name forcepitch
+forcepitch = CAPI.forcepitch
 ---
 -- @class function
--- @name resetmat
-resetmat = CAPI.materialreset
+-- @name forceroll
+forceroll = CAPI.forceroll
 ---
 -- @class function
--- @name autograss
-autograss = CAPI.autograss
+-- @name forcefov
+forcefov = CAPI.forcefov
 ---
 -- @class function
--- @name scroll
-scroll = CAPI.texscroll
+-- @name resetcam
+resetcam = CAPI.resetcam
 ---
 -- @class function
--- @name offset
-offset = CAPI.texoffset
+-- @name getcam
+getcam = CAPI.getcam
 ---
 -- @class function
--- @name rotate
-rotate = CAPI.texrotate
+-- @name getcampos
+getcampos = CAPI.getcampos
 ---
 -- @class function
--- @name scale
-scale = CAPI.texscale
+-- @name caminc
+caminc = CAPI.caminc
 ---
 -- @class function
--- @name layer
-layer = CAPI.texlayer
+-- @name camdec
+camdec = CAPI.camdec
 ---
 -- @class function
--- @name alpha
-alpha = CAPI.texalpha
+-- @name mouselook
+mouselook = CAPI.mouselook
 ---
 -- @class function
--- @name color
-color = CAPI.texcolor
+-- @name characterview
+characterview = CAPI.characterview
 ---
 -- @class function
--- @name ffenv
-ffenv = CAPI.texffenv
----
--- @class function
--- @name reload
-reload = CAPI.reloadtex
----
--- @class function
--- @name gendds
-gendds = CAPI.gendds
----
--- @class function
--- @name flipnormalmapy
-flipnormalmapy = CAPI.flipnormalmapy
----
--- @class function
--- @name mergenormalmaps
-mergenormalmaps = CAPI.mergenormalmaps
----
--- @class function
--- @name showgui
-showgui = CAPI.showtexgui
----
--- @class function
--- @name list
-list = CAPI.listtex
----
--- @class function
--- @name massreplace
-massreplace = CAPI.massreplacetex
----
--- @class function
--- @name edit
-edit = CAPI.edittex
----
--- @class function
--- @name get
-get = CAPI.gettex
----
--- @class function
--- @name getcur
-getcur = CAPI.getcurtex
----
--- @class function
--- @name getsel
-getsel = CAPI.getseltex
----
--- @class function
--- @name getrep
-getrep = CAPI.getreptex
----
--- @class function
--- @name getname
-getname = CAPI.gettexname
+-- @name setdeftpm
+setdeftpm = CAPI.setdeftpm

@@ -156,8 +156,8 @@ namespace lua_binds
         damageblend(e.get<int>(2));
     })
 
-    LUA_BIND_CLIENT(showhudrect,  ClientSystem::addHUDRect (e.get<double>(1), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<int>(5), e.get<double>(6));)
-    LUA_BIND_CLIENT(showhudimage, ClientSystem::addHUDImage(e.get<const char*>(1), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<double>(5), e.get<int>(6), e.get<double>(7));)
+    LUA_BIND_CLIENT(showhudrect,  ClientSystem::addHUDRect (e.get<double>(1), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<int>(5), e.get(6, 1.0));)
+    LUA_BIND_CLIENT(showhudimage, ClientSystem::addHUDImage(e.get<const char*>(1), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<double>(5), e.get(6, 0xFFFFFF), e.get(7, 1.0));)
 
     // text, x, y, scale, color
     LUA_BIND_CLIENT(showhudtext, ClientSystem::addHUDText(e.get<const char*>(1), e.get<double>(2), e.get<double>(3), e.get<double>(4), e.get<int>(5));)
