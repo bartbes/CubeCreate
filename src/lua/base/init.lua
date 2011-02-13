@@ -153,8 +153,5 @@ setmetatable(cc.world, {
 cc.logging.log(cc.logging.DEBUG, ":: Network interface.")
 require("base.base_network")
 
-cc.logging.log(cc.logging.DEBUG, ":: Text editor.")
-require("base.base_textedit")
-
 cc.logging.log(cc.logging.DEBUG, ":: Camera.")
 require("base.base_camera")

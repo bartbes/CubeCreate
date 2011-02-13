@@ -43,19 +43,36 @@ function table.map(t, f)
     end
 end
 
---- Merge two tables together.
+--- Merge two dictionaries together.
 -- <br/><br/>Usage:<br/><br/>
 -- <code>
 -- local a = { a = 5, b = 10 }<br/>
 -- local b = { c = 15, d = 20 }<br/>
--- table.merge(a, b)<br/>
+-- table.mergedicts(a, b)<br/>
 -- </code>
 -- @param ta Table to merge the other one into.
 -- @param tb Table to merge into the first one.
 -- @return The first table (modified). Original table gets overwritten.
-function table.merge(ta, tb)
+function table.mergedicts(ta, tb)
     for a, b in pairs(tb) do
         ta[a] = b
+    end
+    return ta
+end
+
+--- Merge two arrays together.
+-- <br/><br/>Usage:<br/><br/>
+-- <code>
+-- local a = { 5, 10, 15 }<br/>
+-- local b = { 20, 25, 30 }<br/>
+-- table.mergearrays(a, b)<br/>
+-- </code>
+-- @param ta Table to merge the other one into.
+-- @param tb Table to merge into the first one.
+-- @return The first table (modified). Original table gets overwritten.
+function table.mergearrays(ta, tb)
+    for i = 1, #tb do
+        table.insert(ta, tb[i])
     end
     return ta
 end

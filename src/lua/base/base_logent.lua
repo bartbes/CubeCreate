@@ -113,7 +113,13 @@ function root_logent:has_tag(t)
 end
 
 function root_logent:_setup_vars()
-    local _names = table.keys(base.getmetatable(self))
+    local _meta = base.getmetatable(self) -- TODO: efficiency
+    local _names = table.keys(_meta)
+    while _meta do
+        _meta = _meta.__base
+        if not _meta then break end
+        table.mergearrays(_names, table.keys(_meta))
+    end
     for i = 1, #_names do
         local var = self[_names[i]]
         if svar.is(var) then
@@ -129,7 +135,13 @@ function root_logent:create_statedatadict(tcn, kwargs)
     log.log(log.DEBUG, "create_statedatadict(): " .. base.tostring(self) .. base.tostring(self.uid) .. ", " .. base.tostring(tcn))
 
     local r = {}
-    local _names = table.keys(base.getmetatable(self))
+    local _meta = base.getmetatable(self) -- TODO: efficiency
+    local _names = table.keys(_meta)
+    while _meta do
+        _meta = _meta.__base
+        if not _meta then break end
+        table.mergearrays(_names, table.keys(_meta))
+    end
     for i = 1, #_names do
         local var = self[_names[i]]
         if svar.is(var) and var.hashistory then

@@ -72,7 +72,7 @@ def run_server(location=None, use_master=True):
                 def do_connect():
                     assert(not Module.server_proc.connected_to)
                     Module.server_proc.connected_to = True
-                    CModule.run_script('Network.connect("127.0.0.1", 28787)') # XXX: hard-coded
+                    CModule.run_script('cc.network.connect("127.0.0.1", 28787)') # XXX: hard-coded
                 main_actionqueue.add_action(do_connect)
                 break
             else:
@@ -119,11 +119,11 @@ def show_gui(sender, **kwargs):
         if check_server_ready():
             CModule.run_script('''
                 cc.gui.text("Local server: Running")
-                cc.gui.stayopen([[ cc.gui.button("  stop", [=[ engine.ssls() ]=]) ]])
-                cc.gui.button("  show output", [[ cc.gui.show("local_server_output") ]])
-                cc.gui.stayopen([[ cc.gui.button("  save map", [=[ CV:run("do_upload") ]=]) ]])
-                cc.gui.button("  restart map", [[ cc.gui.show("restart_map") ]])
-                cc.gui.button("  editing commands", [[ cc.gui.show("editing") ]])
+                cc.gui.stayopen([[ cc.gui.button("  stop", [=[cc.network.ssls()]=]) ]])
+                cc.gui.button("  show output", [[cc.gui.show("local_server_output")]])
+                cc.gui.stayopen([[ cc.gui.button("  save map", [=[cc.network.do_upload()]=])]])
+                cc.gui.button("  restart map", [[cc.world.restart_map()]])
+                cc.gui.button("  editing commands", [[cc.gui.show("editing")]])
             ''')
         elif check_server_terminated():
             Module.server_proc = None
@@ -131,14 +131,14 @@ def show_gui(sender, **kwargs):
         else:
             CModule.run_script('''
                 cc.gui.text("Local server: ...preparing...")
-                cc.gui.stayopen([[ cc.gui.button("  stop", [=[ engine.ssls() ]=]) ]])
+                cc.gui.stayopen([[ cc.gui.button("  stop", [=[cc.network.ssls()]=]) ]])
             ''')
     else:
         CModule.run_script('''
             cc.gui.text("Local server: (not active)")
             if logged_into_master == 0 then
-				cc.gui.text("   << not logged into master >>")
-			end
+                cc.gui.text("   << not logged into master >>")
+            end
 
             cc.gui.list([[
                 cc.gui.text("Map location to run: base/")
@@ -146,9 +146,9 @@ def show_gui(sender, **kwargs):
                 cc.gui.text(".tar.gz")
             ]])
             cc.gui.stayopen([[
-			    cc.gui.button("  start", [=[
-					engine.ssls(local_server_location)
-			    ]=])
+                cc.gui.button("  start", [=[
+                    cc.network.ssls(local_server_location)
+                ]=])
             ]])
             cc.gui.button("  show output", [[ cc.gui.show("local_server_output") ]])
         ''')
@@ -178,4 +178,3 @@ CModule.run_script('''
         ]=])
     ]])
 ''' % { 'name': get_output_file() })
-

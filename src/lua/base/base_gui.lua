@@ -335,3 +335,63 @@ loadcrosshair = CAPI.loadcrosshair
 -- @class function
 -- @name showscores
 showscores = CAPI.showscores
+---
+-- @class function
+-- @name textlist
+textlist = CAPI.textlist
+---
+-- @class function
+-- @name textshow
+textshow = CAPI.textshow
+---
+-- @class function
+-- @name textfocus
+textfocus = CAPI.textfocus
+---
+-- @class function
+-- @name textprev
+textprev = CAPI.textprev
+---
+-- @class function
+-- @name textmode
+textmode = CAPI.textmode
+---
+-- @class function
+-- @name textsave
+textsave = CAPI.textsave
+---
+-- @class function
+-- @name textload
+textload = CAPI.textload
+---
+-- @class function
+-- @name textinit
+textinit = CAPI.textinit
+---
+-- @class function
+-- @name textcopy
+textcopy = CAPI.textcopy
+---
+-- @class function
+-- @name textpaste
+textpaste = CAPI.textpaste
+---
+-- @class function
+-- @name textmark
+textmark = CAPI.textmark
+---
+-- @class function
+-- @name textselectall
+textselectall = CAPI.textselectall
+---
+-- @class function
+-- @name textclear
+textclear = CAPI.textclear
+---
+-- @class function
+-- @name textcurrentline
+textcurrentline = CAPI.textcurrentline
+---
+-- @class function
+-- @name textexec
+textexec = CAPI.textexec

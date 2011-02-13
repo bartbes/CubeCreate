@@ -107,9 +107,9 @@ do_upload = CAPI.do_upload
 repeat_upload = CAPI.repeat_upload
 ---
 -- @class function
--- @name restart_map
-restart_map = CAPI.restart_map
----
--- @class function
 -- @name do_login
 do_login = CAPI.do_login
+---
+-- @class function
+-- @name ssls
+ssls = CAPI.ssls

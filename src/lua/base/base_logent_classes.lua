@@ -68,7 +68,13 @@ function reg(_cl, st)
     local sv_names = {}
 
     local inst = _cl()
-    local _keys = table.keys(base.getmetatable(inst))
+    local _meta = base.getmetatable(inst) -- TODO: efficiency
+    local _keys = table.keys(_meta)
+    while _meta do
+        _meta = _meta.__base
+        if not _meta then break end
+        table.mergearrays(_keys, table.keys(_meta))
+    end
     for i = 1, #_keys do
         local var = inst[_keys[i]]
         log.log(log.INFO, "considering " .. base.tostring(_keys[i]) .. " -- " .. base.tostring(var))
