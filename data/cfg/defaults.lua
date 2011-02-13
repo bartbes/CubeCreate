@@ -37,18 +37,18 @@ fullconfilter = 0xFFFF -- display all messages in full console
 
 -- WSAD
 
-cc.console.binds.add("W", [[Movement.forward()]])
-cc.console.binds.add("S", [[Movement.backward()]])
-cc.console.binds.add("A", [[Movement.left()]])
-cc.console.binds.add("D", [[Movement.right()]])
+cc.console.binds.add("W", [[cc.console.forward()]])
+cc.console.binds.add("S", [[cc.console.backward()]])
+cc.console.binds.add("A", [[cc.console.left()]])
+cc.console.binds.add("D", [[cc.console.right()]])
 
-cc.console.binds.add("UP", [[Movement.forward()]])
-cc.console.binds.add("DOWN", [[Movement.backward()]])
-cc.console.binds.add("LEFT", [[Movement.left()]])
-cc.console.binds.add("RIGHT", [[Movement.right()]])
+cc.console.binds.add("UP", [[cc.console.forward()]])
+cc.console.binds.add("DOWN", [[cc.console.backward()]])
+cc.console.binds.add("LEFT", [[cc.console.left()]])
+cc.console.binds.add("RIGHT", [[cc.console.right()]])
 
-cc.console.binds.add("SPACE", [[Movement.jump()]])
-cc.console.binds.add("MOUSE2", [[Movement.jump()]])
+cc.console.binds.add("SPACE", [[cc.console.jump()]])
+cc.console.binds.add("MOUSE2", [[cc.console.jump()]])
 cc.console.binds.add("MOUSE1", [[CV:run("attack")]])
 cc.console.binds.add("MOUSE3", [[CV:run("weapon")]])
 
@@ -65,6 +65,6 @@ cc.console.binds.add("BACKQUOTE", [[cc.console.saycommand("/")]])
 cc.console.binds.add("SLASH", [[cc.console.saycommand("/")]])
 
 cc.console.binds.add("I", [[CV:run("taunt")]])
-cc.console.binds.add("E", [[CV:run([=[ if (< (getmode) 0) [ echo "^f3Please press F1 to enter editmode from a local game" ] [ edittoggle ] ]=])]])
-cc.console.binds.add("F1", [[CV:run("edittoggle")]])
+cc.console.binds.add("E", [[cc.world.edittoggle()]])
+cc.console.binds.add("F1", [[cc.world.edittoggle()]])
 

@@ -823,29 +823,29 @@ bool load_world(const char *mname, const char *cname)        // still supports a
             {
                 case ET_LIGHT:
                 {
-                    printf("Light\", {");
+                    printf("light\", {");
                     goto standardEntity;
                 }
                 case ET_SPOTLIGHT:
                 {
-                    printf("Spotlight\", {");
+                    printf("spotlight\", {");
                     goto standardEntity;
                 }
                 case ET_ENVMAP:
                 {
-                    printf("Envmap\", {");
+                    printf("envmap\", {");
                     goto standardEntity;
                 }
                 case ET_PARTICLES:
                 {
-                    printf("ParticleEffect\", {");
+                    printf("particle_effect\", {");
                     goto standardEntity;
                 }
                 case ET_MAPMODEL:
                 {
-                    printf("Mapmodel\", {");
+                    printf("mapmodel\", {");
                     PRINT_STD(e)
-                    printf("\"modelName\":\"@REPLACE_MODEL_PATH@\", ");
+                    printf("\"modelname\":\"@REPLACE_MODEL_PATH@\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[]\", ");
                     printf("\"_persistent\":\"true\"");
@@ -853,10 +853,10 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 }
                 case ET_SOUND:
                 {
-                    printf("SoundEffect\", {");
+                    printf("ambient_sound\", {");
                     PRINT_STD(e)
-                    printf("\"modelName\":\"\", ");
-                    printf("\"soundName\":\"@REPLACE_SOUND_PATH@\", ");
+                    printf("\"modelname\":\"\", ");
+                    printf("\"soundname\":\"@REPLACE_SOUND_PATH@\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[]\", ");
                     printf("\"_persistent\":\"true\"");
@@ -864,9 +864,9 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 }
                 case ET_PLAYERSTART:
                 {
-                    printf("WorldMarker\", {");
+                    printf("world_marker\", {");
                     PRINT_STD(e)
-                    printf("\"modelName\":\"\", ");
+                    printf("\"modelname\":\"\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[start_@REPLACE_TEAM@]\", ");
                     printf("\"_persistent\":\"true\"");
@@ -874,20 +874,20 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 }
                 case JUMPPAD:
                 {
-                    printf("JumpPad\", {");
-                    printf("\"jumpVelocity\":\"[%f|%f|%f]\", ", (int)(char)e.attr3*10.0f, (int)(char)e.attr2*10.0f, e.attr1*12.5f);
-                    printf("\"padModel\":\"\", ");
-                    printf("\"padRotate\":\"false\", ");
-                    printf("\"padPitch\":\"0\", ");
+                    printf("jumppad\", {");
+                    printf("\"jumpvel\":\"[%f|%f|%f]\", ", (int)(char)e.attr3*10.0f, (int)(char)e.attr2*10.0f, e.attr1*12.5f);
+                    printf("\"padmodel\":\"\", ");
+                    printf("\"padrotate\":\"false\", ");
+                    printf("\"padpitch\":\"0\", ");
                     printf("\"attr1\":\"0\", ");
-                    printf("\"collisionRadiusWidth\":\"5\", ");
-                    printf("\"collisionRadiusHeight\":\"1\", ");
+                    printf("\"collision_radius_width\":\"5\", ");
+                    printf("\"collision_radius_height\":\"1\", ");
                     printf("\"position\":\"[%f|%f|%f]\", ", e.o.x, e.o.y, e.o.z);
                     printf("\"attr2\":\"-1\", ");
                     printf("\"attr3\":\"0\", ");
                     printf("\"attr4\":\"0\", ");
                     printf("\"animation\":\"130\", ");
-                    printf("\"modelName\":\"areatrigger\", ");
+                    printf("\"modelname\":\"areatrigger\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[]\", ");
                     printf("\"_persistent\":\"true\"");
@@ -895,20 +895,20 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 }
                 case TELEPORT:
                 {
-                    printf("Teleporter\", {");
+                    printf("teleporter\", {");
                     printf("\"target\":\"[0|0|0]\", ");
-                    printf("\"targetYaw\":\"0\", ");
+                    printf("\"targetyaw\":\"0\", ");
                     printf("\"teledest\":\"%d\", ", e.attr1);
                     printf("\"attr1\":\"0\", ");
-                    printf("\"collisionRadiusWidth\":\"5\", ");
-                    printf("\"collisionRadiusHeight\":\"5\", ");
+                    printf("\"collision_radius_width\":\"5\", ");
+                    printf("\"collision_radius_height\":\"5\", ");
                     printf("\"position\":\"[%f|%f|%f]\", ", e.o.x, e.o.y, e.o.z);
                     printf("\"attr2\":\"%d\", ", e.attr2);
                     printf("\"attr3\":\"%d\", ", e.attr3);
                     printf("\"attr4\":\"%d\", ", e.attr4);
                     printf("\"animation\":\"130\", ");
-                    printf("\"modelName\":\"%s\", ", (e.attr2 < 0) ? "areatrigger" : "@REPLACE_MODEL_PATH@");
-                    printf("\"soundName\":\"0ad/alarmcreatemiltaryfoot_1.ogg\", ");
+                    printf("\"modelname\":\"%s\", ", (e.attr2 < 0) ? "areatrigger" : "@REPLACE_MODEL_PATH@");
+                    printf("\"soundname\":\"0ad/alarmcreatemiltaryfoot_1.ogg\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[]\", ");
                     printf("\"_persistent\":\"true\"");
@@ -916,14 +916,14 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 }
                 case TELEDEST:
                 {
-                    printf("WorldMarker\", {");
+                    printf("world_marker\", {");
                     printf("\"attr1\":\"%d\", ", e.attr1);
                     printf("\"attr2\":\"0\", ");
                     printf("\"attr3\":\"%d\", ", e.attr3);
                     printf("\"attr4\":\"%d\", ", e.attr4);
                     printf("\"position\":\"[%f|%f|%f]\", ", e.o.x, e.o.y, e.o.z);
                     printf("\"animation\":\"130\", ");
-                    printf("\"modelName\":\"\", ");
+                    printf("\"modelname\":\"\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[teledest_%i]\", ", e.attr2);
                     printf("\"_persistent\":\"true\"");
@@ -932,7 +932,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
                 default: standardEntity:
                 {
                     PRINT_STD(e)
-                    printf("\"modelName\":\"\", ");
+                    printf("\"modelname\":\"\", ");
                     printf("\"attachments\":\"[]\", ");
                     printf("\"tags\":\"[]\", ");
                     printf("\"_persistent\":\"true\"");

@@ -699,4 +699,4 @@ state_json.from_wire = json.decode
 state_json.to_data   = json.encode
 state_json.from_data = json.decode
 
-json.register("logent", function(v) return (v.uid ~= nil) end, function(v) return v.uid end)
+json.register(function(v) return (base.type(v) == "table" and v.uid ~= nil) end, function(v) return v.uid end)
