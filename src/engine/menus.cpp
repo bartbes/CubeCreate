@@ -4,7 +4,7 @@
 
 #define GUI_TITLE_COLOR  0xFFDD88
 #define GUI_BUTTON_COLOR 0xFFFFFF
-#define GUI_TEXT_COLOR   0xDDFFDD
+#define GUI_TEXT_COLOR   0xBDBDBD
 
 static vec menupos;
 static int menustart = 0;
@@ -324,7 +324,7 @@ template<class T> static void updateval(const char *var, T val, const char *onch
     if (!ev) ev = var::reg(var, new var::cvar(var, val, true));
 
     updatelater.add().schedule(ev, val);
-    if(onchange[0]) updatelater.add().schedule(onchange);
+    if(onchange && onchange[0]) updatelater.add().schedule(onchange);
 }
 
 static int getval(char *var)

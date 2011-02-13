@@ -315,10 +315,6 @@ npcadd = CAPI.npcadd
 npcdel = CAPI.npcdel
 ---
 -- @class function
--- @name save_mouse_pos
-save_mouse_pos = CAPI.save_mouse_pos
----
--- @class function
 -- @name getentclass
 getentclass = CAPI.getentclass
 ---
