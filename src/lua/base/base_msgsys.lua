@@ -51,7 +51,7 @@ function send(...)
     local cn
 
     local args = { ... }
-    if args[1].is_a and args[1]:is_a(lent.logent) then
+    if base.type(args[1]) == "table" and args[1].is_a and args[1]:is_a(lent.logent) then
         -- server->client message, get clientnumber from entity
         server = true
         cn = args[1].cn
@@ -70,8 +70,8 @@ function send(...)
 
     if server then table.insert(args, 1, cn) end
 
-    log.log(log.DEBUG, string.format("Lua msgsys: send(): %s with { %s }", tostring(mt), table.concat(table.map(args, function(x) return tostring(x) end), ", ")))
-    mt(unpack(args))
+    log.log(log.DEBUG, string.format("Lua msgsys: send(): %s with { %s }", base.tostring(mt), table.concat(table.map(args, function(x) return base.tostring(x) end), ", ")))
+    mt(base.unpack(args))
 end
 
 function genprod(cln, svn)

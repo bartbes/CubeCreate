@@ -165,11 +165,9 @@ namespace lua_binds
         assert(ext);
 
         removeentity(ext); /* Need to remove, then add, to the octa world on each change. */
-        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
         ext->o.x = e.t_get<double>(1);
         ext->o.y = e.t_get<double>(2);
         ext->o.z = e.t_get<double>(3);
-        e.pop(1);
         addentity(ext);
     })
 
@@ -219,11 +217,9 @@ namespace lua_binds
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
 
-        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
         d->o.x = e.t_get<double>(1);
         d->o.y = e.t_get<double>(2);
         d->o.z = e.t_get<double>(3) + d->eyeheight;// + d->aboveeye;
-        e.pop(1);
 
         // Also set 'newpos', otherwise this change may get overwritten
         d->newpos = d->o;
@@ -243,11 +239,9 @@ namespace lua_binds
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
 
-        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
         d->vel.x = e.t_get<double>(1);
         d->vel.y = e.t_get<double>(2);
         d->vel.z = e.t_get<double>(3);
-        e.pop(1);
     })
 
     LUA_BIND_LE(getdynentfalling, {
@@ -260,10 +254,8 @@ namespace lua_binds
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
 
-        e.push_index(2).t_getraw("as_array").shift().call(1, 1);
         d->falling.x = e.t_get<double>(1);
         d->falling.y = e.t_get<double>(2);
         d->falling.z = e.t_get<double>(3);
-        e.pop(1);
     })
 }

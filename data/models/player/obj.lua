@@ -1,3 +1,3 @@
-cc.model.ambient(50)
-cc.model.spec(-1)
-cc.model.scale(80)
+cc.model.mdl.ambient(50)
+cc.model.mdl.spec(-1)
+cc.model.mdl.scale(80)

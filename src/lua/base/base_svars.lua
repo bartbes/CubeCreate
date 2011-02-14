@@ -413,9 +413,10 @@ function wrapped_cvariable:_register(_name, parent)
         local variable = self
         parent:connect(prefix .. _name, function (self, v)
             if glob.CLIENT or parent:can_call_cfuncs() then
-                log.log(log.INFO, string.format("Calling csetter for %s, with %s (%s)", base.tostring(variable._name), base.tostring(v), base.type(v)))
+                log.log(log.DEBUG, string.format("Calling csetter for %s, with %s (%s)", base.tostring(variable._name), base.tostring(v), base.type(v)))
                 -- we've been set up, apply the change
                 variable.csetter(parent, v)
+                log.log(log.DEBUG, "csetter called successfully.")
 
                 -- caching reads from script into C++ (search for -- caching)
                 parent.state_var_vals[base.tostring(variable._name)] = v

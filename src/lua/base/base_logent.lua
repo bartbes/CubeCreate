@@ -145,7 +145,7 @@ function root_logent:create_statedatadict(tcn, kwargs)
             if not skip then
                 local val = self[var._name]
                 if val then
-                    log.log(log.DEBUG, "create_statedatadict() adding " .. base.tostring(var._name) .. ": " .. json.encode(val.as_array and val:as_array() or val))
+                    log.log(log.DEBUG, "create_statedatadict() adding " .. base.tostring(var._name) .. ": " .. json.encode(val))
                     r[not kwargs.compressed and var._name or msgsys.toproid(base.tostring(self), var._name)] = var:is_a(svar.state_array) and var:to_data(val) or var.to_data(val)
                     log.log(log.DEBUG, "create_statedatadict() currently ..")
                     log.log(log.DEBUG, "create_statedatadict() currently: " .. json.encode(r))

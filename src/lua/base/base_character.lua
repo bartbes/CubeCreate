@@ -182,7 +182,7 @@ function character:render_dynamic(hudpass, needhud)
         self.rendering_args_timestamp = lstor.curr_timestamp
     end
 
-    CAPI.rendermodel(unpack(self.rendering_args))
+    cc.model.render(unpack(self.rendering_args))
 end
 
 function character:create_renderingargs(mdlname, anim, o, yaw, pitch, flags, basetime)

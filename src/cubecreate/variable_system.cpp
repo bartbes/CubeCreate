@@ -324,7 +324,8 @@ namespace var
         if ((luasync || alias) && lua::engine.hashandle()) \
         { \
             defformatstring(buf)("%s_ns", name); \
-            lua::engine.getg("_G").t_set(buf, v).pop(1); \
+            lua::engine.getg("cc").t_getraw("engine_variables") \
+                       .t_getraw("inst").t_set(buf, v).pop(3); \
         }
 
         switch (type)
