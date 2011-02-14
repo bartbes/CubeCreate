@@ -157,7 +157,7 @@ namespace lua_binds
         extentity *ext = self.get()->staticEntity;
         assert(ext);
         Logging::log(Logging::INFO, "getextent0(%s): x: %f, y: %f, z: %f\n", self.get()->getClass().c_str(), ext->o.x, ext->o.y, ext->o.z);
-        e.push(ext->o);
+        e.t_new().t_set(1, ext->o.x).t_set(2, ext->o.y).t_set(3, ext->o.z);
     })
 
     LUA_BIND_LE(setextent0, {
@@ -210,7 +210,7 @@ namespace lua_binds
     LUA_BIND_LE(getdynent0, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
-        e.push(vec(d->o.x, d->o.y, d->o.z - d->eyeheight/* - d->aboveeye*/));
+        e.t_new().t_set(1, d->o.x).t_set(2, d->o.y).t_set(3, d->o.z - d->eyeheight/* - d->aboveeye*/);
     })
 
     LUA_BIND_LE(setdynent0, {
@@ -232,7 +232,7 @@ namespace lua_binds
     LUA_BIND_LE(getdynentvel, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
-        e.push(d->vel);
+        e.t_new().t_set(1, d->vel.x).t_set(2, d->vel.y).t_set(3, d->vel.z);
     })
 
     LUA_BIND_LE(setdynentvel, {
@@ -247,7 +247,7 @@ namespace lua_binds
     LUA_BIND_LE(getdynentfalling, {
         fpsent *d = (fpsent*)self.get()->dynamicEntity;
         assert(d);
-        e.push(d->falling);
+        e.t_new().t_set(1, d->falling.x).t_set(2, d->falling.y).t_set(3, d->falling.z);
     })
 
     LUA_BIND_LE(setdynentfalling, {

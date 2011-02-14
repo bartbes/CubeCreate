@@ -226,6 +226,7 @@ function state_array:getter(var)
 
     local cache_name = "__arraysurrogate_" .. var._name
     if not self[cache_name] then
+        log.log(log.DEBUG, "state_array getter: creating surrogate")
         self[cache_name] = var.surrogate_class(self, var)
     end
 
@@ -396,6 +397,8 @@ end
 function wrapped_cvariable:_register(_name, parent)
     self.__base._register(self, _name, parent)
 
+    log.log(log.DEBUG, "WCV register: " .. base.tostring(_name))
+
     -- allow use of string names, for late binding at this stagem we copy raw walues, then eval
     self.cgetter = self.cgetter_raw
     self.csetter = self.csetter_raw
@@ -434,15 +437,15 @@ end
 function wrapped_cvariable:getter(var)
     var:read_tests(self)
 
+    log.log(log.DEBUG, "WCV getter " .. base.tostring(var._name))
+
     -- caching
     local cached_timestamp = self.state_var_val_timestamps[base.tostring(var._name)]
     if cached_timestamp == glob.curr_timestamp then
         return self.state_var_vals[base.tostring(var._name)]
     end
-
-    log.log(log.INFO, "WCV getter " .. base.tostring(var._name))
     if var.cgetter and (glob.CLIENT or self:can_call_cfuncs()) then
-        log.log(log.INFO, "WCV getter: call C")
+        log.log(log.DEBUG, "WCV getter: call C")
         local val = var.cgetter(self)
 
         -- caching
@@ -453,7 +456,7 @@ function wrapped_cvariable:getter(var)
 
         return val
     else
-        log.log(log.INFO, "WCV getter: fallback to state_data since " .. base.tostring(var.cgetter))
+        log.log(log.DEBUG, "WCV getter: fallback to state_data since " .. base.tostring(var.cgetter))
         return var.__base.getter(self, var)
     end
 end
@@ -498,7 +501,7 @@ wrapped_carray.__init    = wrapped_cvariable.__init
 wrapped_carray._register = wrapped_cvariable._register
 
 function wrapped_carray:get_raw(ent)
-    log.log(log.INFO, "WCA:get_raw " .. base.tostring(self._name) .. base.tostring(self.cgetter))
+    log.log(log.DEBUG, "WCA:get_raw " .. base.tostring(self._name) .. " " .. base.tostring(self.cgetter))
 
     if self.cgetter and (glob.CLIENT or ent:can_call_cfuncs()) then
         -- caching
@@ -507,18 +510,19 @@ function wrapped_carray:get_raw(ent)
             return ent.state_var_vals[base.tostring(self._name)]
         end
 
-        log.log(log.INFO, "WCA:get_raw: call C")
+        log.log(log.DEBUG, "WCA:get_raw: call C")
         -- caching
         local val = self.cgetter(ent)
+        log.log(log.DEBUG, "WCA:get_raw:result: " .. json.encode(val))
         if glob.CLIENT or ent._queued_sv_changes_complete then
             ent.state_var_vals[base.tostring(self._name)] = val
             ent.state_var_val_timestamps[base.tostring(self._name)] = glob.curr_timestamp
         end
         return val
     else
-        log.log(log.INFO, "WCA:get_raw: fallback to state_data")
+        log.log(log.DEBUG, "WCA:get_raw: fallback to state_data")
         local r = ent.state_var_vals[base.tostring(self._name)]
-        log.log(log.INFO, "WCA:get_raw .." .. base.tostring(r))
+        log.log(log.DEBUG, "WCA:get_raw .." .. base.tostring(r))
         return r
     end
 end

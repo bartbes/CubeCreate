@@ -47,9 +47,9 @@ vec3 = class.new()
 -- @return String representation of a vector.
 function vec3:__tostring()
     return string.format("vec3 <%s, %s, %s>",
-                         tostring(self.x),
-                         tostring(self.y),
-                         tostring(self.z))
+                         base.tostring(self.x),
+                         base.tostring(self.y),
+                         base.tostring(self.z))
 end
 
 --- vec3 constructor.
@@ -246,10 +246,10 @@ vec4 = class.new(vec3)
 -- @return String representation of a vector.
 function vec4:__tostring()
     return string.format("vec4 <%s, %s, %s, %s>",
-                         tostring(self.x),
-                         tostring(self.y),
-                         tostring(self.z),
-                         tostring(self.w))
+                         base.tostring(self.x),
+                         base.tostring(self.y),
+                         base.tostring(self.z),
+                         base.tostring(self.w))
 end
 
 --- vec4 constructor.
