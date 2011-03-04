@@ -143,7 +143,6 @@ function root_logent:create_statedatadict(tcn, kwargs)
                 if val then
                     log.log(log.DEBUG, "create_statedatadict() adding " .. base.tostring(var._name) .. ": " .. json.encode(val))
                     r[not kwargs.compressed and var._name or msgsys.toproid(base.tostring(self), var._name)] = var:is_a(svar.state_array) and var:to_data(val) or var.to_data(val)
-                    log.log(log.DEBUG, "create_statedatadict() currently ..")
                     log.log(log.DEBUG, "create_statedatadict() currently: " .. json.encode(r))
                 end
             end
@@ -166,7 +165,7 @@ function root_logent:create_statedatadict(tcn, kwargs)
 
     local _filters = {
         function(d) return string.gsub(d, "\", \"", "\",\"") end, -- "foo", "bar" --> "foo","bar"
-        function(d) return string.gsub(d, "\"%[%]\"", "%[%]") end, -- "[]" --> []
+        --function(d) return string.gsub(d, "\"%[%]\"", "%[%]") end, -- "[]" --> []
         function(d) return string.gsub(d, ":\"(%d+)\.(%d+)\"", ":\"%1\".\"%2\"") end, -- :"3.14" --> :"3"."14"
         function(d) return string.gsub(d, ", ", ",") end -- ", " --> "," (without quotes)
     }

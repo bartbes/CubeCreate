@@ -185,20 +185,22 @@ array_surrogate = class.new()
 function array_surrogate:__tostring() return "array_surrogate" end
 
 function array_surrogate:__init(ent, var)
-    log.log(log.INFO, "setting up array_surrogate ..")
+    log.log(log.DEBUG, "setting up array_surrogate(" .. base.tostring(ent) .. ", " .. base.tostring(var) .. ")")
 
     self.entity = ent
     self.variable = var
 
     self:define_userget(function(self, n)
         if n == "length" then
-            return self.variable.get_length(self.variable, self.entity)
+            return (self.variable and
+                self.variable.get_length(self.variable, self.entity)
+            or 0)
         end
-        if not base.tonumber(n) then return nil end
+        if not base.tonumber(n) or not self.variable then return nil end
         return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
     end)
     self:define_userset(function(self, n, v)
-        if base.tonumber(n) then
+        if base.tonumber(n) and self.variable then
             self.variable.set_item(self.variable, self.entity, base.tonumber(n), v)
         else
             base.rawset(self, n, v)
@@ -211,11 +213,11 @@ function array_surrogate:push(v)
 end
 
 function array_surrogate:as_array()
-    log.log(log.INFO, "as_array: " .. base.tostring(self))
+    log.log(log.DEBUG, "as_array: " .. base.tostring(self))
 
     local r = {}
     for i = 1, self.length do
-        log.log(log.INFO, "as_array(" .. base.tostring(i) .. ")")
+        log.log(log.DEBUG, "as_array(" .. base.tostring(i) .. ")")
         table.insert(r, self[i])
     end
     return r
@@ -294,13 +296,13 @@ end
 state_array.to_data_item = conv.tostring
 
 function state_array:to_data(v)
-    log.log(log.INFO, "(1) to_data of state_array: " .. base.tostring(v) .. ", " .. base.type(v) .. ", " .. json.encode(v))
+    log.log(log.DEBUG, "(1) to_data of state_array: " .. base.tostring(v) .. ", " .. base.type(v) .. ", " .. json.encode(v))
     if v.as_array then
-        log.log(log.INFO, "(1.5) to_data of state_array: using as_array ..")
+        log.log(log.DEBUG, "(1.5) to_data of state_array: using as_array ..")
         v = v:as_array()
     end
 
-    log.log(log.INFO, "(2) to_data of state_array: " .. base.tostring(v) .. ", " .. base.type(v) .. ", " .. json.encode(v))
+    log.log(log.DEBUG, "(2) to_data of state_array: " .. base.tostring(v) .. ", " .. base.type(v) .. ", " .. json.encode(v))
 
     return "[" .. table.concat(table.map(v, self.to_data_item), self.separator) .. "]"
 end
