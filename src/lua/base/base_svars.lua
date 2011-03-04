@@ -89,16 +89,23 @@ function state_variable:__init(kwargs)
 end
 
 function state_variable:_register(_name, parent)
+    log.log(log.DEBUG, "state_variable:_register("
+         .. base.tostring(_name) .. ", "
+         .. base.tostring(parent) .. ")")
     self._name = _name
     parent[_SV_PREFIX .. _name] = self
-    parent[_name] = nil
+    parent.properties[_name] = nil
 
     base.assert(self.getter)
     base.assert(self.setter)
+
+    log.log(log.DEBUG, "state_variable:_register: defining (g|s)etter for " .. base.tostring(_name))
+
     parent:define_getter(_name, self.getter, self)
     parent:define_setter(_name, self.setter, self)
 
     if self.altname then
+        log.log(log.DEBUG, "state_variable:_register: defining (g|s)etter for " .. base.tostring(self.altname))
         parent[_SV_PREFIX .. self.altname] = self
         parent:define_getter(self.altname, self.getter, self)
         parent:define_setter(self.altname, self.setter, self)
@@ -126,6 +133,7 @@ end
 
 function state_variable:getter(var)
     var:read_tests(self)
+    log.log(log.DEBUG, "SV getter: " .. base.tostring(var._name))
     return self.state_var_vals[var._name]
 end
 
@@ -186,6 +194,7 @@ function array_surrogate:__init(ent, var)
         if n == "length" then
             return self.variable.get_length(self.variable, self.entity)
         end
+        if not base.tonumber(n) then return nil end
         return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
     end)
     self:define_userset(function(self, n, v)
@@ -522,7 +531,7 @@ function wrapped_carray:get_raw(ent)
     else
         log.log(log.DEBUG, "WCA:get_raw: fallback to state_data")
         local r = ent.state_var_vals[base.tostring(self._name)]
-        log.log(log.DEBUG, "WCA:get_raw .." .. base.tostring(r))
+        log.log(log.DEBUG, "WCA:get_raw .. " .. json.encode(r))
         return r
     end
 end
@@ -546,6 +555,7 @@ function vec3_surrogate:__init(ent, var)
         elseif n == "z" then
             return self.variable.get_item(self.variable, self.entity, 3)
         end
+        if not base.tonumber(n) then return nil end
         return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
     end)
     self:define_userset(function(self, n, v)
@@ -628,6 +638,7 @@ function vec4_surrogate:__init(ent, var)
         elseif n == "w" then
             return self.variable.get_item(self.variable, self.entity, 4)
         end
+        if not base.tonumber(n) then return nil end
         return self.variable.get_item(self.variable, self.entity, base.tonumber(n))
     end)
     self:define_userset(function(self, n, v)

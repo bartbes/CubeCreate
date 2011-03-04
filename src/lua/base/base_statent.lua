@@ -27,6 +27,7 @@
 --
 
 local base = _G
+local table = require("table")
 local glob = require("cc.global")
 local log = require("cc.logging")
 local svar = require("cc.state_variables")
@@ -53,13 +54,15 @@ statent.use_render_dynamic_test = true
 statent._sauertype = "extent"
 statent._sauertype_index = 0
 
-statent.radius = svar.state_float() -- TODO: use sauer values for bounding box -- XXX - needed?
+table.mergedicts(statent.properties, {
+    radius = svar.state_float(), -- TODO: use sauer values for bounding box -- XXX - needed?
 
-statent.position = svar.wrapped_cvec3({ cgetter = "CAPI.getextent0", csetter = "CAPI.setextent0" })
-statent.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1" })
-statent.attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2" })
-statent.attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3" })
-statent.attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4" })
+    position = svar.wrapped_cvec3({ cgetter = "CAPI.getextent0", csetter = "CAPI.setextent0" }),
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1" }),
+    attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2" }),
+    attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3" }),
+    attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4" })
+})
 
 function statent:init(uid, kwargs)
     log.log(log.DEBUG, "statent:init")
@@ -173,15 +176,17 @@ light = class.new(statent)
 light._class = "light"
 light._sauertype_index = 1
 
-light.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" })
-light.attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "red", altname = "red" })
-light.attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "green", altname = "green" })
-light.attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4", guiname = "blue", altname = "blue" })
+table.mergedicts(light.properties, {
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" }),
+    attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "red", altname = "red" }),
+    attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "green", altname = "green" }),
+    attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4", guiname = "blue", altname = "blue" }),
 
-light.radius = svar.variable_alias("attr1")
-light.red = svar.variable_alias("attr2")
-light.green = svar.variable_alias("attr3")
-light.blue = svar.variable_alias("attr4")
+    radius = svar.variable_alias("attr1"),
+    red = svar.variable_alias("attr2"),
+    green = svar.variable_alias("attr3"),
+    blue = svar.variable_alias("attr4")
+})
 
 function light:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -197,8 +202,10 @@ spotlight = class.new(statent)
 spotlight._class = "spotlight"
 spotlight._sauertype_index = 7
 
-spotlight.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" })
-spotlight.radius = svar.variable_alias("attr1")
+table.mergedicts(spotlight.properties, {
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" }),
+    radius = svar.variable_alias("attr1")
+})
 
 function spotlight:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -209,8 +216,10 @@ envmap = class.new(statent)
 envmap._class = "envmap"
 envmap._sauertype_index = 4
 
-envmap.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" })
-envmap.radius = svar.variable_alias("attr1")
+table.mergedicts(envmap.properties, {
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" }),
+    radius = svar.variable_alias("attr1")
+})
 
 function envmap:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -221,14 +230,16 @@ ambient_sound = class.new(statent)
 ambient_sound._class = "ambient_sound"
 ambient_sound._sauertype_index = 6
 
-ambient_sound.attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "radius", altname = "radius" })
-ambient_sound.attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "size", altname = "size" })
-ambient_sound.attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setsoundvol", guiname = "volume", altname = "volume" })
-ambient_sound.soundname = svar.wrapped_cstring({ csetter = "CAPI.setsoundname" })
+table.mergedicts(ambient_sound.properties, {
+    attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "radius", altname = "radius" }),
+    attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "size", altname = "size" }),
+    attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setsoundvol", guiname = "volume", altname = "volume" }),
+    soundname = svar.wrapped_cstring({ csetter = "CAPI.setsoundname" }),
 
-ambient_sound.radius = svar.variable_alias("attr2")
-ambient_sound.size = svar.variable_alias("attr3")
-ambient_sound.volume = svar.variable_alias("attr4")
+    radius = svar.variable_alias("attr2"),
+    size = svar.variable_alias("attr3"),
+    volume = svar.variable_alias("attr4")
+})
 
 function ambient_sound:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -244,15 +255,17 @@ particle_effect = class.new(statent)
 particle_effect._class = "particle_effect"
 particle_effect._sauertype_index = 5
 
-particle_effect.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "particle_type", altname = "particle_type" })
-particle_effect.attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "value1", altname = "value1" })
-particle_effect.attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "value2", altname = "value2" })
-particle_effect.attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4", guiname = "value3", altname = "value3" })
+table.mergedicts(particle_effect.properties, {
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "particle_type", altname = "particle_type" }),
+    attr2 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "value1", altname = "value1" }),
+    attr3 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "value2", altname = "value2" }),
+    attr4 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4", guiname = "value3", altname = "value3" }),
 
-particle_effect.particle_type = svar.variable_alias("attr1")
-particle_effect.value1 = svar.variable_alias("attr2")
-particle_effect.value2 = svar.variable_alias("attr3")
-particle_effect.value3 = svar.variable_alias("attr4")
+    particle_type = svar.variable_alias("attr1"),
+    value1 = svar.variable_alias("attr2"),
+    value2 = svar.variable_alias("attr3"),
+    value3 = svar.variable_alias("attr4")
+})
 
 function particle_effect:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -267,17 +280,19 @@ mapmodel = class.new(statent)
 mapmodel._class = "mapmodel"
 mapmodel._sauertype_index = 2
 
-mapmodel.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "yaw", altname = "yaw" })
-mapmodel.yaw = svar.variable_alias("attr1")
+table.mergedicts(mapmodel.properties, {
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "yaw", altname = "yaw" }),
+    yaw = svar.variable_alias("attr1"),
 
-mapmodel.collision_radius_width = svar.wrapped_cinteger({
-    cgetter = "CAPI.getcollisionradw",
-    csetter = "CAPI.setcollisionradw"
-})
+    collision_radius_width = svar.wrapped_cinteger({
+        cgetter = "CAPI.getcollisionradw",
+        csetter = "CAPI.setcollisionradw"
+    }),
 
-mapmodel.collision_radius_height = svar.wrapped_cinteger({
-    cgetter = "CAPI.getcollisionradh",
-    csetter = "CAPI.setcollisionradh"
+    collision_radius_height = svar.wrapped_cinteger({
+        cgetter = "CAPI.getcollisionradh",
+        csetter = "CAPI.setcollisionradh"
+    })
 })
 
 function mapmodel:init(uid, kwargs)
@@ -316,7 +331,10 @@ end
 area_trigger = class.new(mapmodel)
 area_trigger._class = "area_trigger"
 -- ran on collision
-area_trigger.script_to_run = svar.state_string()
+
+table.mergedicts(area_trigger.properties, {
+    script_to_run = svar.state_string()
+})
 
 function area_trigger:init(uid, kwargs)
     mapmodel.init(self, uid, kwargs)
@@ -402,8 +420,10 @@ world_marker = class.new(statent)
 world_marker._class = "world_marker"
 world_marker._sauertype_index = 3
 
-world_marker.attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "yaw", altname = "yaw" })
-world_marker.yaw = svar.variable_alias("attr1")
+table.mergedicts(world_marker.properties, {
+    attr1 = svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "yaw", altname = "yaw" }),
+    yaw = svar.variable_alias("attr1")
+})
 
 function world_marker:place_entity(ent)
     ent.position = self.position

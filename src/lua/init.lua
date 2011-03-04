@@ -28,6 +28,23 @@
 
 package.path = package.path .. ";./src/lua/?.lua;./src/lua/?/init.lua;./?/init.lua"
 
+--[[
+function trace (event, line)
+      local s = debug.getinfo(2, "nSl")
+      print("DEBUG:")
+      print("    " .. tostring(s.name))
+      print("    " .. tostring(s.namewhat))
+      print("    " .. tostring(s.source))
+      print("    " .. tostring(s.short_src))
+      print("    " .. tostring(s.linedefined))
+      print("    " .. tostring(s.lastlinedefined))
+      print("    " .. tostring(s.what))
+      print("    " .. tostring(s.currentline))
+    end
+    
+debug.sethook(trace, "c")
+]]
+
 -- Logging comes first.
 require("base.base_logging")
 -- Globally wrap some logging stuff because it's often used.

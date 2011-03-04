@@ -85,6 +85,7 @@ namespace lua
         openlib(string)
         openlib(math)
         openlib(package)
+        openlib(debug)
 
         #undef openlib
     }

@@ -28,6 +28,7 @@
 
 local base = _G
 local string = require("string")
+local table = require("table")
 
 --- Class library for Lua. Allows instances, parent calling and simple inheritance.
 -- Multiple inheritance isn't and won't be supported. Code using multiple inheritance
@@ -58,8 +59,11 @@ function new(b)
     -- the base, empty when not inheriting
     if b and base.type(b) == "table" then
         c.__base = b
+        -- copy, because we don't want parent classes inherit child properties
+        c.properties = table.copy(b.properties)
     else
         c.__base = {}
+        c.properties = {}
     end
 
     -- inherit tostring. todo: inherit other metamethods too.

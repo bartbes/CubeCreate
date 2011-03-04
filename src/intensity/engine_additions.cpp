@@ -485,7 +485,7 @@ void LogicSystem::manageActions(long millis)
         engine.getg("cc")
               .t_getraw("logent")
               .t_getraw("store")
-              .t_getraw("actions_manage")
+              .t_getraw("manage_actions")
               .push(double(millis) / 1000.0f)
               .push(lastmillis).call(2, 0).pop(3);
 

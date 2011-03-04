@@ -27,6 +27,7 @@
 --
 
 local base = _G
+local table = require("table")
 local math = require("math")
 local log = require("cc.logging")
 local svar = require("cc.state_variables")
@@ -43,10 +44,12 @@ module("cc.animatable")
 animatable_logent = class.new(lent.logent)
 animatable_logent._class = "animatable_logent"
 
-animatable_logent.animation = svar.wrapped_cinteger({ csetter = "CAPI.setanim", clientset = true })
-animatable_logent.starttime = svar.wrapped_cinteger({ cgetter = "CAPI.getstarttime" })
-animatable_logent.modelname = svar.wrapped_cstring ({ csetter = "CAPI.setmodelname" })
-animatable_logent.attachments = svar.wrapped_carray({ csetter = "CAPI.setattachments" })
+table.mergedicts(animatable_logent.properties, {
+    animation = svar.wrapped_cinteger({ csetter = "CAPI.setanim", clientset = true }),
+    starttime = svar.wrapped_cinteger({ cgetter = "CAPI.getstarttime" }),
+    modelname = svar.wrapped_cstring ({ csetter = "CAPI.setmodelname" }),
+    attachments = svar.wrapped_carray({ csetter = "CAPI.setattachments" })
+})
 
 function animatable_logent:init(uid, kwargs)
     if lent.logent.init then lent.logent.init(self, uid, kwargs) end

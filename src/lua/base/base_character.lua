@@ -27,6 +27,7 @@
 --
 
 local base = _G
+local table = require("table")
 local math = require("math")
 local log = require("cc.logging")
 local svar = require("cc.state_variables")
@@ -68,30 +69,32 @@ character = class.new(anim.animatable_logent)
 character._class = "character"
 character._sauertype = "fpsent"
 
-character._name = svar.state_string()
-character.facing_speed = svar.state_integer()
+table.mergedicts(character.properties, {
+    _name = svar.state_string(),
+    facing_speed = svar.state_integer(),
 
-character.movement_speed = svar.wrapped_cfloat({ cgetter = "CAPI.getmaxspeed", csetter = "CAPI.setmaxspeed" })
-character.yaw = svar.wrapped_cfloat({ cgetter = "CAPI.getyaw", csetter = "CAPI.setyaw", customsynch = true })
-character.pitch = svar.wrapped_cfloat({ cgetter = "CAPI.getpitch", csetter = "CAPI.setpitch", customsynch = true })
-character.move = svar.wrapped_cinteger({ cgetter = "CAPI.getmove", csetter = "CAPI.setmove", customsynch = true })
-character.strafe = svar.wrapped_cinteger({ cgetter = "CAPI.getstrafe", csetter = "CAPI.setstrafe", customsynch = true })
--- intention to yaw / pitch. todo: enable
---character.yawing = svar.wrapped_cinteger({ cgetter = "CAPI.getyawing", csetter = "CAPI.setyawing", customsynch = true })
---character.pitching = svar.wrapped_cinteger({ cgetter = "CAPI.getpitching", csetter = "CAPI.setpitching", customsynch = true })
-character.position = svar.wrapped_cvec3({ cgetter = "CAPI.getdynent0", csetter = "CAPI.setdynent0", customsynch = true })
-character.velocity = svar.wrapped_cvec3({ cgetter = "CAPI.getdynentvel", csetter = "CAPI.setdynentvel", customsynch = true })
-character.falling  = svar.wrapped_cvec3({ cgetter = "CAPI.getdynentfalling", csetter = "CAPI.setdynentfalling", customsynch = true })
-character.radius = svar.wrapped_cfloat({ cgetter = "CAPI.getradius", csetter = "CAPI.setradius" })
-character.aboveeye = svar.wrapped_cfloat({ cgetter = "CAPI.getaboveeye", csetter = "CAPI.setaboveeye" })
-character.eyeheight = svar.wrapped_cfloat({ cgetter = "CAPI.geteyeheight", csetter = "CAPI.seteyeheight" })
-character.blocked = svar.wrapped_cbool({ cgetter = "CAPI.getblocked", csetter = "CAPI.setblocked" })
-character.canmove = svar.wrapped_cbool({ csetter = "CAPI.setcanmove", clientset = true })
-character.mapdefinedposdata = svar.wrapped_cinteger({ cgetter = "CAPI.getmapdefinedposdata", csetter = "CAPI.setmapdefinedposdata", customsynch = true })
-character.cs = svar.wrapped_cinteger({ cgetter = "CAPI.getclientstate", csetter = "CAPI.setclientstate", customsynch = true })
-character.ps = svar.wrapped_cinteger({ cgetter = "CAPI.getphysstate", csetter = "CAPI.setphysstate", customsynch = true })
-character.inwater = svar.wrapped_cinteger({ cgetter = "CAPI.getinwater", csetter = "CAPI.setinwater", customsynch = true })
-character.timeinair = svar.wrapped_cinteger({ cgetter = "CAPI.gettimeinair", csetter = "CAPI.settimeinair", customsynch = true })
+    movement_speed = svar.wrapped_cfloat({ cgetter = "CAPI.getmaxspeed", csetter = "CAPI.setmaxspeed" }),
+    yaw = svar.wrapped_cfloat({ cgetter = "CAPI.getyaw", csetter = "CAPI.setyaw", customsynch = true }),
+    pitch = svar.wrapped_cfloat({ cgetter = "CAPI.getpitch", csetter = "CAPI.setpitch", customsynch = true }),
+    move = svar.wrapped_cinteger({ cgetter = "CAPI.getmove", csetter = "CAPI.setmove", customsynch = true }),
+    strafe = svar.wrapped_cinteger({ cgetter = "CAPI.getstrafe", csetter = "CAPI.setstrafe", customsynch = true }),
+--  intention to yaw / pitch. todo: enable
+--  yawing = svar.wrapped_cinteger({ cgetter = "CAPI.getyawing", csetter = "CAPI.setyawing", customsynch = true }),
+--  pitching = svar.wrapped_cinteger({ cgetter = "CAPI.getpitching", csetter = "CAPI.setpitching", customsynch = true }),
+    position = svar.wrapped_cvec3({ cgetter = "CAPI.getdynent0", csetter = "CAPI.setdynent0", customsynch = true }),
+    velocity = svar.wrapped_cvec3({ cgetter = "CAPI.getdynentvel", csetter = "CAPI.setdynentvel", customsynch = true }),
+    falling  = svar.wrapped_cvec3({ cgetter = "CAPI.getdynentfalling", csetter = "CAPI.setdynentfalling", customsynch = true }),
+    radius = svar.wrapped_cfloat({ cgetter = "CAPI.getradius", csetter = "CAPI.setradius" }),
+    aboveeye = svar.wrapped_cfloat({ cgetter = "CAPI.getaboveeye", csetter = "CAPI.setaboveeye" }),
+    eyeheight = svar.wrapped_cfloat({ cgetter = "CAPI.geteyeheight", csetter = "CAPI.seteyeheight" }),
+    blocked = svar.wrapped_cbool({ cgetter = "CAPI.getblocked", csetter = "CAPI.setblocked" }),
+    canmove = svar.wrapped_cbool({ csetter = "CAPI.setcanmove", clientset = true }),
+    mapdefinedposdata = svar.wrapped_cinteger({ cgetter = "CAPI.getmapdefinedposdata", csetter = "CAPI.setmapdefinedposdata", customsynch = true }),
+    cs = svar.wrapped_cinteger({ cgetter = "CAPI.getclientstate", csetter = "CAPI.setclientstate", customsynch = true }),
+    ps = svar.wrapped_cinteger({ cgetter = "CAPI.getphysstate", csetter = "CAPI.setphysstate", customsynch = true }),
+    inwater = svar.wrapped_cinteger({ cgetter = "CAPI.getinwater", csetter = "CAPI.setinwater", customsynch = true }),
+    timeinair = svar.wrapped_cinteger({ cgetter = "CAPI.gettimeinair", csetter = "CAPI.settimeinair", customsynch = true })
+})
 
 function character:jump()
     CAPI.setjumping(self, true)
@@ -254,8 +257,11 @@ end
 
 player = class.new(character)
 player._class = "player"
-player._can_edit = svar.state_bool()
-player.hud_modelname = svar.state_string()
+
+table.mergedicts(player.properties, {
+    _can_edit = svar.state_bool(),
+    hud_modelname = svar.state_string()
+})
 
 function player:init(uid, kwargs)
     log.log(log.DEBUG, "player:init")
