@@ -114,7 +114,7 @@ end
 
 function state_variable:read_tests(ent)
     if not glob.SERVER or not self.clientread then
-        base.assert(false)
+    --    base.assert(false)
     end
 end
 
@@ -133,7 +133,7 @@ end
 
 function state_variable:getter(var)
     var:read_tests(self)
-    log.log(log.DEBUG, "SV getter: " .. base.tostring(var._name))
+    log.log(log.INFO, "SV getter: " .. base.tostring(var._name))
     return self.state_var_vals[var._name]
 end
 

@@ -26,6 +26,26 @@
 -- THE SOFTWARE.
 --
 
+-- String interpolation: http://lua-users.org/wiki/StringInterpolation
+-- modified to match _ and numbers
+function _cc_interp(s, tab)
+    return (
+        string.gsub(
+            s, '%%%(([a-zA-Z_0-9]*)%)([-0-9%.]*[cdeEfgGiouxXsq])',
+            function(k, fmt)
+                k = tonumber(k) and tonumber(k) or k
+                return (tab[k]
+                    and
+                        string.format("%" .. fmt, tab[k])
+                    or
+                        "%(" .. k .. ")" .. fmt
+                )
+            end
+        )
+    )
+end
+getmetatable("").__mod = _cc_interp
+
 --- Split string into table of tokens, based on http://lua-users.org/wiki/SplitJoin.
 -- <br/><br/>Usage:<br/><br/>
 -- <code>
@@ -78,7 +98,8 @@ function string.template(s, l)
         -- expression? insert a return value of "return EXPRESSION"
         -- command? insert a return value of the code.
         if ex == "=" then
-            table.insert(r, tostring(loadstring("return " .. cd)()))
+            local ret = tostring(loadstring("return " .. cd)())
+            if ret ~= "nil" then table.insert(r, ret) end
         else
             -- make sure there is no more embedded code by looping it.
             local p = string.template(cd, l + 1)

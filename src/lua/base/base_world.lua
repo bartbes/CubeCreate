@@ -26,7 +26,11 @@
 -- THE SOFTWARE.
 --
 
+local base = _G
+local string = require("string")
+local table = require("table")
 local CAPI = require("CAPI")
+local gui = require("cc.gui")
 
 --- World module (map, entities, vslots etc.) for cC's Lua interface.
 -- @class module
@@ -209,22 +213,7 @@ undo = CAPI.undo
 -- @class function
 -- @name redo
 redo = CAPI.redo
----
--- @class function
--- @name clearbrush
-clearbrush = CAPI.clearbrush
----
--- @class function
--- @name brushvert
-brushvert = CAPI.brushvert
----
--- @class function
--- @name hmapcancel
-hmapcancel = CAPI.hmapcancel
----
--- @class function
--- @name hmapselect
-hmapselect = CAPI.hmapselect
+
 ---
 -- @class function
 -- @name pushsel
@@ -437,3 +426,445 @@ editing_getselent = CAPI.editing_getselent
 -- @class function
 -- @name restart_map
 restart_map = CAPI.restart_map
+
+---
+-- @class table
+-- @name hmap
+-- @field brush Brush manipulation tools.
+-- @field brush.index Current brush index.
+-- @field brush.max Max selectable brush index.
+hmap = {
+    brush = {
+        index = -1,
+        max = -1 -- make sure to bump this up if you add more brushes
+    }
+}
+
+function hmap.brush._handle(x, y)
+    base.brushx = x
+    base.brushy = y
+end
+
+function hmap.brush._verts(lst)
+    for y = 1, #lst do
+        local bv = lst[y]
+        for x = 1, #bv do
+            CAPI.brushvert(x, y, bv[x])
+        end
+    end
+end
+
+---
+-- @class function
+-- @name hmap.brush.select
+function hmap.brush.select(n)
+    hmap.brush.index = n + hmap.brush.index
+    if hmap.brush.index < 0 then hmap.brush.index = hmap.brush.max end
+    if hmap.brush.index > hmap.brush.max then hmap.brush.index = 0 end
+    local brushname = hmap["brush_" .. hmap.brush.index]()
+    base.echo(brushname)
+end
+
+---
+-- @class function
+-- @name hmap.brush.new
+function hmap.brush.new(nm, x, y, vrts)
+    hmap.brush.max = hmap.brush.max + 1
+    hmap["brush_" .. hmap.brush.max] = function()
+        local brushname = nm
+        CAPI.clearbrush()
+        if x and y and vrts then
+            hmap.brush._handle(x, y)
+            hmap.brush._verts(vrts)
+        end
+        return brushname
+    end
+end
+
+---
+-- @class function
+-- @name hmap.cancel
+hmap.cancel = CAPI.hmapcancel
+---
+-- @class function
+-- @name hmap.select
+hmap.select = CAPI.hmapselect
+
+--- entity type of current selection
+function enttype()
+    return string.split(entget(), " ")[1]
+end
+
+--- access the given attribute of selected ent
+function entgetattr(a)
+    return string.split(entget(), " ")[a + 2]
+end
+
+--- clear ents of given type
+function clearents(t)
+    if base.editing ~= 0 then
+        entcancel()
+        entselect([[return %(1)q ~= cc.world.enttype()]] % { t })
+        base.echo("Deleted %(1)s %(2)s entities." % { enthavesel(), t })
+        delent()
+    end
+end
+
+---
+-- replace all ents that match current selection
+-- with the values given
+function replaceents(what, a1, a2, a3, a4)
+    if base.editing ~= 0 then
+        entfind(base.unpack(string.split(entget(), " ")))
+        entset(what, a1, a2, a3, a4)
+        base.echo("Replaced %(1)s entities." % { enthavesel() })
+    end
+end
+
+---
+function selentedit()
+    entset(base.unpack(string.split(entget(), " ")))
+end
+
+---
+function selreplaceents()
+    replaceents(base.unpack(string.split(entget(), " ")))
+end
+
+---
+function selentfindall()
+    entfind(base.unpack(string.split(entget(), " ")))
+end
+
+---
+-- modify given attribute of ent by a given amount
+-- @p arg1 attribute
+-- @p arg2 value
+function entsetattr(arg1, arg2)
+    entloop([[
+        local a0 = cc.world.entgetattr(0)
+        local a1 = cc.world.entgetattr(1)
+        local a2 = cc.world.entgetattr(2)
+        local a3 = cc.world.entgetattr(3)
+        local a4 = cc.world.entgetattr(4)
+        a%(1)s = a%(1)s + %(2)s
+        cc.world.entset(cc.world.enttype(), a0, a1, a2, a3, a4)
+    ]] % { arg1, arg2 })
+end
+
+-- entity primary actions
+function ent_action_base(a) entsetattr(0, a) end
+function ent_action_mapmodel(a) entsetattr(1, a) end
+function ent_action_spotlight(a) entsetattr(0, a * 5) end
+function ent_action_light(a) entsetattr(0, a * 5) end
+function ent_action_playerstart(a) entsetattr(0, a * 15) end
+function ent_action_envmap(a) entsetattr(0, a * 5) end
+function ent_action_particles(a) entsetattr(0, a) end
+function ent_action_sound(a) entsetattr(0, a) end
+function ent_action_cycle(a, aa, aaa) entsetattr(a > -1 and aa or aaa) end
+
+-- copy and paste
+
+-- 3 types of copying and pasting
+-- 1. select only cubes      -> paste only cubes
+-- 2. select cubes and ents  -> paste cubes and ents. same relative positions
+-- 3. select only ents       -> paste last selected ent. if ents are selected, replace attrs as paste
+
+entcopybuf = {}
+
+function entreplace()
+    if enthavesel() == 0 then
+        CAPI.save_mouse_pos() -- place new entity right here
+        intensitypasteent() -- using our newent here
+    end
+    ensetattr(base.unpack(entcopybuf))
+end
+
+function editcopy()
+    if havesel() ~= 0 or enthavesel() == 0 then
+        entcopybuf = {}
+        entcopy()
+        copy()
+    else
+        entcopybuf = string.split(entget(), " ")
+        intensityentcopy()
+    end
+end
+
+function editpaste()
+    local cancelpaste = not (enthavesel() or havesel())
+    if table.concat(entcopybuf) == "" then
+        pastehilite()
+        reorient() -- temp - teal fix will be in octaedit
+        CAPI.onrelease([[
+            cc.world.delcube()
+            cc.world.paste()
+            cc.world.entpaste()
+            if %(1)s then cancelsel() end
+        ]] % { cancelpaste })
+    else
+        entreplace()
+        if cancelpaste then cancelsel() end
+    end
+end
+
+-- selection
+
+function equaltype(t)
+    return (
+        t == '*' and true
+        or (enttype() == t)
+    )
+end
+
+function equalattr(n, v)
+    return (
+        v == '*' and true
+        or (entgetattr(n) == v)
+    )
+end
+
+---
+-- select ents with given properties
+-- '*' is wildcard
+function entfind(...)
+    local arg = { ... }
+    if #arg == 1 then
+        entselect([[return cc.world.equaltype(%(1)s)]] % { arg[1] })
+    elseif #arg == 2 then
+        entselect([[
+            return (cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+            )]] % { arg[1], arg[2] })
+    elseif #arg == 3 then
+        entselect([[
+            return (cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+                and cc.world.equalattr(0, %(3)s)
+            )]] % { arg[1], arg[2], arg[3] })
+    elseif #arg == 4 then
+        entselect([[
+            return (cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+                and cc.world.equalattr(0, %(3)s)
+                and cc.world.equalattr(0, %(4)s)
+            )]] % { arg[1], arg[2], arg[3], arg[4] })
+    elseif #arg == 5 then
+        entselect([[
+            return (cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+                and cc.world.equalattr(0, %(3)s)
+                and cc.world.equalattr(0, %(4)s)
+                and cc.world.equalattr(0, %(5)s)
+            )]] % { arg[1], arg[2], arg[3], arg[4], arg[5] })
+    end
+end
+
+function entfindinsel(...)
+    local arg = { ... }
+    if #arg == 1 then
+        entselect([[return cc.world.insel() and cc.world.equaltype(%(1)s)]] % { arg[1] })
+    elseif #arg == 2 then
+        entselect([[
+            return (cc.world.insel() and cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+            )]] % { arg[1], arg[2] })
+    elseif #arg == 3 then
+        entselect([[
+            return (cc.world.insel() and cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+                and cc.world.equalattr(0, %(3)s)
+            )]] % { arg[1], arg[2], arg[3] })
+    elseif #arg == 4 then
+        entselect([[
+            return (cc.world.insel() and cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+                and cc.world.equalattr(0, %(3)s)
+                and cc.world.equalattr(0, %(4)s)
+            )]] % { arg[1], arg[2], arg[3], arg[4] })
+    elseif #arg == 5 then
+        entselect([[
+            return (cc.world.insel() and cc.world.equaltype(%(1)s)
+                and cc.world.equalattr(0, %(2)s)
+                and cc.world.equalattr(0, %(3)s)
+                and cc.world.equalattr(0, %(4)s)
+                and cc.world.equalattr(0, %(5)s)
+            )]] % { arg[1], arg[2], arg[3], arg[4], arg[5] })
+    end
+end
+
+function lse()
+    lse_line = ""
+    lse_count = 0
+    entloop([[
+        cc.world.lse_line = cc.world.lse_line .. "		"
+        cc.world.lse_count = cc.world.lse_count + 1
+        if cc.world.lse_count > 4 then
+            echo(cc.world.lse_line)
+            cc.world.lse_line = ""
+            cc.world.lse_count = 0
+        end
+    ]])
+    if lse_count > 0 then CAPI.echo(lse_line) end
+    CAPI.echo("%(1)i entities selected" % { enthavesel() })
+end
+
+function clearallents()
+    entfind("*")
+    delent()
+end
+
+function enttoggle() base.entmoving = 1; base.entmoving = 0 end
+function entaddmove() base.entmoving = 2 end
+
+function drag() base.dragging = 1; CAPI.onrelease([[dragging = 0]]) end
+function corners() base.selectcorners = 1; base.dragging = 1; CAPI.onrelease([[selectcorners = 0; dragging = 0]]) end
+function entadd() entaddmove(); base.entmoving = 0 end
+function editmove() base.moving = 1; CAPI.onrelease([[moving = 0]]); return base.moving end
+function entdrag() entaddmove(); CAPI.onrelease([[cc.world.finish_dragging(); entmoving = 0]]); return base.entmoving end
+function editdrag() cancelsel(); if entdrag() == 0 then drag() end end
+function selcorners()
+    if base.hmapedit ~= 0 then
+        hmap.select()
+    else
+        cancelsel()
+        if entdrag() == 0 then corners() end
+    end
+end
+function editextend() if entdrag() == 0 then selextend(); reorient(); editmove() end end
+-- Use second mouse button to show our edit entities dialog, if hovering
+function editextend_intensity()
+    if base.has_mouse_target == 0 then
+        editextend()
+    else
+        gui.prepentgui()
+        gui.show("entity")
+    end
+end
+
+function edit_entity(a)
+    if CAPI.set_mouse_targeting_ent(a) ~= 0 then
+        gui.prepentgui()
+        gui.show("entity")
+    else
+        CAPI.echo("No such entity")
+    end
+end
+
+function edit_client(a)
+    if CAPI.set_mouse_target_client(a) ~= 0 then
+        gui.prepentgui()
+        gui.show("entity")
+    else
+        CAPI.echo("No such client")
+    end
+end
+
+function editmovecorner(a)
+    if havesel() ~= 0 then
+        if editmove() == 0 then
+            selcorners()
+        end
+        CAPI.onrelease([[moving = 0; dragging = 0]])
+    else
+        selcorners()
+    end
+end
+
+function editmovedrag(a)
+    if havesel() ~= 0 then
+        if editmove() == 0 then
+            editdrag()
+        end
+        CAPI.onrelease([[moving = 0; dragging = 0]])
+    else
+        editdrag()
+    end
+end
+
+-- other editing commands
+
+function editfacewentpush(a, aa)
+    if havesel() ~= 0 or enthavesel() == 0 then
+        if base.moving ~= 0 then
+            pushsel(a)
+        else
+            entcancel()
+            editface(a, aa)
+        end
+    else
+        if base.entmoving ~= 0 then
+            entpush(a)
+        else
+            _G["ent_action_" .. enttype()]()
+        end
+    end
+end
+
+entswithdirection = { "playerstart", "mapmodel" }
+
+function entdirection(a, aa)
+    if enthavesel() ~= 0 and havesel() == 0 then
+        if table.find(entswithdirection, enttype()) then
+            if a > 0 then
+                entsetattr(0, aa)
+                if entgetattr(0) > 360 then entsetattr(0, -360) end
+            else
+                entsetattr(0, -aa)
+                if entgetattr(0) < 0 then entsetattr(0, 360) end
+            end
+        end
+        return true
+    else return false end
+end
+
+function editdel() if enthavesel() == 0 then delcube() end; delent() end
+function editflip() flip(); entflip() end
+
+function editrotate(a)
+    if not entdirection(a, 15) then
+        rotate(a)
+        entrotate(a)
+    end
+end
+
+function editcut()
+    local hadselection = havesel()
+    base.moving = 1
+    if base.moving ~= 0 then
+        copy();   entcopy()
+        delcube(); delent()
+        CAPI.onrelease([[
+            moving = 0
+            cc.world.paste()
+            cc.world.entpaste()
+            if %(1)s == 0 then
+                cc.world.cancelsel()
+            end
+        ]] % { hadselection })
+    end
+end
+
+function passthrough(a)
+    base.passthroughsel = a
+    if a and a ~= 0 then
+        passthroughcube_bak = base.passthroughcube
+        base.passthroughcube = 1
+    else
+        base.passthroughcube = passthroughcube_bak
+    end
+    entcancel()
+    if base.setting_entediting and base.setting_entediting ~= 0 then
+        base.entediting = base.tonumber(not a or a == 0)
+    end
+end
+
+CAPI.listcomplete("editmat", "air water clip glass noclip lava gameclip death alpha")
+
+function air() editmat("air") end
+function water() editmat("water") end
+function clip() editmat("clip") end
+function glass() editmat("glass") end
+function noclip() editmat("noclip") end
+function lava() editmat("lava") end
+function alpha() editmat("alpha") end

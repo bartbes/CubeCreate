@@ -42,11 +42,9 @@ module("cc.shader")
 -- @param n Shader name.
 -- @param v Vertex shader.
 -- @param f Fragment shader.
-function std(s, n, v, f)
-    v = string.template(v)
-    f = string.template(f)
-    CAPI.shader(s, n, v, f)
-end
+-- @class function
+-- @name std
+std = CAPI.shader
 
 --- Variant shader.
 -- @param s Shader type.
@@ -54,11 +52,9 @@ end
 -- @param r Shader row.
 -- @param v Vertex shader.
 -- @param f Fragment shader.
-function variant(s, n, r, v, f)
-    v = string.template(v)
-    f = string.template(f)
-    CAPI.variantshader(s, n, r, v, f)
-end
+-- @class function
+-- @name variant
+variant = CAPI.variantshader
 
 --- Set global shader.
 -- @param n Shader name.
@@ -175,7 +171,7 @@ alt = CAPI.altshader
 
 --- Fast shader.
 -- @param n Name of the "nice" shader.
--- @param n Name of the "fast" shader.
+-- @param f Name of the "fast" shader.
 -- @param d Detail.
 -- @class function
 -- @name fast
@@ -185,16 +181,15 @@ fast = CAPI.fastshader
 -- @param s Type of the shader.
 -- @param n Name of the shader.
 -- @param c Contents.
-function defer(s, n, c)
-    c = string.template(c)
-    CAPI.defershader(s, n, c)
-end
+-- @class function
+-- @name defer
+defer = CAPI.defershader
 
 --- Force shader.
 -- @param n Name of the shader.
 -- @class function
 -- @name force
-force     = CAPI.forceshader
+force = CAPI.forceshader
 
 --- Is shader defined?
 -- @param n Name of the shader.
@@ -208,7 +203,7 @@ isdefined = CAPI.isshaderdefined
 -- @return True if it is, false otherwise.
 -- @class function
 -- @name isnative
-isnative  = CAPI.isshadernative
+isnative = CAPI.isshadernative
 
 --- PostFX control table.
 -- @class table

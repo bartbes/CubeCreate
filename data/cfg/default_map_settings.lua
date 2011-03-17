@@ -4,7 +4,7 @@
 
 cc.model.reset()
 
-if not skybox then
+if not skybox or skybox == "" then
     skybox = "textures/sky/remus/sky01"
 end
 

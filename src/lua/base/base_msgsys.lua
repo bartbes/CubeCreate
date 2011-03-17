@@ -81,7 +81,7 @@ function genprod(cln, svn)
     local ntoids = {}
     local idston = {}
     for i = 1, #svn do
-        ntoids[svn[i]] = i
+        ntoids[svn[i]] = base.tostring(i)
         idston[i] = svn[i]
     end
 

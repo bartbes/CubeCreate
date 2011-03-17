@@ -395,3 +395,8 @@ textcurrentline = CAPI.textcurrentline
 -- @class function
 -- @name textexec
 textexec = CAPI.textexec
+---
+function prepentsgui()
+    CAPI.prepareentityclasses()
+    show("entities")
+end

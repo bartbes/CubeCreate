@@ -234,7 +234,7 @@ end
 -- @param v Value to set.
 -- @return True if the value can be set, otherwise false.
 function SVAR:check_bounds(v)
-    if base.type(v) ~= "string" or v then
+    if base.type(v) ~= "string" then
         logging.log(logging.ERROR, "Wrong value type passed to variable.")
         return false
     end
@@ -256,3 +256,8 @@ function svar(name, ...) inst:reg(SVAR(name, ...)) end
 -- @class function
 -- @name reset
 reset = CAPI.resetvar
+
+--- Doesn't do anything for now. TODO - implement,
+-- though not important to do at this moment.
+function new(name, value)
+end

@@ -65,6 +65,7 @@ end
 -- @param v Value to convert.
 -- @return A converted value.
 function todec2str(v)
+    v = v or 0
     if math.abs(v) < 0.01 then return "0" end
     local r = base.tostring(v)
     local p = string.find(r, "%.")

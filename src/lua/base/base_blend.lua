@@ -27,6 +27,7 @@
 --
 
 local CAPI = require("CAPI")
+local base = _G
 
 --- Texture blending for cC's Lua interface.
 -- @class module
@@ -69,6 +70,11 @@ brush.cur = CAPI.curblendbrush
 -- @class function
 -- @name brush.rotate
 brush.rotate = CAPI.rotateblendbrush
+---
+function brush.scroll(b)
+    if b then brush.next(b) else brush.next() end
+    CAPI.echo("blend brush set to: %(1)s" % { brush.getname(brush.cur()) })
+end
 
 ---
 -- @class table
@@ -102,3 +108,14 @@ map.optimize = CAPI.optimizeblendmap
 -- @class function
 -- @name map.clear
 map.clear = CAPI.clearblendmap
+
+---
+-- @class table
+-- @name paintmodes
+paintmodes = { "off", "replace", "dig", "fill", "inverted dig", "inverted fill" }
+
+---
+function setpaintmode(m)
+    base.blendpaintmode = m or 0
+    CAPI.echo("blend paint mode set to: %(1)s" % { paintmodes[base.blendpaintmode] })
+end

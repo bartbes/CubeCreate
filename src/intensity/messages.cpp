@@ -1067,7 +1067,7 @@ namespace MessageSystem
         // are remotely connected (TODO: make this not segfault for localconnect)
         Logging::log(Logging::DEBUG, "Updating stateData with: %s\r\n", stateData.c_str());
         engine.getref(entity.get()->luaRef)
-            .t_getraw("_update_completestatedata")
+            .t_getraw("_update_statedata_complete")
             .push_index(-2)
             .push(stateData.c_str())
             .call(2, 0)
@@ -1296,7 +1296,7 @@ namespace MessageSystem
         // are remotely connected (TODO: make this not segfault for localconnect)
         Logging::log(Logging::DEBUG, "Updating stateData\r\n");
         engine.getref(entity.get()->luaRef)
-            .t_getraw("_update_completestatedata")
+            .t_getraw("_update_statedata_complete")
             .push_index(-2)
             .push(stateData.c_str())
             .call(2, 0)

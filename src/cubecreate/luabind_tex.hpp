@@ -147,12 +147,10 @@ namespace lua_binds
         float scale = e.get<float>(4);
 
         s.variants->layer = layer < 0 ? max(slots.length()-1+layer, 0) : layer;
-        s.layermaskname = name[0] ? newstring(path(makerelpath("data", name))) : NULL; 
+        s.layermaskname = name ? newstring(path(makerelpath("data", name))) : NULL; 
         s.layermaskmode = e.get<int>(3);
         s.layermaskscale = scale <= 0 ? 1 : scale;
         propagatevslot(s.variants, 1<<VSLOT_LAYER);
-
-        delete name;
     })
 
     LUA_BIND_CLIENT(texalpha, {
@@ -237,8 +235,6 @@ namespace lua_binds
             *(bvec *)dst = bvec(((bvec *)srcn)->tovec().mul(2).add(((bvec *)srch)->tovec()).normalize());
         );
         saveimage(normalfile, guessimageformat(normalfile, IMG_TGA), d);
-
-        delete normalfile;
     })
 
 }

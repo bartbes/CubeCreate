@@ -58,13 +58,13 @@ local __entities_store = {} -- local store of entities, parallels the c++ store
 local __entities_store_by_class = {}
 
 function get(uid)
-    log.log(log.INFO, "get: entity " .. base.tostring(uid))
+    log.log(log.DEBUG, "get: entity " .. base.tostring(uid))
     local r = __entities_store[base.tonumber(uid)]
     if r then
-        log.log(log.INFO, "get: entity " .. base.tostring(uid) .. " found (" .. r.uid .. ")")
+        log.log(log.DEBUG, "get: entity " .. base.tostring(uid) .. " found (" .. r.uid .. ")")
         return r
     else
-        log.log(log.INFO, "get: could not find entity " .. base.tostring(uid))
+        log.log(log.DEBUG, "get: could not find entity " .. base.tostring(uid))
         return nil
     end
 end

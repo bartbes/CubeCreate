@@ -150,8 +150,13 @@ setmetatable(cc.world, {
     end
 })
 
+cc.world.gravity = 200
+
 cc.logging.log(cc.logging.DEBUG, ":: Network interface.")
 require("base.base_network")
 
 cc.logging.log(cc.logging.DEBUG, ":: Camera.")
 require("base.base_camera")
+
+cc.logging.log(cc.logging.DEBUG, ":: Engine interface.")
+require("base.base_engine")

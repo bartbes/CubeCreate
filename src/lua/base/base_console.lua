@@ -59,6 +59,14 @@ binds = {}
 -- @name binds.add
 binds.add = CAPI.bind
 ---
+function binds.addvar(key, var)
+    CAPI.bind(key, [[%(1)s = %(1)s == 1 and 0 or 1; echo(%(1)q .. %(1)s == 1 and "ON" or "OFF")]] % { var })
+end
+---
+function binds.addmod(key, modifier)
+    CAPI.bind(key, [[%(1)s = 1; cc.console.onrelease([=[%(1)s = 0]=])]] % { modifier })
+end
+---
 -- @class function
 -- @name binds.addspec
 binds.addspec = CAPI.specbind
@@ -66,6 +74,14 @@ binds.addspec = CAPI.specbind
 -- @class function
 -- @name binds.addedit
 binds.addedit = CAPI.editbind
+---
+function binds.addvaredit(key, var)
+    CAPI.editbind(key, [[%(1)s = %(1)s == 1 and 0 or 1; echo(%(1)q .. %(1)s == 1 and "ON" or "OFF")]] % { var })
+end
+---
+function binds.addmodedit(key, modifier)
+    CAPI.editbind(key, [[%(1)s = 1; cc.console.onrelease([=[%(1)s = 0]=])]] % { modifier })
+end
 ---
 -- @class function
 -- @name binds.get
@@ -98,6 +114,8 @@ say = CAPI.say
 -- @class function
 -- @name saycommand
 saycommand = CAPI.saycommand
+---
+function sayteamcommand() CAPI.echo("Team chat not yet implemented") end
 ---
 -- @class function
 -- @name inputcommand

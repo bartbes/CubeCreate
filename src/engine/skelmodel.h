@@ -924,13 +924,8 @@ struct skelmodel : animmodel
 
         int maxgpuparams() const
         {
-            switch(GETIV(renderpath))
-            {
-                case R_GLSLANG: return GETIV(maxvsuniforms);
-                case R_ASMGLSLANG:
-                case R_ASMSHADER: return GETIV(maxvpenvparams);
-                default: return 0;
-            }
+            if (GETIV(renderpath) == R_GLSLANG) return GETIV(maxvsuniforms);
+            return 0;
         }
         int availgpubones() const { return (min(maxgpuparams() - GETIV(reservevpparams), 256) - 10) / (GETIV(matskel) ? 3 : 2); }
         bool gpuaccelerate() const { return GETIV(renderpath)!=R_FIXEDFUNCTION && numframes && GETIV(gpuskel) && numgpubones<=availgpubones(); }

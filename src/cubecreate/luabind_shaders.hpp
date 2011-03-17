@@ -54,8 +54,8 @@ namespace lua_binds
     LUA_BIND_STD_CLIENT(setshader, setshader, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(altshader, altshader, e.get<char*>(1), e.get<char*>(2))
     LUA_BIND_STD_CLIENT(fastshader, fastshader, e.get<char*>(1), e.get<char*>(2), e.get<int*>(3))
-    LUA_BIND_STD_CLIENT(defershader, defershader, e.get<int*>(1), e.get<char*>(2), e.get<char*>(3))
-    LUA_BIND_STD_CLIENT(forceshader, useshaderbyname, e.get<char*>(1))
+    LUA_BIND_STD_CLIENT(defershader, defershader, e.get<int*>(1), e.get<const char*>(2), e.get<const char*>(3))
+    LUA_BIND_STD_CLIENT(forceshader, useshaderbyname, e.get<const char*>(1))
 
     LUA_BIND_STD_CLIENT(isshaderdefined, isshaderdefined, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(isshadernative, isshadernative, e.get<char*>(1))
@@ -69,23 +69,23 @@ namespace lua_binds
                         e.get<float>(2), e.get<float>(3),
                         e.get<float>(4), e.get<float>(5))
     LUA_BIND_STD_CLIENT(setuniformparam, addshaderparam,
-                        e.get<char*>(1), SHPARAM_UNIFORM, -1,
+                        e.get<const char*>(1), SHPARAM_UNIFORM, -1,
                         e.get<float>(2), e.get<float>(3),
                         e.get<float>(4), e.get<float>(5))
     LUA_BIND_STD_CLIENT(setshaderparam, addshaderparam,
-                        e.get<char*>(1), SHPARAM_LOOKUP, -1,
+                        e.get<const char*>(1), SHPARAM_LOOKUP, -1,
                         e.get<float>(2), e.get<float>(3),
                         e.get<float>(4), e.get<float>(5))
     LUA_BIND_STD_CLIENT(defvertexparam, addshaderparam,
-                        e.get<char*>(1)[0] ? e.get<char*>(1) : NULL,
+                        e.get<const char*>(1)[0] ? e.get<char*>(1) : NULL,
                         SHPARAM_VERTEX, e.get<int>(2), e.get<float>(3),
                         e.get<float>(4), e.get<float>(5), e.get<float>(6))
     LUA_BIND_STD_CLIENT(defpixelparam, addshaderparam,
-                        e.get<char*>(1)[0] ? e.get<char*>(1) : NULL,
+                        e.get<const char*>(1)[0] ? e.get<char*>(1) : NULL,
                         SHPARAM_PIXEL, e.get<int>(2), e.get<float>(3),
                         e.get<float>(4), e.get<float>(5), e.get<float>(6))
     LUA_BIND_STD_CLIENT(defuniformparam, addshaderparam,
-                        e.get<char*>(1), SHPARAM_UNIFORM, -1,
+                        e.get<const char*>(1), SHPARAM_UNIFORM, -1,
                         e.get<float>(2), e.get<float>(3),
                         e.get<float>(4), e.get<float>(5))
 

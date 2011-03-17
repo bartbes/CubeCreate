@@ -370,13 +370,13 @@ void LogicSystem::clear()
 
     if (engine.hashandle())
     {
-        //engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("delall").call(0, 0).pop(3);
-        //assert(logicEntities.size() == 0);
+        engine.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("del_all").call(0, 0).pop(3);
+        assert(logicEntities.size() == 0);
 
         // For client, remove player logic entity
-        //#ifdef CLIENT
-        //    ClientSystem::clearPlayerEntity();
-        //#endif
+        #ifdef CLIENT
+            ClientSystem::clearPlayerEntity();
+        #endif
 
         //engine.destroy();
     }

@@ -1209,7 +1209,6 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
 
     initlog("console");
     var::persistvars = false;
-    if(!lua::engine.execf("data/cfg/stdlib.lua")) fatal("cannot find data files (you are running from the wrong directory - you must run CubeCreate from root directory)");   // this is the first file we load.
     if(!lua::engine.execf("data/cfg/font.lua")) fatal("cannot find font definitions");
     if(!setfont("default")) fatal("no default font specified");
 
@@ -1232,7 +1231,6 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
 
     lua::engine.execf("data/cfg/keymap.lua");
     lua::engine.execf("data/cfg/sounds.lua");
-    lua::engine.execf("data/cfg/stdedit.lua");
     lua::engine.execf("data/cfg/menus.lua");
     lua::engine.execf("data/cfg/brush.lua");
     lua::engine.execf("mybrushes.lua");

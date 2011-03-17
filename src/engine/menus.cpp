@@ -577,8 +577,8 @@ static struct applymenu : menu
         {
             int changetypes = 0;
             loopv(needsapply) changetypes |= needsapply[i].type;
-            if(changetypes&CHANGE_GFX) updatelater.add().schedule("Engine.resetGl()");
-            if(changetypes&CHANGE_SOUND) updatelater.add().schedule("Sound.reset()");
+            if(changetypes&CHANGE_GFX) updatelater.add().schedule("cc.engine.resetgl()");
+            if(changetypes&CHANGE_SOUND) updatelater.add().schedule("cc.sound.reset()");
             clearlater = true;
         }
         if(g.button("no", GUI_BUTTON_COLOR, "action")&G3D_UP)

@@ -673,7 +673,7 @@ void gl_init(int w, int h, int bpp, int depth, int fsaa)
     }
     else SETVN(renderpath, R_GLSLANG);
 
-    static const char * const rpnames[4] = { "fixed-function", "assembly shader", "GLSL shader", "assembly/GLSL shader" };
+    static const char * const rpnames[4] = { "fixed-function", "GLSL shader" };
 #if 0 // INTENSITY - JUST PRINTF
     conoutf(CON_INIT, "Rendering using the OpenGL %s path.", rpnames[GETIV(renderpath)]);
 #else

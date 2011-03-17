@@ -1,3 +1,65 @@
+-- HUD stuff
+
+function edithud()
+    if cc.world.enthavesel() ~= 0 then
+        return "%(1)s : %(2)s selected" % { cc.world.entget(), cc.world.enthavesel() }
+    end
+end
+
+-- Entity GUI
+
+cc.gui.new("entities", [[
+    for i = 1, cc.world.numentityclasses() do
+        local entityclass = cc.world.getentclass(i - 1)
+        cc.gui.button(entityclass, "newentnoparams " .. entityclass)
+    end
+]])
+
+-- Export entities
+
+cc.engine_variables.new("newexportfilename", "entities.json")
+
+cc.gui.new("exportentities", [[
+    cc.gui.list([=[
+        cc.gui.text("filename: ")
+        cc.gui.field("newexportfilename", 30, "")
+    ]=])
+    cc.gui.bar()
+    cc.gui.button("export", "cc.world.export_entities(newexportfilename)")
+]])
+
+-- Messages
+
+cc.gui.new("message", [[
+    cc.gui.text(message_title)
+    cc.gui.bar()
+    cc.gui.text(message_content)
+    cc.gui.bar()
+    cc.gui.button("close", "cc.gui.clear(1)")
+]])
+
+cc.gui.new("input_dialog", [[
+    cc.gui.text(input_title)
+    cc.gui.bar()
+    cc.gui.text(input_content)
+    cc.gui.bar()
+    cc.engine_variables.new("new_input_data", input_data)
+    cc.gui.field("new_input_data", 30, [=[input_data = new_input_data]=])
+    cc.gui.bar()
+    -- TODO: input callback support
+    cc.gui.button("submit", [=[cc.gui.input_callback()]=])
+    cc.gui.button("cancel", [=[cc.gui.clear(1)]=])
+]])
+
+cc.gui.new("can_quit", [[
+    cc.gui.text("Editing changes have been made. If you quit")
+    cc.gui.text("now then they will be lost. Are you sure you")
+    cc.gui.text("want to quit?")
+    cc.gui.bar()
+    cc.gui.button("yes", [=[cc.engine.force_quit()]=])
+    cc.gui.button("no", [=[cc.gui.clear(1)]=])
+]])
+
 -- Standard menu definitions
 
 cc.console.binds.add("ESCAPE", [[
@@ -25,7 +87,7 @@ function setup_main_menu()
             cc.gui.button("exec", [==[if minicon_entry then loadstring(minicon_entry)() end]==])
         ]=])
         cc.gui.bar()
-        cc.gui.button("quit", [=[ engine.quit() ]=], "exit")
+        cc.gui.button("quit", [=[cc.engine.quit()]=], "exit")
     ]])
 end
 

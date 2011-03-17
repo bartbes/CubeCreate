@@ -190,7 +190,7 @@ function root_logent:_update_statedata_complete(sd)
     base.assert(base.type(nsd) == "table")
 
     self.initialized = true
-    for k, v in pairs(nsd) do
+    for k, v in base.pairs(nsd) do
         k = base.tonumber(k) and msgsys.fromproid(base.tostring(self), base.tonumber(k)) or k
         log.log(log.DEBUG, "update of complete state data: " .. base.tostring(k) .. " = " .. base.tostring(v))
         self:_set_statedata(k, v, nil, true) -- true - this is internal op, we are sending raw state data
