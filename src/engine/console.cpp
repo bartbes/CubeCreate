@@ -347,11 +347,7 @@ void execbind(keym &k, bool isdown)
         if(ra.key==&k)
         {
             // CubeCreate
-            if(!isdown)
-            {
-                defformatstring(cmd)("CAPI.%s()", ra.action);
-                lua::engine.exec(cmd); // CubeCreate
-            }
+            if(!isdown) lua::engine.exec(ra.action);
             delete[] ra.action;
             releaseactions.remove(i--);
         }

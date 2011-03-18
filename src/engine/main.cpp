@@ -1244,6 +1244,7 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
         lua::engine.execf(game::defaultconfig());
         Utility::writecfg(game::restoreconfig());
     }
+    lua::engine.execf("data/cfg/config.lua");
     lua::engine.execf(game::autoexec());
     initing = NOT_INITING;
 

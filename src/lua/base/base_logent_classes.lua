@@ -103,7 +103,11 @@ function get_sauertype(_cn)
 end
 
 function list()
-    local r = table.filter(table.keys(_logent_classes), function(k, v) local f, c = get_class(v); return f and c._sauertype ~= "fpsent" end)
+    log.log(log.DEBUG, "listing entity classes.")
+    local r = table.filter(table.keys(_logent_classes), function(k, v) log.log(log.DEBUG, "    " .. v); local f, c = get_class(v); return f and c._sauertype and c._sauertype ~= "fpsent" end)
+    log.log(log.DEBUG, "done filtering table.")
+    r = table.values(r)
     table.sort(r)
+    log.log(log.DEBUG, "done sorting.")
     return r
 end

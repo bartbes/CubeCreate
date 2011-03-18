@@ -11,7 +11,7 @@ end
 cc.gui.new("entities", [[
     for i = 1, cc.world.numentityclasses() do
         local entityclass = cc.world.getentclass(i - 1)
-        cc.gui.button(entityclass, "newentnoparams " .. entityclass)
+        cc.gui.button(entityclass, "cc.world.spawnent(%(1)q)" % { entityclass })
     end
 ]])
 

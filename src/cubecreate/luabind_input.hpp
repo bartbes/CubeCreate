@@ -44,7 +44,7 @@ namespace lua_binds
 
     #define MOUSECLICK(num) \
     LUA_BIND_CLIENT(mouse##num##click, { \
-        bool down = (addreleaseaction(QUOT(mouse##num##click)) != 0); \
+        bool down = (addreleaseaction("CAPI."QUOT(mouse##num##click)"()") != 0); \
         \
         Logging::log(Logging::INFO, "mouse click: %d (down: %d)\r\n", num, down); \
         if (!(e.hashandle() && ClientSystem::scenarioStarted())) return; \
@@ -77,7 +77,7 @@ namespace lua_binds
             e.t_getraw("action_key") \
                 .push_index(-2) \
                 .push(num) \
-                .push(addreleaseaction(QUOT(actionkey##num)) != 0) \
+                .push(addreleaseaction("CAPI."QUOT(actionkey##num)"()") != 0) \
                 .call(3, 0); \
                 e.pop(3); \
         } \
@@ -122,7 +122,7 @@ namespace lua_binds
         if (ClientSystem::scenarioStarted()) \
         { \
             PlayerControl::flushActions(); /* stop current actions */ \
-            s = addreleaseaction(#name)!=0; \
+            s = addreleaseaction("CAPI."#name"()")!=0; \
             ((fpsent*)player)->v = s ? d : (os ? -(d) : 0); \
         } \
     })
@@ -137,7 +137,7 @@ namespace lua_binds
         if (ClientSystem::scenarioStarted()) \
         { \
             PlayerControl::flushActions(); /* stop current actions */ \
-            s = addreleaseaction(#name)!=0; \
+            s = addreleaseaction("CAPI."#name"()")!=0; \
             engine.getg("cc").t_getraw("appman").t_getraw("inst"); \
             e.t_getraw(#v).push_index(-2).push(s ? d : (os ? -(d) : 0)).push(s).call(3, 0); \
             e.pop(3); \
@@ -161,7 +161,7 @@ namespace lua_binds
         {
             PlayerControl::flushActions(); /* stop current actions */
             engine.getg("cc").t_getraw("appman").t_getraw("inst");
-            e.t_getraw("do_jump").push_index(-2).push(addreleaseaction("jump") ? true : false).call(2, 0);
+            e.t_getraw("do_jump").push_index(-2).push(addreleaseaction("CAPI.jump()") ? true : false).call(2, 0);
             e.pop(3);
         }
     })
