@@ -44,11 +44,11 @@ module("cc.animatable")
 animatable_logent = class.new(lent.logent)
 animatable_logent._class = "animatable_logent"
 
-table.mergedicts(animatable_logent.properties, {
-    animation = svar.wrapped_cinteger({ csetter = "CAPI.setanim", clientset = true }),
-    starttime = svar.wrapped_cinteger({ cgetter = "CAPI.getstarttime" }),
-    modelname = svar.wrapped_cstring ({ csetter = "CAPI.setmodelname" }),
-    attachments = svar.wrapped_carray({ csetter = "CAPI.setattachments" })
+table.mergearrays(animatable_logent.properties, {
+    { "animation", svar.wrapped_cinteger({ csetter = "CAPI.setanim", clientset = true }) },
+    { "starttime", svar.wrapped_cinteger({ cgetter = "CAPI.getstarttime" }) },
+    { "modelname", svar.wrapped_cstring ({ csetter = "CAPI.setmodelname" }) },
+    { "attachments", svar.wrapped_carray({ csetter = "CAPI.setattachments" }) }
 })
 
 function animatable_logent:init(uid, kwargs)

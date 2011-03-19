@@ -53,9 +53,9 @@ root_logent = class.new()
 root_logent._class = "logent"
 root_logent.should_act = true
 
-table.mergedicts(root_logent.properties, {
-    tags = svar.state_array(),
-    _persistent = svar.state_bool()
+table.mergearrays(root_logent.properties, {
+    { "tags", svar.state_array() },
+    { "_persistent", svar.state_bool() }
 })
 
 function root_logent:__tostring() return self._class end
@@ -115,11 +115,10 @@ function root_logent:has_tag(t)
 end
 
 function root_logent:_setup_vars()
-    local _names = table.keys(self.properties or {})
-    for i = 1, #_names do
-        local var = self.properties[_names[i]]
+    for i = 1, #self.properties do
+        local var = self.properties[i][2]
         if svar.is(var) then
-            var:_register(_names[i], self)
+            var:_register(self.properties[i][1], self)
         end
     end
 end

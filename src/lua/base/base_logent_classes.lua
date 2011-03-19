@@ -68,13 +68,12 @@ function reg(_cl, st)
     local sv_names = {}
 
     local inst = _cl()
-    local _keys = table.keys(inst.properties or {})
-    for i = 1, #_keys do
-        local var = inst.properties[_keys[i]]
-        log.log(log.INFO, "considering " .. base.tostring(_keys[i]) .. " -- " .. base.tostring(var))
+    for i = 1, #inst.properties do
+        local var = inst.properties[i][2]
+        log.log(log.INFO, "considering " .. base.tostring(inst.properties[i][1]) .. " -- " .. base.tostring(var))
         if svar.is(var) then
-            log.log(log.INFO, "setting up " .. base.tostring(_keys[i]))
-            table.insert(sv_names, base.tostring(_keys[i]))
+            log.log(log.INFO, "setting up " .. base.tostring(inst.properties[i][1]))
+            table.insert(sv_names, base.tostring(inst.properties[i][1]))
         end
     end
 

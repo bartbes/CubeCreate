@@ -94,7 +94,7 @@ function state_variable:_register(_name, parent)
          .. base.tostring(parent) .. ")")
     self._name = _name
     parent[_SV_PREFIX .. _name] = self
-    parent.properties[_name] = nil
+    parent[_name] = nil
 
     base.assert(self.getter)
     base.assert(self.setter)
@@ -383,6 +383,7 @@ function variable_alias:_register(_name, parent)
     self._name = _name
 
     parent[_name] = nil
+    log.log(log.DEBUG, "Getting target entity for variable alias " .. _name .. ": " .. _SV_PREFIX .. self.targetname)
     local tg = parent[_SV_PREFIX .. self.targetname]
     parent[_SV_PREFIX .. _name] = tg -- point to the true variable
 
