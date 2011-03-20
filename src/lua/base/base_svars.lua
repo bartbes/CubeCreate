@@ -152,34 +152,34 @@ end
 
 state_integer = class.new(state_variable)
 function state_integer:__tostring() return "state_integer" end
-state_integer.to_wire = conv.tostring
-state_integer.from_wire = conv.tointeger
-state_integer.to_data = conv.tostring
-state_integer.from_data = conv.tointeger
+function state_integer:to_wire(v) return conv.tostring(v) end
+function state_integer:from_wire(v) return conv.tointeger(v) end
+function state_integer:to_data(v) return conv.tostring(v) end
+function state_integer:from_data(v) return conv.tointeger(v) end
 
 state_float = class.new(state_variable)
 function state_float:__tostring() return "state_float" end
-state_float.to_wire = conv.todec2str
-state_float.from_wire = conv.tonumber
-state_float.to_data = conv.todec2str
-state_float.from_data = conv.tonumber
+function state_float:to_wire(v) return conv.todec2str(v) end
+function state_float:from_wire(v) return conv.tonumber(v) end
+function state_float:to_data(v) return conv.todec2str(v) end
+function state_float:from_data(v) return conv.tonumber(v) end
 
 state_enum = class.new(state_integer)
 function state_enum:__tostring() return "state_enum" end
 
 state_bool = class.new(state_variable)
 function state_bool:__tostring() return "state_bool" end
-state_bool.to_wire = conv.tostring
-state_bool.from_wire = conv.toboolean
-state_bool.to_data = conv.tostring
-state_bool.from_data = conv.toboolean
+function state_bool:to_wire(v) return conv.tostring(v) end
+function state_bool:from_wire(v) return conv.toboolean(v) end
+function state_bool:to_data(v) return conv.tostring(v) end
+function state_bool:from_data(v) return conv.toboolean(v) end
 
 state_string = class.new(state_variable)
 function state_string:__tostring() return "state_string" end
-state_string.to_wire = conv.tostring
-state_string.from_wire = conv.tostring
-state_string.to_data = conv.tostring
-state_string.from_data = conv.tostring
+function state_string:to_wire(v) return conv.tostring(v) end
+function state_string:from_wire(v) return conv.tostring(v) end
+function state_string:to_data(v) return conv.tostring(v) end
+function state_string:from_data(v) return conv.tostring(v) end
 
 array_surrogate = class.new()
 function array_surrogate:__tostring() return "array_surrogate" end
@@ -278,7 +278,6 @@ function state_array:to_wire(v)
         -- array surrogate
         v = v:as_array()
     end
-
     return "[" .. table.concat(table.map(v, self.to_wire_item), self.separator) .. "]"
 end
 
@@ -711,9 +710,9 @@ state_vec4.to_data_item    = conv.todec2str
 -- no surrogate, won't notice changes to internals
 state_json = class.new(state_variable)
 function state_json:__tostring() return "state_json" end
-state_json.to_wire   = json.encode
-state_json.from_wire = json.decode
-state_json.to_data   = json.encode
-state_json.from_data = json.decode
+function state_json:to_wire(v) return json.encode(v) end
+function state_json:from_wire(v) return json.decode(v) end
+function state_json:to_data(v) return json.encode(v) end
+function state_json:from_data(v) return json.decode(v) end
 
 json.register(function(v) return (base.type(v) == "table" and v.uid ~= nil) end, function(v) return v.uid end)

@@ -172,7 +172,7 @@ namespace lua_binds
     // This facilitates smooth dragging on the client, and a single bandwidth use at the end.
     LUA_BIND_DEF(finish_dragging, {
         groupeditpure(
-            defformatstring(c)("getEntity(%i).position = {%f,%f,%f}", LogicSystem::getUniqueId(&ent), ent.o[0], ent.o[1], ent.o[2]);
+            defformatstring(c)("cc.logent.store.get(%i).position = {%f,%f,%f}", LogicSystem::getUniqueId(&ent), ent.o[0], ent.o[1], ent.o[2]);
             e.exec(c);
         );
     })
@@ -191,4 +191,9 @@ namespace lua_binds
     })
 
     LUA_BIND_STD(writeobj, writeobj, e.get<char*>(1))
+
+    LUA_BIND_DEF(export_entities, {
+        REFLECT_PYTHON(export_entities);
+        export_entities(e.get<const char*>(1));
+    })
 }

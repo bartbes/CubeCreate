@@ -426,7 +426,10 @@ editing_getselent = CAPI.editing_getselent
 -- @class function
 -- @name restart_map
 restart_map = CAPI.restart_map
-
+---
+-- @class function
+-- @name export_entities
+export_entities = CAPI.export_entities
 ---
 -- @class table
 -- @name hmap

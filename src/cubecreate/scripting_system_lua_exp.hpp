@@ -188,6 +188,7 @@ const LE_reg CAPI[] = {
     LUAREG(finish_dragging),
     LUAREG(mapcfgname),
     LUAREG(writeobj),
+    LUAREG(export_entities),
     LUAREG(playsoundname),
     LUAREG(stopsoundname),
     LUAREG(music),

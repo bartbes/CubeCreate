@@ -108,7 +108,7 @@ namespace lua_binds
     LUA_BIND_STD_CLIENT(movie, movie, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(loadcrosshair, loadcrosshair_, e.get<char*>(1), e.get<int*>(2))
     LUA_BIND_CLIENT(showscores, {
-        bool on = (addreleaseaction("showscores") != 0);
+        bool on = (addreleaseaction("CAPI.showscores()") != 0);
         SETV(scoreboard, on);
         scorebshow(on);
     })

@@ -108,27 +108,28 @@ namespace lua_binds
             return;
         }
 
-        int uniqueId = GuiControl::EditedEntity::currEntity->getUniqueId();
+        int uid = GuiControl::EditedEntity::currEntity->getUniqueId();
 
         // we get this beforehand because of further re-use
-        e.getg("getEntity").push(uniqueId).call(1, 1);
-        // we've got the entity here now (popping getEntity out)
-        e.t_getraw("createStateDataDict").push_index(-2).call(1, 1);
+        e.getg("cc").t_getraw("logent").t_getraw("store").t_getraw("get").push(uid).call(1, 1);
+        // we've got the entity here now (popping get out)
+        e.t_getraw("create_statedatadict").push_index(-2).call(1, 1);
         // ok, state data are on stack, popping createStateDataDict out, let's ref it so we can easily get it later
-        int _tempRef = e.ref();
-        e.pop(1);
+        int _tmpref = e.ref();
+        e.pop(4);
 
-        e.getg("table").t_getraw("keys").getref(_tempRef).call(1, 1);
+        e.getg("table").t_getraw("keys").getref(_tmpref).call(1, 1);
         // we've got keys on stack. let's loop the table now.
         LUA_TABLE_FOREACH(e, {
             // we have array of keys, so the original key is a value in this case
             const char *key = e.get<const char*>(-1);
 
-            e.getg("__getVariableGuiName").push(uniqueId).push(key).call(2, 1);
+            e.getg("cc").t_getraw("state_variables").t_getraw("__getguin");
+            e.push(uid).push(key).call(2, 1);
             const char *guiName = e.get<const char*>(-1);
-            e.pop(1);
+            e.pop(3);
 
-            e.getref(_tempRef);
+            e.getref(_tmpref);
             const char *value = e.t_get<const char*>(key);
             e.pop(1);
 
@@ -145,37 +146,23 @@ namespace lua_binds
             GuiControl::EditedEntity::sortedKeys.push_back(key);
             SETVN(num_entity_gui_fields, GETIV(num_entity_gui_fields) + 1); // increment for later loop
         });
-        e.pop(2).unref(_tempRef);
+        e.pop(2).unref(_tmpref);
 
         // So order is always the same
         sort(GuiControl::EditedEntity::sortedKeys.begin(), GuiControl::EditedEntity::sortedKeys.end());
 
-        for (int i = 0; i < GETIV(num_entity_gui_fields); i++)
-        {
-            std::string key = GuiControl::EditedEntity::sortedKeys[i];
-            std::string guiName = GuiControl::EditedEntity::stateData[key].first;
-            std::string value = GuiControl::EditedEntity::stateData[key].second;
-
-            std::string fieldName = "entity_gui_field_" + Utility::toString(i);
-            std::string labelName = "entity_gui_label_" + Utility::toString(i);
-
-            var::get(fieldName.c_str())->s(value.c_str(), true, true, true);
-            var::get(labelName.c_str())->s(guiName.c_str(), true, true, true);
-        }
-
         // Title
         e.getg("tostring").getref(GuiControl::EditedEntity::currEntity->luaRef).call(1, 1);
-        std::string title = e.get(-1, "Unknown");
+        std::string title = e.get(-1, "unknown");
         e.pop(1);
-        title = Utility::toString(uniqueId) + ": " + title;
-
+        title = Utility::toString(uid) + ": " + title;
         SETVF(entity_gui_title, title.c_str());
 
         // Create the gui
         std::string command =
-            "GUI.new(\"entity\", [[\n"
-            "    GUI.text(EV.entity_gui_title)\n"
-            "    GUI.bar()\n";
+            "cc.gui.new(\"entity\", [[\n"
+            "    cc.gui.text(entity_gui_title)\n"
+            "    cc.gui.bar()\n";
 
         for (int i = 0; i < GETIV(num_entity_gui_fields); i++)
         {
@@ -190,18 +177,18 @@ namespace lua_binds
             }
 
             command +=
-                "    GUI.list([[\n"
-                "        GUI.text(CE.get_gui_label(" + sI + "))\n"
-                "        CV:run(\"new_entity_gui_field_" + sI + " = \" .. CE.get_gui_value(" + sI + "))\n"
-                "        GUI.field(\"new_entity_gui_field_" + sI + "\", "
+                "    cc.gui.list([=[\n"
+                "        cc.gui.text(cc.gui.getentguilabel(" + sI + "))\n"
+                "        cc.engine_variables.new(\"new_entity_gui_field_\"" + sI + "\", CE.get_gui_value(" + sI + "))\n"
+                "        cc.gui.field(\"new_entity_gui_field_" + sI + "\", "
                 + Utility::toString((int)value.size()+25)
-                + ", [[ CE.set_gui_value(" + sI + ", CV.new_entity_gui_field_" + sI + ") ]], 0)\n"
-                "    ]])\n";
+                + ", [==[cc.gui.setentguival(" + sI + ", new_entity_gui_field_" + sI + ")]==], 0)\n"
+                "    ]=])\n";
 
             if ((i+1) % 10 == 0)
             {
                 command +=
-                    "   GUI.tab(" + Utility::toString(i) + ")\n";
+                    "   cc.gui.tab(" + Utility::toString(i) + ")\n";
             }
         }
 
@@ -232,13 +219,19 @@ namespace lua_binds
             GuiControl::EditedEntity::stateData[key].second = e.get<const char*>(2);
 
             int uniqueId = GuiControl::EditedEntity::currEntity->getUniqueId();
-            e.getg("__getVariable").push(uniqueId).push(key).call(2, 1);
-            e.t_getraw("fromData").push_index(-2).push(nv).call(2, 1);
-            e.getg("encodeJSON").shift().call(1, 1);
+            e.getg("cc").t_getraw("state_variables")
+                        .t_getraw("__get")
+                        .push(uniqueId)
+                        .push(key)
+                        .call(2, 1);
+            e.t_getraw("from_data").push_index(-2).push(nv).call(2, 1);
+            int _tmpref = e.ref(); e.pop(1);
+            e.t_getraw("json").t_getraw("encode");
+            e.getref(_tmpref).call(1, 1);
             const char *nav = e.get(-1, "[]");
-            e.pop(2);
+            e.pop(3);
 
-            defformatstring(c)("getEntity(%i).%s = '%s'", uniqueId, key, nav);
+            defformatstring(c)("cc.logent.store.get(%i).%s = '%s'", uniqueId, key, nav);
             e.exec(c);
         }
     })

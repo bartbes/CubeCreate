@@ -133,7 +133,7 @@ namespace lua
                 return lua_isstring(m_handle, i);
             else if (typeid(T) == typeid(void**))
                 return lua_istable(m_handle, i);
-            else return lua_isnil(m_handle, i);
+            else return lua_isnoneornil(m_handle, i);
             return false;
         }
 

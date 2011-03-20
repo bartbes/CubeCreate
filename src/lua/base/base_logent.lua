@@ -141,7 +141,7 @@ function root_logent:create_statedatadict(tcn, kwargs)
                 local val = self[var._name]
                 if val then
                     log.log(log.DEBUG, "create_statedatadict() adding " .. base.tostring(var._name) .. ": " .. json.encode(val))
-                    r[not kwargs.compressed and var._name or msgsys.toproid(base.tostring(self), var._name)] = var:is_a(svar.state_array) and var:to_data(val) or var.to_data(val)
+                    r[not kwargs.compressed and var._name or msgsys.toproid(base.tostring(self), var._name)] = var:to_data(val)
                     log.log(log.DEBUG, "create_statedatadict() currently: " .. json.encode(r))
                 end
             end
@@ -229,14 +229,14 @@ function client_logent:_set_statedata(k, v, auid)
         -- todo: supress msg sending of the same val, at least for some SVs
         msgsys.send(var.reliable and CAPI.statedata_changerequest or CAPI.statedata_changerequest_unreliable,
                     self.uid,
-                    msgsys.toproid(base.tostring(self), base.tostring(var._name)),
-                    var:is_a(svar.state_array) and var:to_wire(v) or var.to_wire(v))
+                    msgsys.toproid(base.tostring(self),
+                    base.tostring(var._name)), var:to_wire(v))
     end
 
     if auid or clientset or customsynch_fromhere then
         log.log(log.INFO, "updating locally")
         -- if originated from server, translated
-        if auid then v = var:is_a(svar.state_array) and var:from_wire(v) or var.from_wrire(v) end
+        if auid then v = var:from_wire(v) end
         base.assert(var:validate(v))
         self:emit(svar.get_onmodify_prefix() .. base.tostring(k), v, auid ~= nil)
         self.state_var_vals[k] = v
@@ -340,13 +340,12 @@ function server_logent:_set_statedata(k, v, auid, iop)
     end
 
     if auid then
-        v = v:is_a(svar.state_array) and v:from_wire(v) or v.from_wire(v)
+        v = v:from_wire(v)
         if not var.clientwrite then
             log.log(log.ERROR, "Client " .. base.tostring(auid) .. " tried to change " .. base.tostring(k))
             return nil
         end
-    elseif iop then
-        v = v:is_a(svar.state_array) and v:from_data(v) or v.from_data(v)
+    elseif iop then v = v:from_data(v)
     end
 
     log.log(log.INFO, "Translated value: " ..
@@ -376,7 +375,7 @@ function server_logent:_set_statedata(k, v, auid, iop)
             var.reliable and CAPI.statedata_update or CAPI.statedata_update_unreliable,
             self.uid,
             msgsys.toproid(_class, base.tostring(k)),
-            var:is_a(svar.state_array) and var:to_wire(v) or var.to_wire(v),
+            var:to_wire(v),
             (var.clientset and auid) and lstor.get(auid).cn or msgsys.ALL_CLIENTS
         }
 

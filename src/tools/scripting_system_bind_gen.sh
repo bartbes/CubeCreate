@@ -12,8 +12,14 @@ TMP="tmp_$$.$$"
 VER="$(cat $IN|grep 'scripting_system_lua_def.hpp, version'|sed 's/ \* scripting_system_lua_def.hpp, version //')"
 # the preprocessor to use to get rid of additional macros
 CPP="cpp -DCLIENT -DSERVER"
+# sed version
+SED="sed"
 
-$CPP $IN | grep LUA_BIND | sed -e 's/ LUA_BIND/\nLUA_BIND/g' -e 's/^   \n//' > $TMP
+if [ "$(uname -s)" = "FreeBSD" ]; then
+    SED="gsed"
+fi
+
+$CPP $IN | grep LUA_BIND | $SED -e 's/ LUA_BIND/\nLUA_BIND/g' -e 's/^   \n//' > $TMP
 
 cat << EOF > $OUT
 /*
@@ -53,7 +59,7 @@ counter=0
 cat $TMP | while read x
 do
 	if [ $counter -ge 2 ]; then
-		name="$(echo $x|sed -e 's/,.*//' -e 's/.*(//')"
+		name="$(echo $x|$SED -e 's/,.*//' -e 's/.*(//')"
 		echo -e "    LUAREG($name)," >> $OUT
 	fi
 	let counter++

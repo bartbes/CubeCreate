@@ -56,7 +56,7 @@ namespace lua_binds
     LUA_BIND_STD(curblendbrush, curblendbrush)
     LUA_BIND_STD(rotateblendbrush, rotateblendbrush, e.get<int*>(1))
     LUA_BIND_DEF(paintblendmap, {
-        if (addreleaseaction("paintBlendMap"))
+        if (addreleaseaction("CAPI.paintblendmap()"))
         {
             if (!paintingblendmap)
             {
