@@ -277,6 +277,20 @@ namespace lua
     }
 
     template<>
+    float lua_Engine::get(int i)
+    {
+        if (!m_hashandle) return 0;
+        else if (!lua_isnoneornil(m_handle, i))
+        {
+            float v = lua_tonumber(m_handle, i);
+            if (!v && !lua_isnumber(m_handle, i))
+                typeerror(i, "number");
+            return v;
+        }
+        else return 0;
+    }
+
+    template<>
     bool lua_Engine::get(int i)
     {
         if (!m_hashandle) return false;
@@ -332,6 +346,20 @@ namespace lua
         else if (!lua_isnoneornil(m_handle, i))
         {
             double v = lua_tonumber(m_handle, i);
+            if (!v && !lua_isnumber(m_handle, i))
+                typeerror(i, "number");
+            return v;
+        }
+        else return d;
+    }
+
+    template<>
+    float lua_Engine::get(int i, float d)
+    {
+        if (!m_hashandle) return d;
+        else if (!lua_isnoneornil(m_handle, i))
+        {
+            float v = lua_tonumber(m_handle, i);
             if (!v && !lua_isnumber(m_handle, i))
                 typeerror(i, "number");
             return v;

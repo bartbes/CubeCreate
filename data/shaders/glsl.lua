@@ -2063,7 +2063,7 @@ end
 
 function bloom(a)
     cc.shader.postfx.clear()
-    if a then setupbloom(6, a) end
+    if a and a ~= 0 then setupbloom(6, a) end
 end
 
 -- misc effect shaders
@@ -2694,7 +2694,8 @@ function modelvertexshader(...)
         mdl_e = tostring(mdlopt(arg[1], "e")),
         mdl_s = tostring(mdlopt(arg[1], "s")),
         mdl_i = tostring(mdlopt(arg[1], "i")),
-        mdl_m = tostring(mdlopt(arg[1], "m"))
+        mdl_m = tostring(mdlopt(arg[1], "m")),
+        arg2  = tostring(arg[2])
     }
     return string.template([[
         <$0 if %(mdl_b)s or %(mdl_B)s then return skelanimdefs() end $0>
@@ -2781,12 +2782,12 @@ function modelvertexshader(...)
                             float invfresnel = dot(camdir, onormal);
                             rvec = mat3(gl_TextureMatrix[0][0].xyz, gl_TextureMatrix[0][1].xyz, gl_TextureMatrix[0][2].xyz) * (2.0*invfresnel*onormal - camdir);
                             rmod = envmapscale.x*max(invfresnel, 0.0) + envmapscale.y;  
-                        ]==]
+                        ]==] end
                     $1>
-                ]=]
+                ]=] end
             $0>
         }
-    ]]) % mdls
+    ]] % mdls)
 end
 
 function modelfragmentshader(...)
@@ -2798,7 +2799,8 @@ function modelfragmentshader(...)
         mdl_e = tostring(mdlopt(arg[1], "e")),
         mdl_s = tostring(mdlopt(arg[1], "s")),
         mdl_i = tostring(mdlopt(arg[1], "i")),
-        mdl_m = tostring(mdlopt(arg[1], "m"))
+        mdl_m = tostring(mdlopt(arg[1], "m")),
+        arg2  = tostring(arg[2])
     }
     return string.template([[
         <$0 if %(mdl_b)s or %(mdl_B)s then return skelanimfragdefs() end $0>
@@ -2870,10 +2872,10 @@ function modelfragmentshader(...)
                             <$2=%(mdl_m)s and "light.rgb" or "gl_FragColor.rgb"$2> = spec * gl_Color.rgb;
                         ]==] elseif not %(mdl_m)s then return "gl_FragColor.rgb = vec3(0.0);" end
                     $1>
-                ]=] else [=[
+                ]=] else return [=[
                     <$1 if %(mdl_s)s or %(mdl_n)s then return "light.rgb *= max(dot(normal, lightvec) + 0.5, lightscale.y);" end $1>
                     <$1 if %(mdl_s)s then return "light.rgb += spec;" end $1>
-                    <$1 if %(mdl_m)s then return "light.rgb *= gl_Color.rgb;" else return "gl_FragColor = light * gl_Color;" $1>
+                    <$1 if %(mdl_m)s then return "light.rgb *= gl_Color.rgb;" else return "gl_FragColor = light * gl_Color;" end $1>
                 ]=] end
             $0>
             <$0
@@ -2881,7 +2883,7 @@ function modelfragmentshader(...)
                     if %(mdl_e)s then return [=[
                         light.rgb = mix(light.rgb, glow, masks.g); // glow mask in green channel
                         <$1
-                            if %(mdl_n)s ten return [==[
+                            if %(mdl_n)s then return [==[
                                 vec3 camn = normalize(camvec);
                                 float invfresnel = dot(camn, normal);
                                 vec3 rvec = 2.0*invfresnel*normal - camn;
@@ -2902,12 +2904,12 @@ function modelfragmentshader(...)
             $0>
             <$0 if %(mdl_i)s or %(mdl_m)s then return "gl_FragColor.a = light.a * gl_Color.a;" end $0>
         }
-    ]]) % mdls
+    ]] % mdls)
 end
 
 function modelanimshader(...)
     local arg = { ... }
-    local fraganimshader = arg[2] > 0 and arg2 or nil
+    local fraganimshader = arg[2] > 0 and arg[2] or 0
     local reuseanimshader = fraganimshader
     if ati_ubo_bug ~= 0 then
         reuseanimshader = "%(1)s , %(2)s" % { arg[2], arg[2] > 0 and 1 or 0 }
@@ -2929,7 +2931,7 @@ function modelshader(...)
             end
             local glaremodeltype = string.gsub(basemodeltype .. "i", "e", "")
             if not string.find(glaremodeltype, "s") then glaremodeltype = string.gsub(glaremodeltype, "n", "") end
-            cc.shader.variant(4, arg[1], 2, modelvertexshader(glaremodeltype), modelfragmentshader(glaremodeltype))
+            cc.shader.variant(4, %(arg1)q, 2, modelvertexshader(glaremodeltype), modelfragmentshader(glaremodeltype))
             for i = 1, 4 do
                 modelanimshader(%(arg1)q, 2, glaremodeltype, i)
             end

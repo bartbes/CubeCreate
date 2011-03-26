@@ -140,7 +140,7 @@ function action:execute(sec)
             self:finish()
         end
 
-        log.log(log.INFO, "        ...finished: " .. base.tostring(finished))
+        log.log(log.INFO, "        ...finished: " .. finished)
         return finished
     else
         if self.parallelto.finished then

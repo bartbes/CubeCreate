@@ -224,7 +224,7 @@ function client_logent:_set_statedata(k, v, auid)
     local customsynch_fromhere = var.customsynch and self._controlled_here
     local clientset = var.clientset
 
-    if not auid and not customsynch_fromhere then
+    if auid and not customsynch_fromhere then
         log.log(log.DEBUG, "sending request / notification to server.")
         -- todo: supress msg sending of the same val, at least for some SVs
         msgsys.send(var.reliable and CAPI.statedata_changerequest or CAPI.statedata_changerequest_unreliable,
@@ -233,12 +233,12 @@ function client_logent:_set_statedata(k, v, auid)
                     base.tostring(var._name)), var:to_wire(v))
     end
 
-    if auid or clientset or customsynch_fromhere then
+    if not auid or clientset or customsynch_fromhere then
         log.log(log.INFO, "updating locally")
         -- if originated from server, translated
-        if auid then v = var:from_wire(v) end
+        if not auid then v = var:from_wire(v) end
         base.assert(var:validate(v))
-        self:emit(svar.get_onmodify_prefix() .. base.tostring(k), v, auid ~= nil)
+        self:emit(svar.get_onmodify_prefix() .. base.tostring(k), v, not auid)
         self.state_var_vals[k] = v
     end
 end

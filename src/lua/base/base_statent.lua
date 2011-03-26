@@ -72,7 +72,7 @@ function statent:init(uid, kwargs)
 
     anim.animatable_logent.init(self, uid, kwargs)
 
-    if not kwargs or not kwargs.position then
+    if not kwargs and not kwargs.position then
         self.position = { 511, 512, 513 }
     else
         self.position = { base.tonumber(kwargs.position.x), base.tonumber(kwargs.position.y), base.tonumber(kwargs.position.z) }

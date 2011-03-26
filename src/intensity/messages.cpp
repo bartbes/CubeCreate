@@ -934,7 +934,7 @@ namespace MessageSystem
             engine.getg("cc")
                   .t_getraw("appman")
                   .t_getraw("inst")
-                  .t_getraw("on_playerlogin")
+                  .t_getraw("on_player_login")
                   .push_index(-2)
                   .getg("cc")
                   .t_getraw("logent")

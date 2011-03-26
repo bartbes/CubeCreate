@@ -156,7 +156,7 @@ int CLogicEntity::getAnimationFrame()
 std::string CLogicEntity::getClass()
 {
     engine.getg("tostring").getref(luaRef).call(1, 1);
-    std::string _class = engine.get(-1, "Unknown");
+    std::string _class = engine.get(-1, "unknown");
     engine.pop(1);
     return _class;
 }

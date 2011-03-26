@@ -306,6 +306,7 @@ function set_player_uid(uid)
     if uid then
         player_logent = get(uid)
         player_logent._controlled_here = true
+        log.log(log.DEBUG, "Player _controlled_here:" .. base.tostring(player_logent._controlled_here))
 
         base.assert(not uid or player_logent)
     end

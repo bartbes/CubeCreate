@@ -617,7 +617,6 @@ bool ClientSystem::isAdmin()
     isAdmin = engine.t_get<bool>("_can_edit");
     engine.pop(1);
 
-   // return isAdmin;
-   return true;
+    return isAdmin;
 }
 

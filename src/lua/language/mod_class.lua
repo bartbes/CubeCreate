@@ -109,7 +109,7 @@ function new(b)
 
     -- called when index is accessed
     function mt:__index(n)
-        if not n or not self:__indexcond(n) then return nil end
+        if not self:__indexcond(n) then return nil end
 
         -- allow for user methods only, no metamethods or internals
         if string.sub(n, 1, 2) ~= "__" and self.__getters["*"] then
@@ -140,7 +140,7 @@ function new(b)
     end
 
     -- conditional for __index, returns true if it's okay (private emulation)
-    function c:__indexcond(n) return true end
+    function c:__indexcond(n) return n and true or false end
 
     -- define getter (callback when virtual element gets accessed)
     function c:define_getter(k, v, o)

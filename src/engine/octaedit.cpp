@@ -1818,7 +1818,7 @@ void editmat(char *name, char *filtername)
 {
     if(noedit()) return;
     int filter = -1;
-    if(filtername[0])
+    if(filtername)
     {
         filter = findmaterial(filtername);
         if(filter < 0) { conoutf(CON_ERROR, "unknown material \"%s\"", filtername); return; }

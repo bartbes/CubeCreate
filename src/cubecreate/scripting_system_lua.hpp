@@ -663,11 +663,13 @@ namespace lua
      * some template specialization prototypes
      */
     template<> double         lua_Engine::get(int i);
+    template<> float          lua_Engine::get(int i);
     template<> bool           lua_Engine::get(int i);
     template<> const char    *lua_Engine::get(int i);
     template<> LogicEntityPtr lua_Engine::get(int i);
     // specializations for with-default getters
     template<> double         lua_Engine::get(int i, double d);
+    template<> float          lua_Engine::get(int i, float d);
     template<> bool           lua_Engine::get(int i, bool d);
     template<> const char    *lua_Engine::get(int i, const char *d);
     // specializations for pointers; temporary till stuff requiring this is rewritten

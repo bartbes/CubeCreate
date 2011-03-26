@@ -113,8 +113,8 @@ function state_variable:_register(_name, parent)
 end
 
 function state_variable:read_tests(ent)
-    if not glob.SERVER or not self.clientread then
-    --    base.assert(false)
+    if not glob.SERVER and not self.clientread then
+        base.assert(false)
     end
 end
 
@@ -123,7 +123,7 @@ function state_variable:write_tests(ent)
         log.log(log.ERROR, "Trying to write a field " .. self._name .. " of " .. ent.uid .. ", " .. base.tostring(ent))
         base.assert(false)
     end
-    if not glob.SERVER or not self.clientwrite then
+    if not glob.SERVER and not self.clientwrite then
         base.assert(glob.SERVER or self.clientwrite)
     end
     if not ent.initialized then
