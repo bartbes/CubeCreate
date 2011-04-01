@@ -55,7 +55,8 @@ function cache_by_time_delay(func, delay)
 end
 
 local __entities_store = {} -- local store of entities, parallels the c++ store
-local __entities_store_by_class = {}
+-- caching
+-- local __entities_store_by_class = {}
 
 function get(uid)
     log.log(log.DEBUG, "get: entity " .. base.tostring(uid))
@@ -96,15 +97,33 @@ function get_all_byclass(cl)
         cl = base.tostring(cl)
     end
 
-    if __entities_store_by_class[base.tostring(cl)] then
-        return __entities_store_by_class[base.tostring(cl)]
-    else
-        return {}
+    -- caching
+    --log.log(log.DEBUG, "Looping byclass")
+    --for k, v in base.pairs(__entities_store_by_class) do
+    --    for a, b in base.pairs(v) do
+    --        log.log(log.DEBUG, "%(1)s %(2)s %(3)s" % { b.position.x, b.position.y, b.position.z })
+    --    end
+    --end
+
+    local ret = {}
+    for k, v in base.pairs(__entities_store) do
+        if base.tostring(v) == cl then
+            table.insert(ret, v)
+        end
     end
+    return ret
+    -- caching
+    --if __entities_store_by_class[base.tostring(cl)] then
+    --    return __entities_store_by_class[base.tostring(cl)]
+    --else
+    --    return {}
+    --end
 end
 
 function get_all_clients()
-    return get_all_byclass("player")
+    local ret = get_all_byclass("player")
+    log.log(log.DEBUG, "logent store: get_all_clients: got %(1)s clients" % { #ret })
+    return ret
 end
 
 function get_all_clientnums()
@@ -169,14 +188,14 @@ function add(cn, uid, kwargs, _new)
     base.assert(get(uid) == r)
 
     -- caching
-    for k, v in base.pairs(lecl._logent_classes) do
-        if r:is_a(v) then
-            if not __entities_store_by_class[k] then
-                __entities_store_by_class[k] = {}
-            end
-            table.insert(__entities_store_by_class[k], r)
-        end
-    end
+    --for k, v in base.pairs(lecl._logent_classes) do
+    --    if base.tostring(r) == k then
+    --        if not __entities_store_by_class[k] then
+    --           __entities_store_by_class[k] = {}
+    --        end
+    --        table.insert(__entities_store_by_class[k], r)
+    --    end
+    --end
 
     -- done after setting the uid and placing in the global store,
     -- because c++ registration relies on both
@@ -209,12 +228,12 @@ function del(uid)
     end
 
     -- caching
-    local ent = __entities_store[base.tonumber(uid)]
-    for k, v in base.pairs(lecl._logent_classes) do
-        if ent:is_a(v) then
-            table.filter(__entities_store_by_class[k], function(a, b) return (b ~= ent) end)
-        end
-    end
+    --local ent = __entities_store[base.tonumber(uid)]
+    --for k, v in base.pairs(lecl._logent_classes) do
+    --    if base.tostring(ent) == k then
+    --        table.filterarray(__entities_store_by_class[k], function(a, b) return (b ~= ent) end)
+    --    end
+    --end
 
     __entities_store[base.tonumber(uid)] = nil
 end
@@ -287,7 +306,9 @@ function render_dynamic(tp)
                 if not ent:render_dynamic_test() then skip = true end
             end
         end
-        ent:render_dynamic(false, not thirdperson and ent == ply)
+        if not skip then
+            ent:render_dynamic(false, not tp and ent == ply)
+        end
     end
 end
 
@@ -411,7 +432,7 @@ function load_entities(sents)
         local state_data = ents[i][3]
         log.log(log.DEBUG, "load_entities: " .. base.tostring(uid) .. ", " .. base.tostring(cls) .. ", " .. json.encode(state_data))
 
-        if mapversion <= 30 and state_data.attr1 then
+        if base.mapversion <= 30 and state_data.attr1 then
             if cls ~= "light" and cls ~= "flickering_light" and cls ~= "particle_effect" and cls ~= "envmap" then
                 state_data.attr1 = (base.tonumber(state_data.attr1) + 180) % 360
             end

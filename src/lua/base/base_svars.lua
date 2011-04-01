@@ -94,7 +94,8 @@ function state_variable:_register(_name, parent)
          .. base.tostring(parent) .. ")")
     self._name = _name
     parent[_SV_PREFIX .. _name] = self
-    parent[_name] = nil
+    parent:remove_getter(_name)
+    parent:remove_setter(_name)
 
     base.assert(self.getter)
     base.assert(self.setter)
@@ -139,7 +140,7 @@ end
 
 function state_variable:setter(var, val)
     var:write_tests(self)
-    self:_set_statedata(var._name, val, nil)
+    self:_set_statedata(var._name, val, -1)
 end
 
 function state_variable:validate(val)
@@ -185,7 +186,7 @@ array_surrogate = class.new()
 function array_surrogate:__tostring() return "array_surrogate" end
 
 function array_surrogate:__init(ent, var)
-    log.log(log.DEBUG, "setting up array_surrogate(" .. base.tostring(ent) .. ", " .. base.tostring(var) .. ")")
+    log.log(log.INFO, "setting up array_surrogate(" .. base.tostring(ent) .. ", " .. base.tostring(var) .. "(" .. var._name .. "))")
 
     self.entity = ent
     self.variable = var
@@ -232,20 +233,16 @@ function state_array:getter(var)
     var:read_tests(self)
 
     if not var:get_raw(self) then return nil end
-
-    log.log(log.INFO, "state_array getter: " .. var._name .. ", " .. base.tostring(var) .. ": creating surrogate ..")
-
-    local cache_name = "__arraysurrogate_" .. var._name
-    if not self[cache_name] then
-        log.log(log.DEBUG, "state_array getter: creating surrogate")
-        self[cache_name] = var.surrogate_class(self, var)
-    end
-
-    return self[cache_name]
+    -- caching: TODO: enable later
+    -- if not self["__asurrogate_" .. var._name] then
+    --     self["__asurrogate_" .. var._name] = var.surrogate_class(self, var)
+    -- end
+    -- return self["__asurrogate_" .. var._name]
+    return var.surrogate_class(self, var)
 end
 
 function state_array:setter(var, val)
-    log.log(log.INFO, "state_array setter: " .. json.encode(val))
+    log.log(log.DEBUG, "state_array setter: " .. json.encode(val))
     if val.x then
         log.log(log.INFO, "state_array setter: " .. base.tostring(val.x) .. ", " .. base.tostring(val.y) .. ", " .. base.tostring(val.z))
     end
@@ -267,7 +264,7 @@ function state_array:setter(var, val)
         end
     end
 
-    self:_set_statedata(var._name, data, nil)
+    self:_set_statedata(var._name, data, -1)
 end
 
 state_array.to_wire_item = conv.tostring
@@ -332,7 +329,7 @@ function state_array:set_item(ent, i, v)
         base.assert(not string.find(v, "%" .. self.separator))
     end
     arr[i] = v
-    ent:set_statedata(self._name, arr, nil)
+    ent:_set_statedata(self._name, arr, -1)
 end
 
 function state_array:get_item(ent, i)
@@ -379,9 +376,11 @@ function variable_alias:__init(tn)
 end
 
 function variable_alias:_register(_name, parent)
+    log.log(log.DEBUG, "variable_alias:_register(%(1)q, %(2)s)" % { _name, base.tostring(parent) })
     self._name = _name
 
-    parent[_name] = nil
+    parent:remove_getter(_name)
+    parent:remove_setter(_name)
     log.log(log.DEBUG, "Getting target entity for variable alias " .. _name .. ": " .. _SV_PREFIX .. self.targetname)
     local tg = parent[_SV_PREFIX .. self.targetname]
     parent[_SV_PREFIX .. _name] = tg -- point to the true variable
@@ -432,9 +431,9 @@ function wrapped_cvariable:_register(_name, parent)
                 variable.csetter(parent, v)
                 log.log(log.DEBUG, "csetter called successfully.")
 
-                -- caching reads from script into C++ (search for -- caching)
-                parent.state_var_vals[base.tostring(variable._name)] = v
-                parent.state_var_val_timestamps[base.tostring(variable._name)] = glob.curr_timestamp
+                -- caching reads from script into C++ (search for -- caching) TODO: enable later
+                -- parent.state_var_vals[base.tostring(variable._name)] = v
+                -- parent.state_var_val_timestamps[base.tostring(variable._name)] = glob.curr_timestamp
             else
                 -- not yet set up, queue change
                 parent:_queue_sv_change(base.tostring(variable._name), v)
@@ -448,26 +447,26 @@ end
 function wrapped_cvariable:getter(var)
     var:read_tests(self)
 
-    log.log(log.DEBUG, "WCV getter " .. base.tostring(var._name))
+    log.log(log.INFO, "WCV getter " .. base.tostring(var._name))
 
-    -- caching
-    local cached_timestamp = self.state_var_val_timestamps[base.tostring(var._name)]
-    if cached_timestamp == glob.curr_timestamp then
-        return self.state_var_vals[base.tostring(var._name)]
-    end
+    -- caching: TODO: enable later
+    -- local cached_timestamp = self.state_var_val_timestamps[base.tostring(var._name)]
+    -- if cached_timestamp == glob.curr_timestamp then
+    --     return self.state_var_vals[base.tostring(var._name)]
+    -- end
     if var.cgetter and (glob.CLIENT or self:can_call_cfuncs()) then
-        log.log(log.DEBUG, "WCV getter: call C")
+        log.log(log.INFO, "WCV getter: call C")
         local val = var.cgetter(self)
 
-        -- caching
-        if glob.CLIENT or self._queued_sv_changes_complete then
-            self.state_var_vals[base.tostring(var._name)] = val
-            self.state_var_val_timestamps[base.tostring(var._name)] = glob.curr_timestamp
-        end
+        -- caching: TODO: enable later
+        -- if glob.CLIENT or self._queued_sv_changes_complete then
+        --     self.state_var_vals[base.tostring(var._name)] = val
+        --     self.state_var_val_timestamps[base.tostring(var._name)] = glob.curr_timestamp
+        -- end
 
         return val
     else
-        log.log(log.DEBUG, "WCV getter: fallback to state_data since " .. base.tostring(var.cgetter))
+        log.log(log.INFO, "WCV getter: fallback to state_data since " .. base.tostring(var.cgetter))
         return var.__base.getter(self, var)
     end
 end
@@ -512,28 +511,28 @@ wrapped_carray.__init    = wrapped_cvariable.__init
 wrapped_carray._register = wrapped_cvariable._register
 
 function wrapped_carray:get_raw(ent)
-    log.log(log.DEBUG, "WCA:get_raw " .. base.tostring(self._name) .. " " .. base.tostring(self.cgetter))
+    log.log(log.INFO, "WCA:get_raw " .. base.tostring(self._name) .. " " .. base.tostring(self.cgetter))
 
     if self.cgetter and (glob.CLIENT or ent:can_call_cfuncs()) then
-        -- caching
-        local cached_timestamp = ent.state_var_val_timestamps[base.tostring(self._name)]
-        if cached_timestamp == glob.curr_timestamp then
-            return ent.state_var_vals[base.tostring(self._name)]
-        end
+        -- caching: TODO: enable later
+        -- local cached_timestamp = ent.state_var_val_timestamps[base.tostring(self._name)]
+        -- if cached_timestamp == glob.curr_timestamp then
+        --     return ent.state_var_vals[base.tostring(self._name)]
+        -- end
 
-        log.log(log.DEBUG, "WCA:get_raw: call C")
-        -- caching
+        log.log(log.INFO, "WCA:get_raw: call C")
+        -- caching: TODO: enable later
         local val = self.cgetter(ent)
-        log.log(log.DEBUG, "WCA:get_raw:result: " .. json.encode(val))
-        if glob.CLIENT or ent._queued_sv_changes_complete then
-            ent.state_var_vals[base.tostring(self._name)] = val
-            ent.state_var_val_timestamps[base.tostring(self._name)] = glob.curr_timestamp
-        end
+        log.log(log.INFO, "WCA:get_raw:result: " .. json.encode(val))
+        -- if glob.CLIENT or ent._queued_sv_changes_complete then
+        --     ent.state_var_vals[base.tostring(self._name)] = val
+        --     ent.state_var_val_timestamps[base.tostring(self._name)] = glob.curr_timestamp
+        -- end
         return val
     else
-        log.log(log.DEBUG, "WCA:get_raw: fallback to state_data")
+        log.log(log.INFO, "WCA:get_raw: fallback to state_data")
         local r = ent.state_var_vals[base.tostring(self._name)]
-        log.log(log.DEBUG, "WCA:get_raw .. " .. json.encode(r))
+        log.log(log.INFO, "WCA:get_raw .. " .. json.encode(r))
         return r
     end
 end
@@ -542,7 +541,23 @@ vec3_surrogate = class.new(array_surrogate)
 function vec3_surrogate:__tostring() return "vec3_surrogate" end
 
 function vec3_surrogate:__init(ent, var)
-    self.__base.__init(self, ent, var)
+    array_surrogate.__init(self, ent, var)
+
+    self.magnitude = vector.vec3.magnitude
+    self.normalize = vector.vec3.normalize
+    self.cap = vector.vec3.cap
+    self.subnew = vector.vec3.subnew
+    self.addnew = vector.vec3.addnew
+    self.mulnew = vector.vec3.mulnew
+    self.sub = vector.vec3.sub
+    self.add = vector.vec3.add
+    self.mul = vector.vec3.mul
+    self.copy = vector.vec3.copy
+    self.getarr = vector.vec3.getarr
+    self.fromyawpitch = vector.vec3.fromyawpitch
+    self.toyawpitch = vector.vec3.toyawpitch
+    self.iscloseto = vector.vec3.iscloseto
+    self.dotproduct = vector.vec3.dotproduct
 
     self.entity = ent
     self.variable = var
@@ -581,22 +596,6 @@ function vec3_surrogate:push(v)
     base.assert(false)
 end
 
-vec3_surrogate.magnitude = vector.vec3.magnitude
-vec3_surrogate.normalize = vector.vec3.normalize
-vec3_surrogate.cap = vector.vec3.cap
-vec3_surrogate.subnew = vector.vec3.subnew
-vec3_surrogate.addnew = vector.vec3.addnew
-vec3_surrogate.mulnew = vector.vec3.mulnew
-vec3_surrogate.sub = vector.vec3.sub
-vec3_surrogate.add = vector.vec3.add
-vec3_surrogate.mul = vector.vec3.mul
-vec3_surrogate.copy = vector.vec3.copy
-vec3_surrogate.getarr = vector.vec3.getarr
-vec3_surrogate.fromyawpitch = vector.vec3.fromyawpitch
-vec3_surrogate.toyawpitch = vector.vec3.toyawpitch
-vec3_surrogate.iscloseto = vector.vec3.iscloseto
-vec3_surrogate.dotproduct = vector.vec3.dotproduct
-
 wrapped_cvec3 = class.new(state_array)
 function wrapped_cvec3:__tostring() return "wrapped_cvec3" end
 
@@ -623,7 +622,25 @@ vec4_surrogate = class.new(array_surrogate)
 function vec4_surrogate:__tostring() return "vec4_surrogate" end
 
 function vec4_surrogate:__init(ent, var)
-    self.__base.__init(self, ent, var)
+    array_surrogate.__init(self, ent, var)
+
+    self.magnitude = vector.vec4.magnitude
+    self.subnew = vector.vec4.subnew
+    self.addnew = vector.vec4.addnew
+    self.mulnew = vector.vec4.mulnew
+    self.sub = vector.vec4.sub
+    self.add = vector.vec4.add
+    self.mul = vector.vec4.mul
+    self.copy = vector.vec4.copy
+    self.getarr = vector.vec4.getarr
+    self.quatfromaxiangle = vector.vec4.quatfromaxiangle
+    self.toyawpitchroll = vector.vec4.toyawpitchroll
+    self.normalize = vector.vec4.normalize
+    self.cap = vector.vec4.cap
+    self.fromyawpitch = vector.vec4.fromyawpitch
+    self.toyawpitch = vector.vec4.toyawpitch
+    self.iscloseto = vector.vec4.iscloseto
+    self.dotproduct = vector.vec4.dotproduct
 
     self.entity = ent
     self.variable = var
@@ -665,25 +682,6 @@ end
 function vec4_surrogate:push(v)
     base.assert(false)
 end
-
-vec4_surrogate.magnitude = vector.vec4.magnitude
-vec4_surrogate.subnew = vector.vec4.subnew
-vec4_surrogate.addnew = vector.vec4.addnew
-vec4_surrogate.mulnew = vector.vec4.mulnew
-vec4_surrogate.sub = vector.vec4.sub
-vec4_surrogate.add = vector.vec4.add
-vec4_surrogate.mul = vector.vec4.mul
-vec4_surrogate.copy = vector.vec4.copy
-vec4_surrogate.getarr = vector.vec4.getarr
-vec4_surrogate.quatfromaxiangle = vector.vec4.quatfromaxiangle
-vec4_surrogate.toyawpitchroll = vector.vec4.toyawpitchroll
-vec4_surrogate.normalize = vector.vec4.normalize
-vec4_surrogate.cap = vector.vec4.cap
-vec4_surrogate.fromyawpitch = vector.vec4.fromyawpitch
-vec4_surrogate.toyawpitch = vector.vec4.toyawpitch
-vec4_surrogate.iscloseto = vector.vec4.iscloseto
-vec4_surrogate.dotproduct = vector.vec4.dotproduct
-
 
 wrapped_cvec4 = class.new(state_array)
 function wrapped_cvec4:__tostring() return "wrapped_cvec4" end

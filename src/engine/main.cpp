@@ -1209,7 +1209,7 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
 
     initlog("console");
     var::persistvars = false;
-    if(!lua::engine.execf("data/cfg/font.lua")) fatal("cannot find font definitions");
+    if(!lua::engine.execf("data/cfg/font.lua"), false) fatal("cannot find font definitions");
     if(!setfont("default")) fatal("no default font specified");
 
     inbetweenframes = true;
@@ -1234,7 +1234,7 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
     lua::engine.execf("data/cfg/menus.lua");
     lua::engine.execf("data/cfg/brush.lua");
     lua::engine.execf("mybrushes.lua");
-    if(game::savedservers()) lua::engine.execf(game::savedservers());
+    if(game::savedservers()) lua::engine.execf(game::savedservers(), false);
     
     var::persistvars = true;
     
@@ -1245,7 +1245,7 @@ int sauer_main(int argc, char **argv) // INTENSITY: Renamed so we can access it 
         Utility::writecfg(game::restoreconfig());
     }
     lua::engine.execf("data/cfg/config.lua");
-    lua::engine.execf(game::autoexec());
+    lua::engine.execf(game::autoexec(), false);
     initing = NOT_INITING;
 
     var::persistvars = false;

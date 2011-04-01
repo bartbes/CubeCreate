@@ -268,10 +268,10 @@ struct md2 : vertmodel
         loadingmd2 = this;
         var::persistvars = false;
         defformatstring(name3)("data/models/%s/md2.lua", loadname); // INTENSITY
-        if(!lua::engine.execf(path(name3))) // INTENSITY
+        if(!lua::engine.execf(path(name3), false)) // INTENSITY
         {
             formatstring(name3)("data/models/%s/md2.lua", pname); // INTENSITY
-            lua::engine.execf(path(name3)); // INTENSITY
+            lua::engine.execf(path(name3), false); // INTENSITY
         }
         var::persistvars = true;
         loadingmd2 = 0;

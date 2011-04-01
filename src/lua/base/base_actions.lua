@@ -221,7 +221,7 @@ function action_system:isempty()
 end
 
 function action_system:manage(sec)
-    self.actlist = table.filter(self.actlist, function (i, v) return not v.finished end)
+    self.actlist = table.filterarray(self.actlist, function (i, v) return not v.finished end)
     if #self.actlist > 0 then
         log.log(log.INFO, "executing " .. base.tostring(self.actlist[1]))
         if self.actlist[1]:execute(sec) then -- if the action is completed, remove it immediately to not mess with it later

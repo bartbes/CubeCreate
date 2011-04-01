@@ -327,7 +327,7 @@ VAR(reflectclip, 0, 6, 64);
 VAR(reflectclipavatar, -64, 0, 64);
 FVAR(polygonoffsetfactor, -1e4f, -3.0f, 1e4f);
 FVAR(polygonoffsetunits, -1e4f, -3.0f, 1e4f);
-FVAR(depthoffset, -1e4f, -0.01f, 1e4f);
+FVAR(depthoffset, -1e4f, 0.01f, 1e4f);
 VARR(fog, 16, 4000, 1000024);
 VARFR(fogcolour, 0, 0x8099B3, 0xFFFFFF, fogcolor);
 VARP(skyboxglare, 0, 1, 1);
@@ -403,7 +403,7 @@ VAR(cullparticles, 0, 1, 1);
 VAR(replayparticles, 0, 1, 1);
 VAR(seedparticles, 0, 3000, 10000); // globalname was seedmillis
 VAR(dbgpcull, 0, 0, 1);
-FVARFP(editpartsize, 0.0f, 2.0f, 100.0f, particleinit);
+FVARFP(editpartsize, 0.0f, 2.0f, 100.0f, particleinitf);
 
 // engine/rendersky.cpp
 SVARFR(starbox, "", loadstars); // INTENSITY: SkyManager: various star and sun variables

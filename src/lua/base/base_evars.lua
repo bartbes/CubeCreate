@@ -259,5 +259,6 @@ reset = CAPI.resetvar
 
 --- Doesn't do anything for now. TODO - implement,
 -- though not important to do at this moment.
-function new(name, value)
-end
+-- @class function
+-- @name new
+new = CAPI.newvar

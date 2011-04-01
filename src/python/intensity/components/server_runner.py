@@ -31,6 +31,8 @@ def run_server(location=None, use_master=True):
     if location is not None:
         location = 'base/' + location + '.tar.gz'
 
+    log(logging.DEBUG, "Location: %s" % location)
+
     if location is not None and use_master:
         try:
             location = AssetMetadata.get_by_path('data/' + location).asset_id
@@ -121,7 +123,7 @@ def show_gui(sender, **kwargs):
                 cc.gui.text("Local server: Running")
                 cc.gui.stayopen([[ cc.gui.button("  stop", [=[cc.network.ssls()]=]) ]])
                 cc.gui.button("  show output", [[cc.gui.show("local_server_output")]])
-                cc.gui.stayopen([[ cc.gui.button("  save map", [=[cc.network.do_upload()]=])]])
+                cc.gui.stayopen([[ cc.gui.button("  save map", [=[cc.network.do_upload()]=]) ]])
                 cc.gui.button("  restart map", [[cc.world.restart_map()]])
                 cc.gui.button("  editing commands", [[cc.gui.show("editing")]])
             ''')
@@ -158,7 +160,7 @@ show_components.connect(show_gui, weak=False)
 
 # Always enter private edit mode if masterless
 def request_private_edit(sender, **kwargs):
-    if not CModule.run_script_int("logged_into_master"):
+    if not CModule.run_script_int("return logged_into_master"):
         MessageSystem.send(CModule.RequestPrivateEditMode)
 map_load_finish.connect(request_private_edit, weak=False)
 

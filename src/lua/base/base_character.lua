@@ -69,7 +69,14 @@ character = class.new(anim.animatable_logent)
 character._class = "character"
 character._sauertype = "fpsent"
 
-table.mergearrays(character.properties, {
+character.properties = {
+    anim.animatable_logent.properties[1], -- tags
+    anim.animatable_logent.properties[2], -- _persitent
+    anim.animatable_logent.properties[3], -- animation
+    anim.animatable_logent.properties[4], -- starttime
+    anim.animatable_logent.properties[5], -- modelname
+    anim.animatable_logent.properties[6], -- attachments
+
     { "_name", svar.state_string() },
     { "facing_speed", svar.state_integer() },
 
@@ -94,7 +101,7 @@ table.mergearrays(character.properties, {
     { "ps", svar.wrapped_cinteger({ cgetter = "CAPI.getphysstate", csetter = "CAPI.setphysstate", customsynch = true }) },
     { "inwater", svar.wrapped_cinteger({ cgetter = "CAPI.getinwater", csetter = "CAPI.setinwater", customsynch = true }) },
     { "timeinair", svar.wrapped_cinteger({ cgetter = "CAPI.gettimeinair", csetter = "CAPI.settimeinair", customsynch = true }) }
-})
+}
 
 function character:jump()
     CAPI.setjumping(self, true)
@@ -163,12 +170,13 @@ function character:render_dynamic(hudpass, needhud)
 
     if self.rendering_args_timestamp ~= lstor.curr_timestamp then
         local state = self.cs
-        if s == CSTATE.SPECTAROR or s == CSTATE.SPAWNING then return nil end
+        if state == CSTATE.SPECTAROR or state == CSTATE.SPAWNING then return nil end
 
         local mdlname = (hudpass and needhud) and self.hud_modelname or self.modelname
         local yaw = self.yaw + 90
         local pitch = self.pitch
         local o = self.position:copy()
+        
         if hudpass and needhud and self.hud_modeloffset then o:add(self.hud_modeloffset) end
         local basetime = self.starttime
         local physstate = self.ps
@@ -181,15 +189,12 @@ function character:render_dynamic(hudpass, needhud)
         local anim = self:decide_animation(state, physstate, move, strafe, vel, falling, inwater, timeinair)
         local flags = self:get_renderingflags()
 
-        self.rendering_args = self:create_renderingargs(mdlname, anim, o, yaw, pitch, flags, basetime)
+        self.rendering_args = { self, mdlname, anim, o.x, o.y, o.z, yaw, pitch, 0, flags, basetime }
         self.rendering_args_timestamp = lstor.curr_timestamp
     end
 
-    cc.model.render(unpack(self.rendering_args))
-end
-
-function character:create_renderingargs(mdlname, anim, o, yaw, pitch, flags, basetime)
-    return { self, mdlname, anim, o.x, o.y, o.z, yaw, pitch, flags, basetime }
+    -- render only when model is set
+    if self.rendering_args[2] ~= "" then mdl.render(base.unpack(self.rendering_args)) end
 end
 
 function character:get_renderingflags()
@@ -258,10 +263,41 @@ end
 player = class.new(character)
 player._class = "player"
 
-table.mergearrays(player.properties, {
+player.properties = {
+    character.properties[1], -- tags
+    character.properties[2], -- _persitent
+    character.properties[3], -- animation
+    character.properties[4], -- starttime
+    character.properties[5], -- modelname
+    character.properties[6], -- attachments
+
+    character.properties[7], -- _name
+    character.properties[8], -- facing_speed
+
+    character.properties[9], -- movement_speed
+    character.properties[10], -- yaw
+    character.properties[11], -- pitch
+    character.properties[12], -- move
+    character.properties[13], -- strafe
+    -- character.properties[X], -- yawing
+    -- character.properties[X], -- pitching
+    character.properties[14], -- position
+    character.properties[15], -- velocity
+    character.properties[16], -- falling
+    character.properties[17], -- radius
+    character.properties[18], -- aboveeye
+    character.properties[19], -- eyeheight
+    character.properties[20], -- blocked
+    character.properties[21], -- canmove
+    character.properties[22], -- mapdefinedposdata
+    character.properties[23], -- cs
+    character.properties[24], -- ps
+    character.properties[25], -- inwater
+    character.properties[26], -- timeinair
+
     { "_can_edit", svar.state_bool() },
     { "hud_modelname", svar.state_string() }
-})
+}
 
 function player:init(uid, kwargs)
     log.log(log.DEBUG, "player:init")

@@ -1008,7 +1008,7 @@ bool load_world(const char *mname, const char *cname)        // still supports a
     var::overridevars = true;
     if (lua::engine.hashandle())
     {
-        lua::engine.execf("data/cfg/default_map_settings.lua");
+        lua::engine.execf("data/cfg/default_map_settings.lua", false);
         WorldSystem::runMapScript();
     }
     var::overridevars = false;

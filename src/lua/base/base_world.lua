@@ -508,7 +508,7 @@ function clearents(t)
     if base.editing ~= 0 then
         entcancel()
         entselect([[return %(1)q ~= cc.world.enttype()]] % { t })
-        base.echo("Deleted %(1)s %(2)s entities." % { enthavesel(), t })
+        base.echo("Deleted %(1)s %(2)s entities." % { base.tostring(enthavesel()), t })
         delent()
     end
 end
@@ -520,7 +520,7 @@ function replaceents(what, a1, a2, a3, a4)
     if base.editing ~= 0 then
         entfind(base.unpack(string.split(entget(), " ")))
         entset(what, a1, a2, a3, a4)
-        base.echo("Replaced %(1)s entities." % { enthavesel() })
+        base.echo("Replaced %(1)s entities." % { base.tostring(enthavesel()) })
     end
 end
 
@@ -580,7 +580,7 @@ function entreplace()
         CAPI.save_mouse_pos() -- place new entity right here
         intensitypasteent() -- using our newent here
     end
-    ensetattr(base.unpack(entcopybuf))
+    entsetattr(base.unpack(entcopybuf))
 end
 
 function editcopy()
@@ -603,8 +603,8 @@ function editpaste()
             cc.world.delcube()
             cc.world.paste()
             cc.world.entpaste()
-            if %(1)s then cancelsel() end
-        ]] % { cancelpaste })
+            if %(1)s then cc.world.cancelsel() end
+        ]] % { base.tostring(cancelpaste) })
     else
         entreplace()
         if cancelpaste then cancelsel() end
@@ -708,8 +708,8 @@ function lse()
             cc.world.lse_count = 0
         end
     ]])
-    if lse_count > 0 then CAPI.echo(lse_line) end
-    CAPI.echo("%(1)i entities selected" % { enthavesel() })
+    if lse_count > 0 then base.echo(lse_line) end
+    base.echo("%(1)i entities selected" % { enthavesel() })
 end
 
 function clearallents()
@@ -750,7 +750,7 @@ function edit_entity(a)
         gui.prepentgui()
         gui.show("entity")
     else
-        CAPI.echo("No such entity")
+        base.echo("No such entity")
     end
 end
 
@@ -759,7 +759,7 @@ function edit_client(a)
         gui.prepentgui()
         gui.show("entity")
     else
-        CAPI.echo("No such client")
+        base.echo("No such client")
     end
 end
 

@@ -73,7 +73,7 @@ brush.rotate = CAPI.rotateblendbrush
 ---
 function brush.scroll(b)
     if b then brush.next(b) else brush.next() end
-    CAPI.echo("blend brush set to: %(1)s" % { brush.getname(brush.cur()) })
+    base.echo("blend brush set to: %(1)s" % { brush.getname(brush.cur()) })
 end
 
 ---
@@ -117,5 +117,5 @@ paintmodes = { "off", "replace", "dig", "fill", "inverted dig", "inverted fill" 
 ---
 function setpaintmode(m)
     base.blendpaintmode = m or 0
-    CAPI.echo("blend paint mode set to: %(1)s" % { paintmodes[base.blendpaintmode] })
+    base.echo("blend paint mode set to: %(1)s" % { paintmodes[base.blendpaintmode] })
 end

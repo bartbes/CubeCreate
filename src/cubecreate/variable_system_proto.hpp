@@ -201,6 +201,7 @@ VCB(damageblendmillis, int, if (!curv) damageblendmillis = 0;)
 
 // engine/renderparticles.cpp
 VCB(particleinit, int, particleinit();)
+VCB(particleinitf, float, particleinit();)
 
 // engine/rendersky.cpp
 extern Texture *sky[6], *clouds[6], *stars[6], *sun[6];

@@ -98,6 +98,7 @@ namespace lua_binds
 
     // Sets up a GUI for editing an entity's state data. TODO: get rid of ugly ass STL shit
     LUA_BIND_CLIENT(prepentgui, {
+        SETVN(num_entity_gui_fields, 0);
         GuiControl::EditedEntity::stateData.clear();
         GuiControl::EditedEntity::sortedKeys.clear();
 
@@ -179,7 +180,7 @@ namespace lua_binds
             command +=
                 "    cc.gui.list([=[\n"
                 "        cc.gui.text(cc.gui.getentguilabel(" + sI + "))\n"
-                "        cc.engine_variables.new(\"new_entity_gui_field_\"" + sI + "\", CE.get_gui_value(" + sI + "))\n"
+                "        cc.engine_variables.new(\"new_entity_gui_field_" + sI + "\", cc.engine_variables.VAR_S, cc.gui.getentguival(" + sI + "))\n"
                 "        cc.gui.field(\"new_entity_gui_field_" + sI + "\", "
                 + Utility::toString((int)value.size()+25)
                 + ", [==[cc.gui.setentguival(" + sI + ", new_entity_gui_field_" + sI + ")]==], 0)\n"
@@ -225,14 +226,19 @@ namespace lua_binds
                         .push(key)
                         .call(2, 1);
             e.t_getraw("from_data").push_index(-2).push(nv).call(2, 1);
-            int _tmpref = e.ref(); e.pop(1);
+            int _tmpref = e.ref(); e.pop(2);
             e.t_getraw("json").t_getraw("encode");
             e.getref(_tmpref).call(1, 1);
-            const char *nav = e.get(-1, "[]");
+            const char *nav = e.get<const char*>(-1);
             e.pop(3);
 
-            defformatstring(c)("cc.logent.store.get(%i).%s = '%s'", uniqueId, key, nav);
-            e.exec(c);
+            if (nav)
+            {
+                e.getg("string").t_getraw("gsub").push(nav).push("%[(.*)%]").push("{%1}").call(3, 2);
+                e.pop(1); nav = e.get<const char*>(-1); e.pop(2);
+                defformatstring(c)("cc.logent.store.get(%i).%s = %s", uniqueId, key, nav);
+                e.exec(c);
+            }
         }
     })
 

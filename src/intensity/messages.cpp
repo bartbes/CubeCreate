@@ -942,7 +942,7 @@ namespace MessageSystem
                   .t_getraw("get")
                   .push(FPSServerInterface::getUniqueId(sender))
                   .call(1, 1)
-                  .shift().pop(1).shift().pop(1)
+                  .shift().pop(1).shift().pop(1).shift().pop(1)
                   .call(2, 0)
                   .pop(3);
         #else // CLIENT

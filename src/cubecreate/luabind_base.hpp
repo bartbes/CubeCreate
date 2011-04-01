@@ -166,6 +166,47 @@ namespace lua_binds
 
     LUA_BIND_DEF(resetvar, var::get(e.get<const char*>(1))->r();)
 
+    LUA_BIND_DEF(newvar, {
+        const char *name = e.get<const char*>(1);
+        switch (e.get<int>(2))
+        {
+            case var::VAR_I:
+            {
+                var::cvar *ev = var::get(name);
+                if (!ev)
+                {
+                    ev = var::reg(name, new var::cvar(name, e.get<int>(3), true));
+                    ev->regliv();
+                }
+                else ev->s(e.get<int>(3), true, false, false);
+                break;
+            }
+            case var::VAR_F:
+            {
+                var::cvar *ev = var::get(name);
+                if (!ev)
+                {
+                    ev = var::reg(name, new var::cvar(name, e.get<float>(3), true));
+                    ev->reglfv();
+                }
+                else ev->s(e.get<float>(3), true, false, false);
+                break;
+            }
+            case var::VAR_S:
+            {
+                var::cvar *ev = var::get(name);
+                if (!ev)
+                {
+                    ev = var::reg(name, new var::cvar(name, e.get<const char*>(3), true));
+                    ev->reglsv();
+                }
+                else ev->s(e.get<const char*>(3), true, false, false);
+                break;
+            }
+            default: break;
+        }
+    })
+
     LUA_BIND_DEF(svfl, {
         const char *name = e.get<const char*>(1);
         int type = e.get<int>(2);

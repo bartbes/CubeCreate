@@ -542,6 +542,13 @@ namespace lua
         return *this;
     }
 
+    lua_Engine& lua_Engine::push(float v)
+    {
+        if (!m_hashandle) return *this;
+        lua_pushnumber(m_handle, v);
+        return *this;
+    }
+
     lua_Engine& lua_Engine::push(bool v)
     {
         if (!m_hashandle) return *this;
@@ -637,9 +644,9 @@ namespace lua
     }
 
     #define RUNMETHOD(t) \
-    bool lua_Engine::exec##t(const char *s) \
+    bool lua_Engine::exec##t(const char *s, bool msg) \
     { \
-        bool ret = load##t(s); \
+        bool ret = load##t(s, msg); \
         if (!ret) return false; \
         else \
         { \
@@ -647,7 +654,7 @@ namespace lua
             if (ret) \
             { \
                 m_lasterror = geterror(); \
-                Logging::log_noformat(Logging::ERROR, m_lasterror); \
+                if (msg) Logging::log_noformat(Logging::ERROR, m_lasterror); \
                 return false; \
             } \
         } \
@@ -658,7 +665,7 @@ namespace lua
     RUNMETHOD(f)
     #undef RUNMETHOD
 
-    bool lua_Engine::loadf(const char *s)
+    bool lua_Engine::loadf(const char *s, bool msg)
     {
         if (!m_hashandle) return false;
 
@@ -666,12 +673,12 @@ namespace lua
         if (ret)
         {
             m_lasterror = geterror();
-            Logging::log(Logging::ERROR, "%s", m_lasterror);
+            if (msg) Logging::log(Logging::ERROR, "%s", m_lasterror);
         }
         return !ret;
     }
 
-    bool lua_Engine::load(const char *s)
+    bool lua_Engine::load(const char *s, bool msg)
     {
         if (!m_hashandle) return false;
 
@@ -679,7 +686,7 @@ namespace lua
         if (ret)
         {
             m_lasterror = geterror();
-            Logging::log(Logging::ERROR, "%s", m_lasterror);
+            if (msg) Logging::log(Logging::ERROR, "%s", m_lasterror);
         }
         return !ret;
     }

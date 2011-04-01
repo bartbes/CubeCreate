@@ -58,6 +58,7 @@ const LE_reg CAPI[] = {
     LUAREG(band),
     LUAREG(bnot),
     LUAREG(resetvar),
+    LUAREG(newvar),
     LUAREG(svfl),
     LUAREG(ssls),
     LUAREG(toggleconsole),

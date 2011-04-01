@@ -838,7 +838,7 @@ bool setuplistenserver(bool dedicated)
 
 void initserver(bool listen, bool dedicated)
 {
-    if(dedicated) lua::engine.execf("server-init.lua");
+    if(dedicated) lua::engine.execf("server-init.lua", false);
 
     if(listen) setuplistenserver(dedicated);
 

@@ -213,9 +213,17 @@ namespace lua
          * @param v The value to push.
          * @return Instance of lua_Engine class.
          * 
-         * Pushes a floating point value @p v onto stack.
+         * Pushes a double precision floating point value @p v onto stack.
          */
         lua_Engine& push(double v);
+        /**
+         * @brief Push a value onto stack.
+         * @param v The value to push.
+         * @return Instance of lua_Engine class.
+         * 
+         * Pushes a floating point value @p v onto stack.
+         */
+        lua_Engine& push(float v);
         /**
          * @brief Push a value onto stack.
          * @param v The value to push.
@@ -324,22 +332,25 @@ namespace lua
         /**
          * @brief Runs a Lua script from file.
          * @param s Path to file containing the script.
+         * @param msg Optional - if true (default), possible error message is printed.
          * @return True on success; false otherwise.
          * 
          * Loads a file and runs it, leaving all return values on stack.
          */
-        bool execf(const char *s);
+        bool execf(const char *s, bool msg = true);
         /**
          * @brief Runs a Lua script from string.
          * @param s The string containing a Lua script to run.
+         * @param msg Optional - if true (default), possible error message is printed.
          * @return True on success; false otherwise.
          * 
          * Runs the string, leaving all return values on stack.
          */
-        bool exec(const char *s);
+        bool exec(const char *s, bool msg = true);
         /**
          * @brief Runs a Lua script from string, returning value as its result.
          * @param s The string containing a Lua script to run.
+         * @param msg Optional - if true (default), possible error message is printed.
          * @return Value of specified type.
          * 
          * Runs the string and gets a value of needed type from -1,
@@ -359,7 +370,7 @@ namespace lua
          * @endcode
          */
         template<typename T>
-        T exec(const char *s)
+        T exec(const char *s, bool msg = true)
         {
             if (!exec(s)) return 0;
             T ret = get<T>(-1);
@@ -369,21 +380,23 @@ namespace lua
         /**
          * @brief Parses a Lua script from file, but doesn't run it.
          * @param s Path to file containing the script.
+         * @param msg Optional - if true (default), possible error message is printed.
          * @return True on success; false otherwise.
          * 
          * Parses a file containing a Lua script, but doesn't run it.
          * Useful for checking if the script has proper syntax.
          */
-        bool loadf(const char *s);
+        bool loadf(const char *s, bool msg = true);
         /**
          * @brief Parses a Lua script from a string, but doesn't run it.
          * @param s A string containing the Lua script.
+         * @param msg Optional - if true (default), possible error message is printed.
          * @return True on success; false otherwise.
          * 
          * Parses a string containing a Lua script, but doesn't run it.
          * Useful for checking if the script has proper syntax.
          */
-        bool load(const char *s);
+        bool load(const char *s, bool msg = true);
 
         /**
          * @brief Creates a new Lua table and pushes it onto stack.

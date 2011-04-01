@@ -57,14 +57,8 @@ function new(b)
     local c = {}
 
     -- the base, empty when not inheriting
-    if b and base.type(b) == "table" then
-        c.__base = b
-        -- copy, because we don't want parent classes inherit child properties
-        c.properties = table.copy(b.properties)
-    else
-        c.__base = {}
-        c.properties = {}
-    end
+    if b and base.type(b) == "table" then c.__base = b
+    else c.__base = {} end
 
     -- inherit tostring. todo: inherit other metamethods too.
     if b then c.__tostring = b.__tostring end
@@ -154,6 +148,21 @@ function new(b)
         self.__setters[k] = v
         self.__setselfs[k] = self -- a little hack to get right self
         if o then self.__setaddargs[k] = o end
+    end
+
+    -- remove getter
+    function c:remove_getter(k)
+        -- do not check if exists, no need
+        self.__getters[k] = nil
+        self.__getselfs[k] = nil
+        self.__getaddargs[k] = nil
+    end
+
+    -- remove setter
+    function c:remove_setter(k)
+        self.__setters[k] = nil
+        self.__setselfs[k] = nil
+        self.__setaddargs[k] = nil
     end
 
     -- define userget (callback on anything)

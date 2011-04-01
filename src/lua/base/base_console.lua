@@ -26,6 +26,7 @@
 -- THE SOFTWARE.
 --
 
+local base = _G
 local CAPI = require("CAPI")
 
 --- Console Lua interface. Provides methods for bindings,
@@ -115,7 +116,7 @@ say = CAPI.say
 -- @name saycommand
 saycommand = CAPI.saycommand
 ---
-function sayteamcommand() CAPI.echo("Team chat not yet implemented") end
+function sayteamcommand() base.echo("Team chat not yet implemented") end
 ---
 -- @class function
 -- @name inputcommand

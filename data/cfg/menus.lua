@@ -17,7 +17,7 @@ cc.gui.new("entities", [[
 
 -- Export entities
 
-cc.engine_variables.new("newexportfilename", "entities.json")
+cc.engine_variables.new("newexportfilename", cc.engine_variables.VAR_S, "entities.json")
 
 cc.gui.new("exportentities", [[
     cc.gui.list([=[
@@ -43,7 +43,7 @@ cc.gui.new("input_dialog", [[
     cc.gui.bar()
     cc.gui.text(input_content)
     cc.gui.bar()
-    cc.engine_variables.new("new_input_data", input_data)
+    cc.engine_variables.new("new_input_data", cc.engine_variables.VAR_S, input_data)
     cc.gui.field("new_input_data", 30, [=[input_data = new_input_data]=])
     cc.gui.bar()
     -- TODO: input callback support

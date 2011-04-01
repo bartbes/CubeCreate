@@ -54,7 +54,14 @@ statent.use_render_dynamic_test = true
 statent._sauertype = "extent"
 statent._sauertype_index = 0
 
-table.mergearrays(statent.properties, {
+statent.properties = {
+    anim.animatable_logent.properties[1], -- tags
+    anim.animatable_logent.properties[2], -- _persitent
+    anim.animatable_logent.properties[3], -- animation
+    anim.animatable_logent.properties[4], -- starttime
+    anim.animatable_logent.properties[5], -- modelname
+    anim.animatable_logent.properties[6], -- attachments
+
     { "radius", svar.state_float() }, -- TODO: use sauer values for bounding box -- XXX - needed?
 
     { "position", svar.wrapped_cvec3({ cgetter = "CAPI.getextent0", csetter = "CAPI.setextent0" }) },
@@ -62,7 +69,7 @@ table.mergearrays(statent.properties, {
     { "attr2", svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2" }) },
     { "attr3", svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3" }) },
     { "attr4", svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setattr4" }) }
-})
+}
 
 function statent:init(uid, kwargs)
     log.log(log.DEBUG, "statent:init")
@@ -176,7 +183,16 @@ light = class.new(statent)
 light._class = "light"
 light._sauertype_index = 1
 
-table.mergearrays(light.properties, {
+light.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+
+    statent.properties[8], -- position
+
     { "attr1", svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" }) },
     { "attr2", svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "red", altname = "red" }) },
     { "attr3", svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "green", altname = "green" }) },
@@ -186,7 +202,7 @@ table.mergearrays(light.properties, {
     { "red", svar.variable_alias("attr2") },
     { "green", svar.variable_alias("attr3") },
     { "blue", svar.variable_alias("attr4") }
-})
+}
 
 function light:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -202,10 +218,19 @@ spotlight = class.new(statent)
 spotlight._class = "spotlight"
 spotlight._sauertype_index = 7
 
-table.mergearrays(spotlight.properties, {
+spotlight.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+
+    statent.properties[8], -- position
+
     { "attr1", svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" }) },
     { "radius", svar.variable_alias("attr1") }
-})
+}
 
 function spotlight:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -216,10 +241,19 @@ envmap = class.new(statent)
 envmap._class = "envmap"
 envmap._sauertype_index = 4
 
-table.mergearrays(envmap.properties, {
+envmap.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+
+    statent.properties[8], -- position
+
     { "attr1", svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "radius", altname = "radius" }) },
     { "radius", svar.variable_alias("attr1") }
-})
+}
 
 function envmap:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -230,7 +264,16 @@ ambient_sound = class.new(statent)
 ambient_sound._class = "ambient_sound"
 ambient_sound._sauertype_index = 6
 
-table.mergearrays(ambient_sound.properties, {
+ambient_sound.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+
+    statent.properties[8], -- position
+
     { "attr2", svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "radius", altname = "radius" }) },
     { "attr3", svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "size", altname = "size" }) },
     { "attr4", svar.wrapped_cinteger({ cgetter = "CAPI.getattr4", csetter = "CAPI.setsoundvol", guiname = "volume", altname = "volume" }) },
@@ -239,7 +282,7 @@ table.mergearrays(ambient_sound.properties, {
     { "radius", svar.variable_alias("attr2") },
     { "size", svar.variable_alias("attr3") },
     { "volume", svar.variable_alias("attr4") }
-})
+}
 
 function ambient_sound:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -255,7 +298,17 @@ particle_effect = class.new(statent)
 particle_effect._class = "particle_effect"
 particle_effect._sauertype_index = 5
 
-table.mergearrays(particle_effect.properties, {
+particle_effect.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+    statent.properties[7], -- radius
+
+    statent.properties[8], -- position
+
     { "attr1", svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "particle_type", altname = "particle_type" }) },
     { "attr2", svar.wrapped_cinteger({ cgetter = "CAPI.getattr2", csetter = "CAPI.setattr2", guiname = "value1", altname = "value1" }) },
     { "attr3", svar.wrapped_cinteger({ cgetter = "CAPI.getattr3", csetter = "CAPI.setattr3", guiname = "value2", altname = "value2" }) },
@@ -265,7 +318,7 @@ table.mergearrays(particle_effect.properties, {
     { "value1", svar.variable_alias("attr2") },
     { "value2", svar.variable_alias("attr3") },
     { "value3", svar.variable_alias("attr4") }
-})
+}
 
 function particle_effect:init(uid, kwargs)
     statent.init(self, uid, kwargs)
@@ -280,7 +333,17 @@ mapmodel = class.new(statent)
 mapmodel._class = "mapmodel"
 mapmodel._sauertype_index = 2
 
-table.mergearrays(mapmodel.properties, {
+mapmodel.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+    statent.properties[7], -- radius
+
+    statent.properties[8], -- position
+
     { "attr1", svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "yaw", altname = "yaw" }) },
     { "yaw", svar.variable_alias("attr1") },
 
@@ -293,7 +356,7 @@ table.mergearrays(mapmodel.properties, {
         cgetter = "CAPI.getcollisionradh",
         csetter = "CAPI.setcollisionradh"
     }) }
-})
+}
 
 function mapmodel:init(uid, kwargs)
     log.log(log.DEBUG, "mapmodel:init")
@@ -332,9 +395,25 @@ area_trigger = class.new(mapmodel)
 area_trigger._class = "area_trigger"
 -- ran on collision
 
-table.mergearrays(area_trigger.properties, {
+area_trigger.properties = {
+    mapmodel.properties[1], -- tags
+    mapmodel.properties[2], -- _persitent
+    mapmodel.properties[3], -- animation
+    mapmodel.properties[4], -- starttime
+    mapmodel.properties[5], -- modelname
+    mapmodel.properties[6], -- attachments
+    mapmodel.properties[7], -- radius
+
+    mapmodel.properties[8], -- position
+
+    mapmodel.properties[9], -- attr1
+    mapmodel.properties[10], -- yaw
+
+    mapmodel.properties[11], -- collision_radius_width
+    mapmodel.properties[12], -- collision_radius_height
+
     { "script_to_run", svar.state_string() }
-})
+}
 
 function area_trigger:init(uid, kwargs)
     mapmodel.init(self, uid, kwargs)
@@ -354,6 +433,7 @@ end
 
 resettable_area_trigger = class.new(area_trigger)
 resettable_area_trigger._class = "resettable_area_trigger"
+resettable_area_trigger.properties = area_trigger.properties
 
 function resettable_area_trigger:activate(kwargs)
     area_trigger.activate(self, kwargs)
@@ -420,10 +500,20 @@ world_marker = class.new(statent)
 world_marker._class = "world_marker"
 world_marker._sauertype_index = 3
 
-table.mergedicts(world_marker.properties, {
+world_marker.properties = {
+    statent.properties[1], -- tags
+    statent.properties[2], -- _persitent
+    statent.properties[3], -- animation
+    statent.properties[4], -- starttime
+    statent.properties[5], -- modelname
+    statent.properties[6], -- attachments
+    statent.properties[7], -- radius
+
+    statent.properties[8], -- position
+
     { "attr1", svar.wrapped_cinteger({ cgetter = "CAPI.getattr1", csetter = "CAPI.setattr1", guiname = "yaw", altname = "yaw" }) },
     { "yaw", svar.variable_alias("attr1") }
-})
+}
 
 function world_marker:place_entity(ent)
     ent.position = self.position

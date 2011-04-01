@@ -100,18 +100,35 @@ end
 -- <br/><br/>Usage:<br/><br/>
 -- <code>
 -- local a = { a = 5, b = 10 }<br/>
--- local b = { 5, 10, 15 }<br/>
--- local c = table.filter(a, function f(k, v) return ((v <= 5) and true or false) end)<br/>
--- local d = table.filter(a, function f(i, v) return ((i <= 2) and true or false) end)<br/>
+-- local b = table.filter(a, function (k, v) return ((v <= 5) and true or false) end)<br/>
 -- </code>
 -- @param t Table to filter.
--- @param f Function taking index / key, value and returning true if element matches condition. (false otherwise)
+-- @param f Function taking key, value and returning true if element matches condition. (false otherwise)
 -- @return Filtered table.
 function table.filter(t, f)
     local r = {}
     for a, b in pairs(t) do
         if f(a, b) then
             r[a] = b
+        end
+    end
+    return r
+end
+
+--- Filter an array.
+-- <br/><br/>Usage:<br/><br/>
+-- <code>
+-- local a = { 5, 10, 15 }<br/>
+-- local b = table.filterarray(a, function (i, v) return ((i <= 2) and true or false) end)<br/>
+-- </code>
+-- @param t Array to filter.
+-- @param f Function taking index, value and returning true if element matches condition. (false otherwise)
+-- @return Filtered array.
+function table.filterarray(t, f)
+    local r = {}
+    for a = 1, #t do
+        if f(a, t[a]) then
+            table.insert(r, t[a])
         end
     end
     return r

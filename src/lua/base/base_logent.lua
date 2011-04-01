@@ -53,10 +53,10 @@ root_logent = class.new()
 root_logent._class = "logent"
 root_logent.should_act = true
 
-table.mergearrays(root_logent.properties, {
+root_logent.properties = {
     { "tags", svar.state_array() },
     { "_persistent", svar.state_bool() }
-})
+}
 
 function root_logent:__tostring() return self._class end
 
@@ -68,8 +68,8 @@ function root_logent:_general_setup()
 
     self.action_system = act.action_system(self)
     self.state_var_vals = {}
-    -- caching reads from script into c++ (search for -- caching)
-    self.state_var_val_timestamps = {}
+    -- caching reads from script into c++ (search for -- caching) TODO: ENABLE LATER
+    -- self.state_var_val_timestamps = {}
 
     self.deactivated = false
     self:_setup_vars()
@@ -106,7 +106,7 @@ end
 
 function root_logent:del_tag(t)
     log.log(log.DEBUG, "root_logent:del_tag(\"" .. base.tostring(t) .. "\")")
-    self.tags = table.filter(self.tags:as_array(), function(tag) return tag ~= t end)
+    self.tags = table.filterarray(self.tags:as_array(), function(i, tag) return tag ~= t end)
 end
 
 function root_logent:has_tag(t)
@@ -224,7 +224,7 @@ function client_logent:_set_statedata(k, v, auid)
     local customsynch_fromhere = var.customsynch and self._controlled_here
     local clientset = var.clientset
 
-    if auid and not customsynch_fromhere then
+    if auid == -1 and not customsynch_fromhere then
         log.log(log.DEBUG, "sending request / notification to server.")
         -- todo: supress msg sending of the same val, at least for some SVs
         msgsys.send(var.reliable and CAPI.statedata_changerequest or CAPI.statedata_changerequest_unreliable,
@@ -233,12 +233,12 @@ function client_logent:_set_statedata(k, v, auid)
                     base.tostring(var._name)), var:to_wire(v))
     end
 
-    if not auid or clientset or customsynch_fromhere then
-        log.log(log.INFO, "updating locally")
+    if auid ~= -1 or clientset or customsynch_fromhere then
+        log.log(log.DEBUG, "updating locally")
         -- if originated from server, translated
-        if not auid then v = var:from_wire(v) end
+        if auid ~= -1 then v = var:from_wire(v) end
         base.assert(var:validate(v))
-        self:emit(svar.get_onmodify_prefix() .. base.tostring(k), v, not auid)
+        self:emit(svar.get_onmodify_prefix() .. base.tostring(k), v, auid ~= -1)
         self.state_var_vals[k] = v
     end
 end
@@ -339,13 +339,13 @@ function server_logent:_set_statedata(k, v, auid, iop)
         return nil
     end
 
-    if auid then
-        v = v:from_wire(v)
+    if auid and auid ~= -1 then
+        v = var:from_wire(v)
         if not var.clientwrite then
             log.log(log.ERROR, "Client " .. base.tostring(auid) .. " tried to change " .. base.tostring(k))
             return nil
         end
-    elseif iop then v = v:from_data(v)
+    elseif iop then v = var:from_data(v)
     end
 
     log.log(log.INFO, "Translated value: " ..
@@ -356,8 +356,8 @@ function server_logent:_set_statedata(k, v, auid, iop)
                       base.tostring(v))
 
     self:emit(svar.get_onmodify_prefix() .. base.tostring(k), v, auid)
-    if cancel_sd_update then
-        cancel_sd_update = nil
+    if base.cancel_sd_update then
+        base.cancel_sd_update = nil
         return nil
     end
 
@@ -376,7 +376,7 @@ function server_logent:_set_statedata(k, v, auid, iop)
             self.uid,
             msgsys.toproid(_class, base.tostring(k)),
             var:to_wire(v),
-            (var.clientset and auid) and lstor.get(auid).cn or msgsys.ALL_CLIENTS
+            (var.clientset and auid and auid ~= -1) and lstor.get(auid).cn or msgsys.ALL_CLIENTS
         }
 
         local cns = lstor.get_all_clientnums()

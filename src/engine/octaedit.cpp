@@ -381,9 +381,8 @@ void rendereditcursor() // INTENSITY: Replaced all player->o with camera1->o, so
     
     // cursors    
 
-    renderentselection(camera1->o, camdir, GETIV(entmoving)!=0);
-
     lineshader->set();
+    renderentselection(camera1->o, camdir, GETIV(entmoving)!=0);
 
     enablepolygonoffset(GL_POLYGON_OFFSET_LINE);
 

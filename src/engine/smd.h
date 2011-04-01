@@ -458,7 +458,7 @@ struct smd : skelmodel
 
         loadingsmd = this;
         var::persistvars = false;
-        if(lua::engine.execf(path(cfgname)) && parts.length()) // INTENSITY: execfile(cfgname, false) && parts.length()) // configured smd, will call the smd* commands below
+        if(lua::engine.execf(path(cfgname), false) && parts.length()) // INTENSITY: execfile(cfgname, false) && parts.length()) // configured smd, will call the smd* commands below
         {
             var::persistvars = true;
             loadingsmd = NULL;
