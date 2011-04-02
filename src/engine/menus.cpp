@@ -13,16 +13,17 @@ static g3d_gui *cgui = NULL;
 
 struct menu : g3d_callback
 {
-    char *name, *header, *contents, *onclear;
+    char *name, *header, *onclear;
+    int contents_ref;
 
-    menu() : name(NULL), header(NULL), contents(NULL), onclear(NULL) {}
+    menu() : name(NULL), header(NULL), onclear(NULL), contents_ref(0) {}
 
     void gui(g3d_gui &g, bool firstpass)
     {
         cgui = &g;
         cgui->start(menustart, 0.03f, &menutab);
         cgui->tab(header ? header : name, GUI_TITLE_COLOR);
-        lua::engine.exec(contents);
+        lua::engine.getref(contents_ref).call(0, 0);
         cgui->end();
         cgui = NULL;
     }
@@ -221,19 +222,21 @@ void guionclear(char *action)
     if(action[0]) m->onclear = newstring(action);
 }
 
-void guistayopen(char *contents)
+void guistayopen(int fref)
 {
     bool oldclearmenu = shouldclearmenu;
     shouldclearmenu = false;
-    lua::engine.exec(contents);
+    lua::engine.getref(fref).call(0, 0);
+    lua::engine.unref(fref);
     shouldclearmenu = oldclearmenu;
 }
 
-void guinoautotab(char *contents)
+void guinoautotab(int fref)
 {
     if(!cgui) return;
     cgui->allowautotab(false);
-    lua::engine.exec(contents);
+    lua::engine.getref(fref).call(0, 0);
+    lua::engine.unref(fref);
     cgui->allowautotab(true);
 }
 
@@ -505,23 +508,25 @@ void guikeyfield(char *var, int *maxlength, char *onchange)
 //use text<action> to do more...
 
 
-void guilist(char *contents)
+void guilist(int fref)
 {
     if(!cgui) return;
     cgui->pushlist();
-    lua::engine.exec(contents);
+    lua::engine.getref(fref).call(0, 0);
+    lua::engine.unref(fref);
     cgui->poplist();
 }
 
-void guialign(int *align, char *contents)
+void guialign(int *align, int fref)
 {
     if(!cgui) return;
     cgui->pushlist(clamp(*align, -1, 1));
-    lua::engine.exec(contents);
+    lua::engine.getref(fref).call(0, 0);
+    lua::engine.unref(fref);
     cgui->poplist();
 }
 
-void newgui(char *name, char *contents, char *header)
+void newgui(char *name, int fref, char *header)
 {
     menu *m = guis.access(name);
     if(!m)
@@ -533,10 +538,10 @@ void newgui(char *name, char *contents, char *header)
     else
     {
         DELETEA(m->header);
-        DELETEA(m->contents);
+        lua::engine.unref(m->contents_ref);
     }
     m->header = header && header[0] ? newstring(header) : NULL;
-    m->contents = newstring(contents);
+    m->contents_ref = fref;
 }
 
 void guiservers()

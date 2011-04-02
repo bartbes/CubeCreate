@@ -117,7 +117,7 @@ namespace lua
          * @endcode
          * 
          * Supported types are int, double, float, bool,
-         * const char*, void** (table), void (nil).
+         * const char*, void** (table), void* (function), void (nil).
          */
         template<typename T>
         bool is(int i)
@@ -133,6 +133,8 @@ namespace lua
                 return lua_isstring(m_handle, i);
             else if (typeid(T) == typeid(void**))
                 return lua_istable(m_handle, i);
+            else if (typeid(T) == typeid(void*))
+                return lua_isfunction(m_handle, i);
             else return lua_isnoneornil(m_handle, i);
             return false;
         }

@@ -34,8 +34,8 @@ void fontchar(int *x, int *y, int *w, int *h);
 void showgui(const char *name);
 int cleargui(int n);
 void guionclear(char *action);
-void guistayopen(char *contents);
-void guinoautotab(char *contents);
+void guistayopen(int fref);
+void guinoautotab(int fref);
 void guibutton(char *name, char *action, char *icon);
 void guiimage(char *path, char *action, float *scale, int *overlaid, char *alt);
 void guicolor(int *color);
@@ -54,9 +54,9 @@ void guibitfield(char *name, char *var, int *mask, char *onchange);
 void guifield(char *var, int *maxlength, char *onchange, int *password);
 void guieditor(char *name, int *maxlength, int *height, int *mode);
 void guikeyfield(char *var, int *maxlength, char *onchange);
-void guilist(char *contents);
-void guialign(int *align, char *contents);
-void newgui(char *name, char *contents, char *header);
+void guilist(int fref);
+void guialign(int *align, int fref);
+void newgui(char *name, int fref, char *header);
 
 namespace lua_binds
 {
@@ -67,16 +67,24 @@ namespace lua_binds
     LUA_BIND_STD_CLIENT(fontoffset, fontoffset, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(fontchar, fontchar, e.get<int*>(1), e.get<int*>(2), e.get<int*>(3), e.get<int*>(4))
 
-    LUA_BIND_STD_CLIENT(newgui, newgui, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
+    LUA_BIND_CLIENT(newgui, {
+        if (!e.is<void*>(2))
+        {
+            e.typeerror(2, "function");
+            return;
+        }
+        int refn = e.push_index(2).ref();
+        newgui(e.get<char*>(1), refn, e.get<char*>(3));
+    })
     LUA_BIND_STD_CLIENT(guibutton, guibutton, e.get<char*>(1), e.get<char*>(2), e.get<char*>(3))
     LUA_BIND_STD_CLIENT(guitext, guitext, e.get<char*>(1), e.get<char*>(2))
     LUA_BIND_STD_CLIENT(cleargui, e.push, cleargui(e.get<int>(1)))
     LUA_BIND_STD_CLIENT(showgui, showgui, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(guionclear, guionclear, e.get<char*>(1))
-    LUA_BIND_STD_CLIENT(guistayopen, guistayopen, e.get<char*>(1))
-    LUA_BIND_STD_CLIENT(guinoautotab, guinoautotab, e.get<char*>(1))
-    LUA_BIND_STD_CLIENT(guilist, guilist, e.get<char*>(1))
-    LUA_BIND_STD_CLIENT(guialign, guialign, e.get<int*>(1), e.get<char*>(2))
+    LUA_BIND_CLIENT(guistayopen, { int refn = e.push_index(1).ref(); guistayopen(refn); })
+    LUA_BIND_CLIENT(guinoautotab, { int refn = e.push_index(1).ref(); guinoautotab(refn); })
+    LUA_BIND_CLIENT(guilist, { int refn = e.push_index(1).ref(); guilist(refn); })
+    LUA_BIND_CLIENT(guialign, { int refn = e.push_index(1).ref(); guialign(e.get<int*>(1), refn); })
     LUA_BIND_STD_CLIENT(guititle, guititle, e.get<char*>(1))
     LUA_BIND_STD_CLIENT(guibar, guibar)
     LUA_BIND_STD_CLIENT(guistrut, guistrut, e.get<float*>(1), e.get<int*>(2))
@@ -161,7 +169,7 @@ namespace lua_binds
 
         // Create the gui
         std::string command =
-            "cc.gui.new(\"entity\", [[\n"
+            "cc.gui.new(\"entity\", function()\n"
             "    cc.gui.text(entity_gui_title)\n"
             "    cc.gui.bar()\n";
 
@@ -178,13 +186,13 @@ namespace lua_binds
             }
 
             command +=
-                "    cc.gui.list([=[\n"
+                "    cc.gui.list(function()\n"
                 "        cc.gui.text(cc.gui.getentguilabel(" + sI + "))\n"
                 "        cc.engine_variables.new(\"new_entity_gui_field_" + sI + "\", cc.engine_variables.VAR_S, cc.gui.getentguival(" + sI + "))\n"
                 "        cc.gui.field(\"new_entity_gui_field_" + sI + "\", "
                 + Utility::toString((int)value.size()+25)
-                + ", [==[cc.gui.setentguival(" + sI + ", new_entity_gui_field_" + sI + ")]==], 0)\n"
-                "    ]=])\n";
+                + ", [[cc.gui.setentguival(" + sI + ", new_entity_gui_field_" + sI + ")]], 0)\n"
+                "    end)\n";
 
             if ((i+1) % 10 == 0)
             {
@@ -194,7 +202,7 @@ namespace lua_binds
         }
 
         command +=
-            "]])\n";
+            "end)\n";
 
 //      printf("Command: %s\r\n", command.c_str());
         e.exec(command.c_str());

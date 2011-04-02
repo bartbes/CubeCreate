@@ -121,9 +121,9 @@ def show_gui(sender, **kwargs):
         if check_server_ready():
             CModule.run_script('''
                 cc.gui.text("Local server: Running")
-                cc.gui.stayopen([[ cc.gui.button("  stop", [=[cc.network.ssls()]=]) ]])
+                cc.gui.stayopen(function() cc.gui.button("  stop", [=[cc.network.ssls()]=]) end)
                 cc.gui.button("  show output", [[cc.gui.show("local_server_output")]])
-                cc.gui.stayopen([[ cc.gui.button("  save map", [=[cc.network.do_upload()]=]) ]])
+                cc.gui.stayopen(function() cc.gui.button("  save map", [=[cc.network.do_upload()]=]) end)
                 cc.gui.button("  restart map", [[cc.world.restart_map()]])
                 cc.gui.button("  editing commands", [[cc.gui.show("editing")]])
             ''')
@@ -133,7 +133,7 @@ def show_gui(sender, **kwargs):
         else:
             CModule.run_script('''
                 cc.gui.text("Local server: ...preparing...")
-                cc.gui.stayopen([[ cc.gui.button("  stop", [=[cc.network.ssls()]=]) ]])
+                cc.gui.stayopen(function() cc.gui.button("  stop", [=[cc.network.ssls()]=]) end)
             ''')
     else:
         CModule.run_script('''
@@ -142,16 +142,16 @@ def show_gui(sender, **kwargs):
                 cc.gui.text("   << not logged into master >>")
             end
 
-            cc.gui.list([[
+            cc.gui.list(function()
                 cc.gui.text("Map location to run: base/")
                 cc.gui.field("local_server_location", 30, "")
                 cc.gui.text(".tar.gz")
-            ]])
-            cc.gui.stayopen([[
+            end)
+            cc.gui.stayopen(function()
                 cc.gui.button("  start", [=[
                     cc.network.ssls(local_server_location)
                 ]=])
-            ]])
+            end)
             cc.gui.button("  show output", [[ cc.gui.show("local_server_output") ]])
         ''')
     CModule.run_script('cc.gui.bar()')
@@ -165,18 +165,18 @@ def request_private_edit(sender, **kwargs):
 map_load_finish.connect(request_private_edit, weak=False)
 
 CModule.run_script('''
-    cc.gui.new("local_server_output", [[
-        cc.gui.noautotab([=[
+    cc.gui.new("local_server_output", function()
+        cc.gui.noautotab(function()
             cc.gui.bar()
             cc.gui.editor("%(name)s", -80, 20)
             cc.gui.bar()
-            cc.gui.stayopen([==[
-                cc.gui.button("refresh", [===[
+            cc.gui.stayopen(function()
+                cc.gui.button("refresh", [[
                     cc.gui.textfocus("%(name)s")
                     cc.gui.textload("%(name)s")
                     cc.gui.show("-1")
-                ]===])
-            ]==])
-        ]=])
-    ]])
+                ]])
+            end)
+        end)
+    end)
 ''' % { 'name': get_output_file() })
