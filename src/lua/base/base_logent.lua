@@ -68,8 +68,8 @@ function root_logent:_general_setup()
 
     self.action_system = act.action_system(self)
     self.state_var_vals = {}
-    -- caching reads from script into c++ (search for -- caching) TODO: ENABLE LATER
-    -- self.state_var_val_timestamps = {}
+    -- caching reads from script into c++ (search for -- caching)
+    self.state_var_val_timestamps = {}
 
     self.deactivated = false
     self:_setup_vars()

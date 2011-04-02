@@ -431,9 +431,9 @@ function wrapped_cvariable:_register(_name, parent)
                 variable.csetter(parent, v)
                 log.log(log.DEBUG, "csetter called successfully.")
 
-                -- caching reads from script into C++ (search for -- caching) TODO: enable later
-                -- parent.state_var_vals[base.tostring(variable._name)] = v
-                -- parent.state_var_val_timestamps[base.tostring(variable._name)] = glob.curr_timestamp
+                -- caching reads from script into C++ (search for -- caching)
+                parent.state_var_vals[base.tostring(variable._name)] = v
+                parent.state_var_val_timestamps[base.tostring(variable._name)] = glob.curr_timestamp
             else
                 -- not yet set up, queue change
                 parent:_queue_sv_change(base.tostring(variable._name), v)
@@ -449,20 +449,20 @@ function wrapped_cvariable:getter(var)
 
     log.log(log.INFO, "WCV getter " .. base.tostring(var._name))
 
-    -- caching: TODO: enable later
-    -- local cached_timestamp = self.state_var_val_timestamps[base.tostring(var._name)]
-    -- if cached_timestamp == glob.curr_timestamp then
-    --     return self.state_var_vals[base.tostring(var._name)]
-    -- end
+    -- caching
+    local cached_timestamp = self.state_var_val_timestamps[base.tostring(var._name)]
+    if cached_timestamp == glob.curr_timestamp then
+        return self.state_var_vals[base.tostring(var._name)]
+    end
     if var.cgetter and (glob.CLIENT or self:can_call_cfuncs()) then
         log.log(log.INFO, "WCV getter: call C")
         local val = var.cgetter(self)
 
-        -- caching: TODO: enable later
-        -- if glob.CLIENT or self._queued_sv_changes_complete then
-        --     self.state_var_vals[base.tostring(var._name)] = val
-        --     self.state_var_val_timestamps[base.tostring(var._name)] = glob.curr_timestamp
-        -- end
+        -- caching
+        if glob.CLIENT or self._queued_sv_changes_complete then
+            self.state_var_vals[base.tostring(var._name)] = val
+            self.state_var_val_timestamps[base.tostring(var._name)] = glob.curr_timestamp
+        end
 
         return val
     else
@@ -514,20 +514,20 @@ function wrapped_carray:get_raw(ent)
     log.log(log.INFO, "WCA:get_raw " .. base.tostring(self._name) .. " " .. base.tostring(self.cgetter))
 
     if self.cgetter and (glob.CLIENT or ent:can_call_cfuncs()) then
-        -- caching: TODO: enable later
-        -- local cached_timestamp = ent.state_var_val_timestamps[base.tostring(self._name)]
-        -- if cached_timestamp == glob.curr_timestamp then
-        --     return ent.state_var_vals[base.tostring(self._name)]
-        -- end
+        -- caching
+        local cached_timestamp = ent.state_var_val_timestamps[base.tostring(self._name)]
+        if cached_timestamp == glob.curr_timestamp then
+            return ent.state_var_vals[base.tostring(self._name)]
+        end
 
         log.log(log.INFO, "WCA:get_raw: call C")
-        -- caching: TODO: enable later
+        -- caching
         local val = self.cgetter(ent)
         log.log(log.INFO, "WCA:get_raw:result: " .. json.encode(val))
-        -- if glob.CLIENT or ent._queued_sv_changes_complete then
-        --     ent.state_var_vals[base.tostring(self._name)] = val
-        --     ent.state_var_val_timestamps[base.tostring(self._name)] = glob.curr_timestamp
-        -- end
+        if glob.CLIENT or ent._queued_sv_changes_complete then
+            ent.state_var_vals[base.tostring(self._name)] = val
+            ent.state_var_val_timestamps[base.tostring(self._name)] = glob.curr_timestamp
+        end
         return val
     else
         log.log(log.INFO, "WCA:get_raw: fallback to state_data")
