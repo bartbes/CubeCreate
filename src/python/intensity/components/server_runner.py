@@ -10,6 +10,7 @@ Works both when logged into the master, or when not.
 
 import subprocess, time
 import os, signal, sys
+import platform
 
 from intensity.base import *
 from intensity.logging import *
@@ -48,9 +49,20 @@ def run_server(location=None, use_master=True):
         activity = ''
         map_asset = '-config:Activity:force_location:%s' % location
 
+    servbin_name = ""
+    if UNIX:
+        machine = platform.machine()
+        system = platform.system()
+        if not os.path.exists("./bin/CC_Server_%s-%s" % (system, machine)):
+            machine = platform.processor()
+            if not os.path.exists("./bin/CC_Server_%s-%s" % (system, machine)):
+                log(logging.ERROR, "Cannot find server binary (./bin/CC_Server_%s-%s)" % (system, machine))
+                return
+        servbin_name = "./bin/CC_Server_%s-%s" % (system, machine)
+
     Module.server_proc = subprocess.Popen(
         "%s %s %s %s -component:intensity.components.shutdown_if_idle -components:intensity.components.shutdown_if_empty -config:Startup:no_console:1" % (
-            'exec ./intensity_server.sh' if UNIX else 'intensity_server.bat',
+            'exec ./%s -r' % servbin_name if UNIX else 'intensity_server.bat',
             os.path.join(sys.argv[1], 'settings_server.json') if sys.argv[1][0] != '-' else '', # Home dir, if given for client - use also in server
             activity,
             map_asset,
