@@ -625,11 +625,12 @@ namespace game
     {
         engine.getg("cc")
               .t_getraw("logent")
+              .t_getraw("store")
               .t_getraw("get")
               .push(LogicSystem::getUniqueId(d)).call(1, 1);
         // got class here
         std::string ret(engine.t_get<const char*>("_name"));
-        engine.pop(3);
+        engine.pop(4);
         return ret;
     }
 

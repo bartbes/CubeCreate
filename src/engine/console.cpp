@@ -296,9 +296,14 @@ struct hline
     {
         if(action)
         {
-            // TODO: finish this
-            //alias("commandbuf", buf);
-            //execute(action);
+            var::cvar *ev = var::get("commandbuf");
+            if (!ev)
+            {
+                ev = var::reg("commandbuf", new var::cvar("commandbuf", buf, true));
+                ev->reglsv();
+            }
+            else ev->s(buf, true, false, false);
+            lua::engine.exec(action);
         }
         else if(buf[0]=='/') lua::engine.exec(buf+1);
         else game::toserver(buf);
