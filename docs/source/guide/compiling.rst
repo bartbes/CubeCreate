@@ -2,9 +2,9 @@
 Compiling CubeCreate
 ********************
 
-Officially supported platforms for CubeCreate (those which include binaries) are currently Linux, Windows and Mac OS X.
+Officially supported platforms for CubeCreate (those which include/will include binaries) are currently Linux, FreeBSD, Windows and Mac OS X.
 
-It should work without problems also on Solaris, BSD and other UNIX-like or UNIX systems (official support will be added when we get bins).
+It should work without problems also on Solaris and other UNIX-like or UNIX systems.
 
 For different platforms, compilation instructions might differ a bit, so separate OSes will be explained separately.
 
@@ -36,7 +36,7 @@ with little modifications it should work everywhere.
 
    .. code-block :: bash
 
-       $ sudo apt-get install cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev python-dev zlib1g-dev
+       $ sudo apt-get install cmake build-essential libsdl1.2-dev libsdl-image1.2-dev libsdl-mixer1.2-dev python-dev zlib1g-dev liblua5.1-dev
 
    If I list the dependencies (for other OSes), they are:
 
@@ -46,8 +46,9 @@ with little modifications it should work everywhere.
    3. SDL dev package, SDL_image dev package, SDL_mixer dev package
    4. Python dev libraries and headers
    5. Zlib dev libraries and headers
+   6. Lua dev libraries and headers
 
-2. Open a terminal, build CC:
+2. Open a terminal, build cC:
 
    .. code-block :: bash
 
@@ -56,25 +57,21 @@ with little modifications it should work everywhere.
        $ make
        $ make install
 
-   If you have a dualcore processor, you can use -j2 as make argument.
-
-   If you want to build an experimental webbrowser plugin, provide -DINTENSITY_PLUGIN=1 as cmake argument.
-
-   See more info about webbrowser plugin at the end of this page.
+   If you have a multicore processor, you can use -jNUMCORES+1 as make argument.
 
 3. You're done, you should have binaries in CCROOT/bin and libraries in CCROOT/lib.
 
 Windows
 =======
 
-On Windows, you don't need to get many dependencies, since most of them is already provided with CC.
-If you have 64bit windows, get 32bit versions of dependencies, 64bit builds of CC are not yet supported on Windows.
+On Windows, you don't need to get many dependencies, since most of them is already provided with cC.
+If you have 64bit windows, get 32bit versions of dependencies, 64bit builds of cC are not yet supported on Windows.
 
 You need to get:
 
 1. CMake from www.cmake.org. Install it into standard directory. Let it write PATH variable when installing so it works correctly.
 2. Python from www.python.org. **Note:** The batch files etc. assume
-   you are using Python 2.6.x, so get 2.6.X release (currently 2.6.5 - http://python.org/download/releases/2.6.5/ , CC will be updated to latest soon)
+   you are using Python 2.6.x, so get 2.6.X release (currently 2.6.6 - http://python.org/download/releases/2.6.6/ , cC will be updated to latest soon)
    Install it into C:\\Python26 as usual and install it for ALL USERS.
    After installing, run Control panel of Windows, edit environment variables of system and append this into PATH:
 
@@ -82,7 +79,16 @@ You need to get:
 
        ;C:\Python26;C:\Python26\Scripts
 
-Then, you have two ways to build CC. Visual Studio Express Edition is recommended and Code::Blocks support is currently incomplete.
+3. Lua from here http://code.google.com/p/luaforwindows/
+4. Boost_python library and boost headers; it was tested with boost 1.41:
+
+   https://sourceforge.net/projects/boost/files/boost-binaries/1.41.0/libboost_python-vc90-mt-1_41.zip/download
+   https://sourceforge.net/projects/boost/files/boost-binaries/1.41.0/boost_1_41_headers.zip/download
+
+   Unpack the .lib file from boost_python archive into cubecreate/src/windows/boost_python (create dir)
+   Unpack "boost" directory from second archive into cubecreate/src/windows/boost (create dir, the path is src/windows/boost/boost/...)
+
+Then, you have two ways to build cC. Visual Studio Express Edition is recommended and Code::Blocks support is currently incomplete.
 
 Using Visual Studio Express Edition
 -----------------------------------
@@ -90,12 +96,12 @@ Using Visual Studio Express Edition
 This is an easier and more straightforward version. Also, mingw build doesn't work correctly yet
 (builds, links, but there are runtime errors)
 
-1. Get Microsoft Visual Studio 2008 Express Edition from Microsoft website. CC works just with 2008 now.
+1. Get Microsoft Visual Studio 2008 Express Edition from Microsoft website. cC works just with 2008 now.
 
    You don't need to install optional components, and install it into default path it tells you.
 
-2. Run CMake GUI. As "Where is source code", set path to your CC directory. As "Where to build binaries",
-   set cbuild directory of your CC directory.
+2. Run CMake GUI. As "Where is source code", set path to your cC directory. As "Where to build binaries",
+   set cbuild directory of your cC directory.
 
    Hit "Configure" button. It will ask you what type of build files it should generate.
    Select MS Visual Studio 9 project. Don't set x64 even if you have 64bit OS.
@@ -119,6 +125,7 @@ Using MinGW and Code::Blocks
 ----------------------------
 
 **Note:** it compiles and links, but has run-time errors atm.
+**Note:** this is out of date.
 
 1. Get MinGW from `sourceforge <http://sourceforge.net/projects/mingw/files/Automated MinGW Installer/MinGW 5.1.6/MinGW-5.1.6.exe/download>`_ and install it.
    Choose "Download and install", then "Candidate", let it install to for example C:\\mingw.
@@ -131,8 +138,8 @@ Using MinGW and Code::Blocks
 
 **MinGW compilation**
 
-1. Run CMake GUI. As "Where is source code", set path to your CC directory. As "Where to build binaries",
-   set cbuild directory of your CC directory.
+1. Run CMake GUI. As "Where is source code", set path to your cC directory. As "Where to build binaries",
+   set cbuild directory of your cC directory.
 
    Hit "Configure" button. It will ask you what type of build files it should generate.
    Select MinGW Makefiles.
@@ -165,8 +172,8 @@ Using MinGW and Code::Blocks
 1. Get latest Code::Blocks from website, install it,
    don't let it install mingw as you already have it in C:\\mingw.
 
-2. Run CMake GUI. As "Where is source code", set path to your CC directory. As "Where to build binaries",
-   set cbuild directory of your CC directory.
+2. Run CMake GUI. As "Where is source code", set path to your cC directory. As "Where to build binaries",
+   set cbuild directory of your cC directory.
 
    Hit "Configure" button. It will ask you what type of build files it should generate.
    Select CodeBlocks MinGW Makefiles.
@@ -193,7 +200,9 @@ Using MinGW and Code::Blocks
 Mac OS X (Darwin)
 =================
 
-1. You'll need to get some dependencies, first. (I assume you've got CC repository already downloaded)
+**Note:** Might not work (untested with lua)
+
+1. You'll need to get some dependencies, first. (I assume you've got cC repository already downloaded)
     1. The XCode developer DVD. I got it after registration on Mac developer portal, filename of xcode dvd i downloaded was "xcode322_2148_developerdvd.dmg"
        at this URL http://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wo/5.1.17.2.1.3.3.1.0.1.1.0.3.3.3.3.1
     2. The needed SDL dmg files - http://www.libsdl.org/release/SDL-1.2.14.dmg , 
@@ -202,8 +211,10 @@ Mac OS X (Darwin)
        
        Put the SDL.framework, SDL_mixer.framework and SDL_image.framework from the dmgs to /Library/Frameworks
     3. Get CMake here http://www.cmake.org/files/v2.8/cmake-2.8.2-Darwin-universal.dmg
+    4. Install Lua libraries / headers using your preferred way (i.e. with fink)
+    5. Install boost headers and boost_python library using your preferred way.
 
-2. If you don't want to use xcode IDE, then simply go to "cbuild" directory in your CC tree in terminal and do
+2. If you don't want to use xcode IDE, then simply go to "cbuild" directory in your cC tree in terminal and do
 
    .. code-block :: bash
 
@@ -215,7 +226,7 @@ Mac OS X (Darwin)
 
    After everything goes OK, you should have binaries and you can launch (intensity_client.command file from Finder)
 
-3. If you want to use the xcode IDE, then it's as easy as first method. Simply go into "cbuild" dir in your CC tree in terminal and do
+3. If you want to use the xcode IDE, then it's as easy as first method. Simply go into "cbuild" dir in your cC tree in terminal and do
 
    .. code-block :: bash
 
@@ -227,4 +238,4 @@ Mac OS X (Darwin)
    to Release in order to get proper binaries. Then, in the tree on the left, open Targets tree, right-click ALL_BUILD, and select "Build ALL_BUILD".
    Then wait some time and after it's built, right-click target "install" and select "Build install"
 
-   Then, you should have binaries in your bin/ and lib/ directories same as with normal "make" building. Then, just run CC.
+   Then, you should have binaries in your bin/ and lib/ directories same as with normal "make" building. Then, just run cC.
