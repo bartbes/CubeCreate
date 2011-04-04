@@ -45,7 +45,7 @@ function reg(_cl, st)
     log.log(log.DEBUG, "registering LE class: " .. base.tostring(_cln))
 
     if not st then
-        local _base = self.__base
+        local _base = _cl.__base
         while _base do
             local _pn = _base._class
             log.log(log.DEBUG, "finding sauertype in parent: " .. base.tostring(_pn))
