@@ -10,7 +10,6 @@ link_directories(${CMAKE_SOURCE_DIR}/src/enet)
 if (MINGW OR WIN32)
 	include_directories(windows/boost)
 	link_directories(${CMAKE_SOURCE_DIR}/src/windows/boost_python)
-	add_subdirectory(${CMAKE_SOURCE_DIR}/src/windows/boost_python)
 endif (MINGW OR WIN32)
 
 # further proceed.
