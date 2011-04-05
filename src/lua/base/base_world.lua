@@ -37,54 +37,76 @@ local gui = require("cc.gui")
 -- @name cc.world
 module("cc.world")
 
----
+--- Check for collision
 -- @class function
 -- @name iscolliding
+-- @param x X coordinate
+-- @param y Y coordinate
+-- @param z Z coordinate
+-- @param rd Radius
+-- @param ignore Entity to be ignored for this test (entity id)
 iscolliding = CAPI.iscolliding
----
+
+--- Set the gravity
 -- @class function
 -- @name setgravity
+-- @param gr Gravity
 setgravity = CAPI.setgravity
----
+
+--- Get material
 -- @class function
 -- @name getmat
+-- @param x X coordinate
+-- @param y Y coordinate
+-- @param z Z coordinate
+-- @return Material id
 getmat = CAPI.getmat
+
 ---
 -- @class function
 -- @name entautoview
 entautoview = CAPI.entautoview
+
 ---
 -- @class function
 -- @name entflip
 entflip = CAPI.entflip
+
 ---
 -- @class function
 -- @name entrotate
 entrotate = CAPI.entrotate
+
 ---
 -- @class function
 -- @name entpush
 entpush = CAPI.entpush
+
 ---
 -- @class function
 -- @name attachent
 attachent = CAPI.attachent
+
 ---
 -- @class function
 -- @name newent
 newent = CAPI.newent
+
 ---
 -- @class function
 -- @name delent
 delent = CAPI.delent
+
 ---
 -- @class function
 -- @name dropent
 dropent = CAPI.dropent
+
 ---
 -- @class function
 -- @name entcopy
 entcopy = CAPI.entcopy
+
 ---
 -- @class function
 -- @name entpaste
@@ -93,30 +115,37 @@ entpaste = CAPI.entpaste
 -- @class function
 -- @name enthavesel
 enthavesel = CAPI.enthavesel
+
 ---
 -- @class function
 -- @name entselect
 entselect = CAPI.entselect
+
 ---
 -- @class function
 -- @name entloop
 entloop = CAPI.entloop
+
 ---
 -- @class function
 -- @name insel
 insel = CAPI.insel
+
 ---
 -- @class function
 -- @name entget
 entget = CAPI.entget
+
 ---
 -- @class function
 -- @name entindex
 entindex = CAPI.entindex
+
 ---
 -- @class function
 -- @name entset
 entset = CAPI.entset
+
 ---
 -- @class function
 -- @name nearestent
@@ -125,90 +154,117 @@ nearestent = CAPI.nearestent
 -- @class function
 -- @name intensityentcopy
 intensityentcopy = CAPI.intensityentcopy
+
 ---
 -- @class function
 -- @name intensitypasteent
 intensitypasteent = CAPI.intensitypasteent
----
+
+--- Create a new map
+-- Generally not used, emptymap is normally forked
 -- @class function
 -- @name newmap
+-- @param sz Size
 newmap = CAPI.newmap
----
+
+--- Enlarge the map
 -- @class function
 -- @name mapenlarge
 mapenlarge = CAPI.mapenlarge
----
+
+--- Shrink the map
 -- @class function
 -- @name shrinkmap
 shrinkmap = CAPI.shrinkmap
----
+
+--- Get the name of the map
 -- @class function
 -- @name mapname
+-- @return The map name
 mapname = CAPI.mapname
+
 ---
 -- @class function
 -- @name finish_dragging
 finish_dragging = CAPI.finish_dragging
----
+
+--- Get the name of the map's config file
 -- @class function
 -- @name mapcfgname
+-- @return The map's config file
 mapcfgname = CAPI.mapcfgname
+
 ---
 -- @class function
 -- @name writeobj
 writeobj = CAPI.writeobj
----
+
+--- Get the version number of the map
 -- @class function
 -- @name getmapversion
+-- @return The map's version number
 getmapversion = CAPI.getmapversion
----
+
+--- Toggle edit mode
 -- @class function
 -- @name edittoggle
 edittoggle = CAPI.edittoggle
+
 ---
 -- @class function
 -- @name entcancel
 entcancel = CAPI.entcancel
+
 ---
 -- @class function
 -- @name cubecancel
 cubecancel = CAPI.cubecancel
+
 ---
 -- @class function
 -- @name cancelsel
 cancelsel = CAPI.cancelsel
+
 ---
 -- @class function
 -- @name reorient
 reorient = CAPI.reorient
+
 ---
 -- @class function
 -- @name selextend
 selextend = CAPI.selextend
+
 ---
 -- @class function
 -- @name havesel
 havesel = CAPI.havesel
+
 ---
 -- @class function
 -- @name clearundos
 clearundos = CAPI.clearundos
+
 ---
 -- @class function
 -- @name copy
 copy = CAPI.copy
+
 ---
 -- @class function
 -- @name pastehilite
 pastehilite = CAPI.pastehilite
+
 ---
 -- @class function
 -- @name paste
 paste = CAPI.paste
+
 ---
 -- @class function
 -- @name undo
 undo = CAPI.undo
+
 ---
 -- @class function
 -- @name redo
@@ -218,154 +274,192 @@ redo = CAPI.redo
 -- @class function
 -- @name pushsel
 pushsel = CAPI.pushsel
+
 ---
 -- @class function
 -- @name editface
 editface = CAPI.editface
+
 ---
 -- @class function
 -- @name delcube
 delcube = CAPI.delcube
+
 ---
 -- @class function
 -- @name compactvslosts
 compactvslosts = CAPI.compactvslosts
+
 ---
 -- @class function
 -- @name fixinsidefaces
 fixinsidefaces = CAPI.fixinsidefaces
+
 ---
 -- @class function
 -- @name vdelta
 vdelta = CAPI.vdelta
+
 ---
 -- @class function
 -- @name vrotate
 vrotate = CAPI.vrotate
+
 ---
 -- @class function
 -- @name voffset
 voffset = CAPI.voffset
+
 ---
 -- @class function
 -- @name vscroll
 vscroll = CAPI.vscroll
+
 ---
 -- @class function
 -- @name vscale
 vscale = CAPI.vscale
+
 ---
 -- @class function
 -- @name vlayer
 vlayer = CAPI.vlayer
+
 ---
 -- @class function
 -- @name valpha
 valpha = CAPI.valpha
+
 ---
 -- @class function
 -- @name vcolor
 vcolor = CAPI.vcolor
+
 ---
 -- @class function
 -- @name vreset
 vreset = CAPI.vreset
+
 ---
 -- @class function
 -- @name vshaderparam
 vshaderparam = CAPI.vshaderparam
+
 ---
 -- @class function
 -- @name replace
 replace = CAPI.replace
+
 ---
 -- @class function
 -- @name replacesel
 replacesel = CAPI.replacesel
+
 ---
 -- @class function
 -- @name flip
 flip = CAPI.flip
+
 ---
 -- @class function
 -- @name rotate
 rotate = CAPI.rotate
+
 ---
 -- @class function
 -- @name editmat
 editmat = CAPI.editmat
+
 ---
 -- @class function
 -- @name npcadd
 npcadd = CAPI.npcadd
+
 ---
 -- @class function
 -- @name npcdel
 npcdel = CAPI.npcdel
+
 ---
 -- @class function
 -- @name getentclass
 getentclass = CAPI.getentclass
+
 ---
 -- @class function
 -- @name prepareentityclasses
 prepareentityclasses = CAPI.prepareentityclasses
+
 ---
 -- @class function
 -- @name numentityclasses
 numentityclasses = CAPI.numentityclasses
+
 ---
 -- @class function
 -- @name spawnent
 spawnent = CAPI.spawnent
+
 ---
 -- @class function
 -- @name debugoctree
 debugoctree = CAPI.debugoctree
+
 ---
 -- @class function
 -- @name centerent
 centerent = CAPI.centerent
+
 ---
 -- @class function
 -- @name requestprivedit
 requestprivedit = CAPI.requestprivedit
+
 ---
 -- @class function
 -- @name hasprivedit
 hasprivedit = CAPI.hasprivedit
+
 ---
 -- @class function
 -- @name resetlightmaps
 resetlightmaps = CAPI.resetlightmaps
+
 ---
 -- @class function
 -- @name calclight
 calclight = CAPI.calclight
+
 ---
 -- @class function
 -- @name patchlight
 patchlight = CAPI.patchlight
+
 ---
 -- @class function
 -- @name clearlightmaps
 clearlightmaps = CAPI.clearlightmaps
+
 ---
 -- @class function
 -- @name dumplms
 dumplms = CAPI.dumplms
+
 ---
 -- @class function
 -- @name recalc
 recalc = CAPI.recalc
+
 ---
 -- @class function
 -- @name printcube
 printcube = CAPI.printcube
+
 ---
 -- @class function
 -- @name remip
 remip = CAPI.remip
+
 ---
 -- @class function
 -- @name phystest
