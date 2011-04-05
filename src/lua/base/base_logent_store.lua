@@ -264,7 +264,7 @@ function manage_actions(sec, lastmillis)
         local ent = ents[i]
         local skip = false
         if ent.deactivated then skip = true end
-        if ent.should_act then skip = true end
+        if not ent.should_act then skip = true end
         if not skip then
             if glob.CLIENT then
                 ent:client_act(sec)

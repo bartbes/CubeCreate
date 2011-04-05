@@ -83,13 +83,8 @@ set(SERVER_LIBRARIES
     ${ZLIB_LIBRARIES}
     ${UTIL}
     json_${CC_BUILD_SUFFIX}
+    ${Boost_PYTHON_LIBRARY}
 )
-
-if (WIN32 OR MINGW)
-	set(SERVER_LIBRARIES ${SERVER_LIBRARIES} boost_python_${CC_BUILD_SUFFIX})
-else (WIN32 OR MINGW)
-	set(SERVER_LIBRARIES ${SERVER_LIBRARIES} ${Boost_PYTHON_LIBRARY})
-endif (WIN32 OR MINGW)
 
 # additional libs on windows
 if (MINGW OR WIN32)
